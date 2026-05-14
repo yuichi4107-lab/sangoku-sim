@@ -161,6 +161,12 @@
       </label>
       <button id="btn-clear-formation">全軍団クリア</button>
     </div>
+    <div id="global-priority" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:#fdf6e3;border:1px solid var(--border);padding:6px 10px;margin:6px 0;font-size:13px;">
+      <strong>集結共通の優先属性</strong>
+      <label>第一優先<select id="global-pri1"></select></label>
+      <label>第二優先<select id="global-pri2"></select></label>
+      <span style="font-size:11px;color:var(--muted);">※ 全8軍団で共有。各軍団の兵種は個別に指定</span>
+    </div>
     <div id="formation"></div>
 
     <h2 style="margin-top:16px;">属性マトリクス</h2>
@@ -294,6 +300,8 @@ const state = {
   activeUserId: 1,
   filters: { troop: '', rarity: '', search: '', ownedOnly: false },
   formations: defaultFormations(),
+  // 第一優先・第二優先は集結全体で共有（全軍団で1セット）
+  priority: { pri1: '', pri2: '' },
   aggMode: 'formation',
 };
 
@@ -378,6 +386,20 @@ function loadState() {
     } else if (s.formation && Array.isArray(s.formation.battalions) && s.formation.battalions.length === 5) {
       state.formations[0] = normFormation(s.formation, 1);
     }
+
+    // 第一/第二優先は集結全体で1セットに変更（v06後期）
+    // 既存データが無い場合は、各軍団の f.auto から最初の非空ペアを採用
+    if (s.priority && typeof s.priority === 'object') {
+      state.priority = {
+        pri1: s.priority.pri1 || '',
+        pri2: s.priority.pri2 || '',
+      };
+    } else {
+      const seed = state.formations.find(f => f.auto && (f.auto.pri1 || f.auto.pri2));
+      if (seed) {
+        state.priority = { pri1: seed.auto.pri1 || '', pri2: seed.auto.pri2 || '' };
+      }
+    }
   } catch (e) { console.warn('localStorage load failed', e); }
 }
 
@@ -389,6 +411,7 @@ function saveState() {
       activeUserId: state.activeUserId,
       filters: state.filters,
       formations: state.formations,
+      priority: state.priority,
       aggMode: state.aggMode,
     }));
   } catch (e) { console.warn('localStorage save failed', e); }
@@ -685,6 +708,7 @@ function renderFilters() {
       activeUserId: state.activeUserId,
       filters: state.filters,
       formations: state.formations,
+      priority: state.priority,
       aggMode: state.aggMode,
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -718,8 +742,10 @@ function renderFilters() {
       state.ownerships = {};
       state.activeUserId = 1;
       state.formations = defaultFormations();
+      state.priority = { pri1: '', pri2: '' };
       loadState();
       renderUserTabs();
+      renderGlobalPriority();
       renderRoster();
       renderFormation();
       renderSummary();
@@ -790,16 +816,20 @@ function renderFilters() {
       notify('チェックを入れた軍団がありません');
       return;
     }
-    // 設定不足チェック
-    const missing = targets.filter(({ f }) => !f.troop_type || (!f.auto.pri1 && !f.auto.pri2));
+    // 第一/第二優先は集結全体で共有 → どちらか1つでも未指定なら全体停止
+    if (!state.priority.pri1 && !state.priority.pri2) {
+      notify('第一優先または第二優先を指定してください（集結全体共通）');
+      return;
+    }
+    // 兵種未指定の軍団チェック（兵種は軍団ごとに残す）
+    const missing = targets.filter(({ f }) => !f.troop_type);
     if (missing.length) {
       const names = missing.map(({ idx }) => `軍団${idx + 1}`).join('、');
-      if (!await askConfirm(`${names} は兵種または優先設定が未指定です。\nスキップして他軍団のみ編成しますか？`)) return;
+      if (!await askConfirm(`${names} は兵種が未指定です。\nスキップして他軍団のみ編成しますか？`)) return;
     }
     // 対象軍団を順番に編成（pool は runAutoBuilderFor 内で他軍団から自動集計）
     for (const { idx, f } of targets) {
       if (!f.troop_type) continue;
-      if (!f.auto.pri1 && !f.auto.pri2) continue;
       runAutoBuilderFor(idx);
     }
   });
@@ -885,8 +915,9 @@ function runAutoBuilderFor(legionIdx) {
   const f = state.formations[legionIdx];
   const userId = f.user_id;
   const troop = f.troop_type;
-  const pri1 = f.auto.pri1;
-  const pri2 = f.auto.pri2;
+  // 第一/第二優先は集結全体で共有
+  const pri1 = state.priority.pri1;
+  const pri2 = state.priority.pri2;
   if (!pri1 && !pri2) {
     notify('第一優先または第二優先を指定してください');
     return;
@@ -1028,14 +1059,12 @@ function renderFormation() {
       renderSummary();
     });
 
-    // 自動編成コントロール（軍団ごと: 兵種・第一・第二優先のみ。実行は一括ボタンで）
+    // 自動編成コントロール（軍団ごと: 兵種のみ。第一/第二優先は集結共通=ヘッダで指定）
     const ctrl = document.createElement('div');
     ctrl.style.cssText = 'background:#fafaf3;border:1px dashed var(--border);padding:6px;margin:6px 0;font-size:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;';
     ctrl.innerHTML = `
       <strong>自動編成設定:</strong>
       <label>兵種<select data-legion="${li}" data-ab="troop"></select></label>
-      <label>第一優先<select data-legion="${li}" data-ab="pri1"></select></label>
-      <label>第二優先<select data-legion="${li}" data-ab="pri2"></select></label>
       <button data-legion="${li}" data-ab="clear">この軍団をクリア</button>
     `;
     panel.appendChild(ctrl);
@@ -1047,13 +1076,6 @@ function renderFormation() {
       f.troop_type = troopSel.value || null;
       saveState(); renderFormation(); renderSummary();
     });
-    const priOpts = buildPriorityOptions();
-    for (const key of ['pri1', 'pri2']) {
-      const sel = ctrl.querySelector(`select[data-ab="${key}"]`);
-      sel.innerHTML = priOpts.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
-      sel.value = f.auto[key] || '';
-      sel.addEventListener('change', () => { f.auto[key] = sel.value; saveState(); });
-    }
     ctrl.querySelector('button[data-ab="clear"]').addEventListener('click', async () => {
       if (!await askConfirm(`軍団${li + 1} をクリアします`)) return;
       const keepUid = state.formations[li].user_id;
@@ -1481,6 +1503,21 @@ function groupsHadAnyContent(aggregated) {
   return false;
 }
 
+// 集結共通の優先属性 UI（第一/第二優先を1セットだけ表示）
+function renderGlobalPriority() {
+  const priOpts = buildPriorityOptions();
+  for (const key of ['pri1', 'pri2']) {
+    const sel = document.getElementById(`global-${key}`);
+    if (!sel) continue;
+    sel.innerHTML = priOpts.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+    sel.value = state.priority[key] || '';
+    sel.onchange = () => {
+      state.priority[key] = sel.value;
+      saveState();
+    };
+  }
+}
+
 // ============================================================
 // 起動
 // ============================================================
@@ -1493,6 +1530,7 @@ function groupsHadAnyContent(aggregated) {
   }
   renderUserTabs();
   renderFilters();
+  renderGlobalPriority();
   renderRoster();
   renderFormation();
   renderSummary();
