@@ -1476,7 +1476,7 @@ generals:
     stacking: non_stackable
     effect_attribute: その他
     direction: both
-  - name: 【装備】抵抗5%増（上限10%）
+  - name: 抵抗5%増（上限10%）
     type: buff
     scope: rally
     unlocked_at: 0
@@ -1556,7 +1556,7 @@ generals:
       note: xlsx備考由来の固定%上限
     effect_attribute: 連撃
     direction: up
-  - name: 【装備】防御6%増（上限12%）
+  - name: 防御6%増（上限12%）
     type: buff
     scope: rally
     unlocked_at: 0
@@ -1630,7 +1630,7 @@ generals:
       confidence: medium
     effect_attribute: その他
     direction: down
-  - name: 【装備】敵軍紀5%減（累加不可）
+  - name: 敵軍紀5%減（累加不可）
     type: debuff
     scope: self
     unlocked_at: 0
@@ -1685,7 +1685,7 @@ generals:
       confidence: medium
     effect_attribute: シールド
     direction: up
-  - name: 【装備】貫通抵抗5%増（累加不可）
+  - name: 貫通抵抗5%増（累加不可）
     type: buff
     scope: self
     unlocked_at: 0
@@ -1777,7 +1777,7 @@ generals:
       confidence: medium
     effect_attribute: 抵抗
     direction: up
-  - name: 【装備】抵抗低下5％＋敵方歩兵比率×3％
+  - name: 抵抗低下5％＋敵方歩兵比率×3％
     type: passive
     scope: self
     unlocked_at: 0
@@ -2405,7 +2405,7 @@ generals:
       note: xlsx備考由来の固定%上限
     effect_attribute: 貫通
     direction: both
-  - name: 【装備】連撃5%増（上限10%）
+  - name: 連撃5%増（上限10%）
     type: buff
     scope: rally
     unlocked_at: 0
@@ -2501,7 +2501,7 @@ generals:
       note: xlsx備考由来の固定%上限
     effect_attribute: 防御
     direction: down
-  - name: 【装備】抵抗基礎速度×15%（累加不可）
+  - name: 抵抗基礎速度×15%（累加不可）
     type: passive
     scope: self
     unlocked_at: 0
@@ -3034,7 +3034,7 @@ generals:
       note: xlsx備考由来の固定%上限
     effect_attribute: 連撃
     direction: up
-  - name: 【装備】ダメージ増（連撃増% x 20%）
+  - name: ダメージ増（連撃増% x 20%）
     type: buff
     scope: self
     unlocked_at: 0
@@ -3401,7 +3401,7 @@ generals:
       note: xlsx備考由来の固定%上限
     effect_attribute: その他
     direction: up
-  - name: 【装備】敵貫通抵抗5%減（累加不可）
+  - name: 敵貫通抵抗5%減（累加不可）
     type: debuff
     scope: self
     unlocked_at: 0
@@ -3477,7 +3477,7 @@ generals:
     stacking: non_stackable
     effect_attribute: その他
     direction: up
-  - name: 【装備】攻撃力6%増（上限12%）
+  - name: 攻撃力6%増（上限12%）
     type: buff
     scope: rally
     unlocked_at: 0
@@ -3721,7 +3721,7 @@ generals:
       note: xlsx備考由来の固定%上限
     effect_attribute: その他
     direction: down
-  - name: 【装備】交戦毎兵士4%増
+  - name: 交戦毎兵士4%増
     type: buff
     scope: self
     unlocked_at: 0
@@ -3899,7 +3899,7 @@ generals:
       confidence: medium
     effect_attribute: 攻撃
     direction: up
-  - name: 【装備】味方角陣連撃12%増
+  - name: 味方角陣連撃12%増
     type: buff
     scope: array
     unlocked_at: 0
@@ -3974,7 +3974,7 @@ generals:
       note: xlsx備考由来の固定%上限
     effect_attribute: その他
     direction: up
-  - name: 【装備】戦車基礎軍紀×20%増
+  - name: 戦車基礎軍紀×20%増
     type: buff
     scope: self
     unlocked_at: 0
@@ -4028,7 +4028,7 @@ generals:
       confidence: medium
     effect_attribute: 防御
     direction: down
-  - name: 【装備】味方角陣連撃12%増
+  - name: 味方角陣連撃12%増
     type: buff
     scope: array
     unlocked_at: 0
@@ -4917,7 +4917,7 @@ generals:
     stacking: non_stackable
     effect_attribute: 連撃
     direction: up
-  - name: 【装備】集結陣内基礎軍紀10%増（上限無し）
+  - name: 集結陣内基礎軍紀10%増（上限無し）
     type: buff
     scope: rally
     unlocked_at: 0
@@ -4995,7 +4995,7 @@ generals:
       note: xlsx備考由来の固定%上限
     effect_attribute: その他
     direction: up
-  - name: 【装備】敵の参戦可能兵士5%が味方にダメージ与えられない（累加不可）
+  - name: 敵の参戦可能兵士5%が味方にダメージ与えられない（累加不可）
     type: passive
     scope: self
     unlocked_at: 0
@@ -5083,7 +5083,7 @@ generals:
       confidence: medium
     effect_attribute: その他
     direction: down
-  - name: 【装備】敵の防御6%減
+  - name: 敵の防御6%減
     type: debuff
     scope: self
     unlocked_at: 0

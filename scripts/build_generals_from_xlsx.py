@@ -117,10 +117,10 @@ def parse_one_skill(kind: str, text: str):
         },
     }
 
-    # 装備限定なら unlocked_at_equipment 設定
+    # 装備限定なら unlocked_at_equipment 設定（構造化フィールドが正準）。
+    # 既定値は 4（装備4で解放）。name にはプレフィックスを付けない。
     if kind == 'equipment':
-        skill['unlocked_at_equipment'] = 1
-        skill['name'] = '【装備】' + skill['name']
+        skill['unlocked_at_equipment'] = 4
 
     # 主効果数値の抽出
     nums = PCT_VALUE.findall(text)
