@@ -119,6 +119,24 @@ meta:
       cap_basis: 敵の元の貫通値
       shared: false
       note: 貫通転化系の上限（張遼制敵主義）
+    rally_resist_down_80_shared:
+      scope: rally
+      cap_type: fixed_percent
+      cap_value: -80
+      shared: true
+      note: 集結・敵抵抗ダウン（典韋・曹仁・王双系の共有プール、上限80%）
+    rally_resist_down_50_non_shared:
+      scope: rally
+      cap_type: fixed_percent
+      cap_value: -50
+      shared: false
+      note: 集結・敵抵抗ダウン（個別プール、上限50%）
+    rally_renge_down_non_shared:
+      scope: rally
+      cap_type: fixed_percent
+      cap_value: -50
+      shared: false
+      note: 集結・敵連撃ダウン（個別プール、上限50%）
 generals:
 - id: chouryou
   name: 張遼
@@ -975,7 +993,7 @@ generals:
       - -20.0
       confidence: medium
     cap:
-      rule: no_cap
+      rule: rally_renge_down_shared
       cap_value: -50.0
       note: xlsx備考由来の固定%上限
       shared: true
@@ -1378,7 +1396,7 @@ generals:
       - -4.0
       confidence: medium
     cap:
-      rule: no_cap
+      rule: rally_resist_down_80_shared
       cap_value: -80.0
       note: xlsx備考由来の固定%上限
       shared: true
@@ -1850,7 +1868,7 @@ generals:
       - -5.0
       confidence: medium
     cap:
-      rule: no_cap
+      rule: rally_renge_down_shared
       cap_value: -50.0
       note: xlsx備考由来の固定%上限
       shared: true
@@ -1933,7 +1951,7 @@ generals:
       - -20.0
       confidence: medium
     cap:
-      rule: no_cap
+      rule: rally_resist_down_50_non_shared
       cap_value: -50.0
       note: xlsx備考由来の固定%上限
       shared: false
@@ -3534,7 +3552,7 @@ generals:
       - -20.0
       confidence: medium
     cap:
-      rule: no_cap
+      rule: rally_renge_down_shared
       cap_value: -50.0
       note: xlsx備考由来の固定%上限
       shared: true
@@ -5308,7 +5326,7 @@ generals:
       - -35.0
       confidence: medium
     cap:
-      rule: no_cap
+      rule: rally_resist_down_80_shared
       cap_value: -80.0
       note: xlsx備考由来の固定%上限
       shared: true

@@ -70,7 +70,10 @@ def main():
             v = None
             if 'value' in sk and isinstance(sk['value'].get('by_breakthrough'), list):
                 v = sk['value']['by_breakthrough'][-1]  # 突破4時点
-            attr, direction = classify(sk.get('effect', '') or sk.get('name', ''), v)
+            # 判別は effect 文のみ（name はフォールバックしない）。
+            # 「スキル名ではなくスキル効果で判別する」方針を徹底するため、
+            # effect が空のスキルは「その他/None」に分類される。
+            attr, direction = classify(sk.get('effect') or '', v)
             sk['effect_attribute'] = attr
             sk['direction'] = direction
             key = f'{attr}/{direction}'
