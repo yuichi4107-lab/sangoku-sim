@@ -10,7 +10,10 @@ import re
 import yaml
 from pathlib import Path
 
-YAML_PATH = Path(r'C:/Users/fcmdt/OneDrive/デスクトップ/三国覇王戦記/generals.yaml')
+# プロジェクトルート（scripts/ の親ディレクトリ）からの相対指定。
+# CI / Codespaces / ローカル どこでも同じ動作にする。
+ROOT = Path(__file__).resolve().parent.parent
+YAML_PATH = ROOT / 'generals.yaml'
 
 # 検査順序が重要: 「貫通抵抗」は「貫通」「抵抗」より先に判定する
 ATTRIBUTE_PATTERNS = [

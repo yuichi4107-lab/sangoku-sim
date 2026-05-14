@@ -8,7 +8,9 @@ import re
 import yaml
 from pathlib import Path
 
-ROOT = Path(r'C:/Users/fcmdt/OneDrive/デスクトップ/三国覇王戦記')
+# プロジェクトルート（scripts/ の親ディレクトリ）。
+# CI / Codespaces / ローカル どこでも同じ動作にする。
+ROOT = Path(__file__).resolve().parent.parent
 YAML_PATH = ROOT / 'generals.yaml'
 HTML_PATH = ROOT / 'index.html'
 

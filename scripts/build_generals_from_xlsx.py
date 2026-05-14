@@ -8,10 +8,13 @@
 import re
 import sys
 import yaml
+from pathlib import Path
 from openpyxl import load_workbook
 
-XLSX = r'C:/Users/fcmdt/OneDrive/デスクトップ/三国覇王戦記/3_20251224.xlsx'
-YAML_PATH = r'C:/Users/fcmdt/OneDrive/デスクトップ/三国覇王戦記/generals.yaml'
+# プロジェクトルート（scripts/ の親ディレクトリ）。
+ROOT = Path(__file__).resolve().parent.parent
+XLSX = str(ROOT / '3_20251224.xlsx')
+YAML_PATH = str(ROOT / 'generals.yaml')
 
 OVERLAP_NAMES = {'張遼', '于禁', '関羽', '馬超', '張寧姫', '賈逵', '玄趙雲'}
 CATEGORY_TO_TROOP = {'歩兵':'歩兵', '馬兵':'騎兵', '弓兵':'弓兵', '戦車':'戦車', '共通':'万能'}

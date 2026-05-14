@@ -1,0 +1,60 @@
+name: build
+
+# generals.yaml もしくは関連スクリプトが変わったら、
+# 1) classify_skill_attributes.py で属性分類を再付与
+# 2) inline_data_to_html.py で index.html に JSON を再埋め込み
+# 3) 差分があればコミット & push（GitHub Pages が自動再デプロイ）
+#
+# 補足: 既定 GITHUB_TOKEN による push は他ワークフローを再トリガーしないので、
+# 無限ループにはなりません（GitHub Actions の仕様）。
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'generals.yaml'
+      - 'scripts/classify_skill_attributes.py'
+      - 'scripts/inline_data_to_html.py'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install pyyaml openpyxl
+
+      - name: Classify skill attributes
+        run: python scripts/classify_skill_attributes.py
+
+      - name: Embed JSON into index.html
+        run: python scripts/inline_data_to_html.py
+
+      - name: Commit & push if changed
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add generals.yaml index.html
+            git commit -m "chore: auto-rebuild (classify + inline) [skip ci]"
+            git push
+          else
+            echo "No changes to commit"
+          fi
