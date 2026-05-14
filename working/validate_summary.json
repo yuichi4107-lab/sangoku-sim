@@ -1,0 +1,18 @@
+{
+  "total": 101,
+  "data_version": "0.4-full",
+  "rarity_counts": {
+    "橙": 56,
+    "玄": 45
+  },
+  "troop_counts": {
+    "万能": 30,
+    "騎兵": 21,
+    "歩兵": 20,
+    "弓兵": 20,
+    "戦車": 10
+  },
+  "awakening_pairs": 10,
+  "total_skills": 169,
+  "errors": []
+}

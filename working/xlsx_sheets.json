@@ -1,0 +1,110 @@
+[
+  {
+    "sheet": "武将",
+    "rows": 309,
+    "cols": 33,
+    "dim": "A1:AG309"
+  },
+  {
+    "sheet": "武将複数",
+    "rows": 314,
+    "cols": 36,
+    "dim": "A1:AJ314"
+  },
+  {
+    "sheet": "Sheet3",
+    "rows": 51,
+    "cols": 31,
+    "dim": "A3:AE51"
+  },
+  {
+    "sheet": "Sheet5",
+    "rows": 39,
+    "cols": 20,
+    "dim": "A2:T39"
+  },
+  {
+    "sheet": "すえいまひな",
+    "rows": 26,
+    "cols": 29,
+    "dim": "A3:AC26"
+  },
+  {
+    "sheet": "神A盛倉 (2)",
+    "rows": 28,
+    "cols": 26,
+    "dim": "C4:Z28"
+  },
+  {
+    "sheet": "神A盛倉",
+    "rows": 28,
+    "cols": 18,
+    "dim": "C4:R28"
+  },
+  {
+    "sheet": "Sheet2",
+    "rows": 27,
+    "cols": 21,
+    "dim": "B2:U27"
+  },
+  {
+    "sheet": "あらともてつ",
+    "rows": 46,
+    "cols": 30,
+    "dim": "A3:AD46"
+  },
+  {
+    "sheet": "あら中斗",
+    "rows": 25,
+    "cols": 18,
+    "dim": "A2:R25"
+  },
+  {
+    "sheet": "青ナギ",
+    "rows": 60,
+    "cols": 24,
+    "dim": "A3:X60"
+  },
+  {
+    "sheet": "集結",
+    "rows": 96,
+    "cols": 36,
+    "dim": "A3:AJ96"
+  },
+  {
+    "sheet": "Sheet4",
+    "rows": 1,
+    "cols": 1,
+    "dim": "A1:A1"
+  },
+  {
+    "sheet": "毘斗",
+    "rows": 60,
+    "cols": 31,
+    "dim": "A1:AE60"
+  },
+  {
+    "sheet": "あら哲hisa",
+    "rows": 60,
+    "cols": 24,
+    "dim": "A3:X60"
+  },
+  {
+    "sheet": "斗毘A",
+    "rows": 42,
+    "cols": 44,
+    "dim": "A1:AR42"
+  },
+  {
+    "sheet": "陣法",
+    "rows": 28,
+    "cols": 7,
+    "dim": "A1:G28"
+  },
+  {
+    "sheet": "Sheet1",
+    "rows": 46,
+    "cols": 16,
+    "dim": "A1:P46"
+  }
+]

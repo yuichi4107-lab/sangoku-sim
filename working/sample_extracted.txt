@@ -1,0 +1,38 @@
+=== 玄趙雲 (gen_chouun) ===
+  rarity=玄 / troop=万能 / slot=武力
+  base_general_id=chouun
+  xlsx_remarks=
+  - 龍胆 [scope=legion, unit=percent, val4=15, cap={'rule': 'legion_buff_default', 'cap_value': None}, stack=additive]
+  - 死闘 [scope=rally, unit=pt_per_soldier, val4=30, cap={'rule': 'rally_per_soldier_pt_50', 'cap_value': 50}, stack=additive]
+  - 武神 [scope=rally, unit=percent, val4=22, cap={'rule': 'no_cap', 'note': 'wiki・xlsx共に上限の明示記載なし'}, stack=additive]
+  - 実ダメ兵種比率（装備） [scope=rally, unit=percent, val4=8, cap={'rule': 'no_cap', 'cap_value': 5, 'note': '上限5%（xlsx備考より）'}, stack=additive]
+  - 兵種比率バフ（xlsx備考主スキル） [scope=rally, unit=percent, val4=20, cap={'rule': 'no_cap', 'cap_value': 30, 'note': '上限30%（xlsx備考より）'}, stack=additive]
+
+=== 玄孫権 (玄孫権) ===
+  rarity=玄 / troop=歩兵 / slot=統率
+  base_general_id=None
+  xlsx_remarks=連撃20%減（上限50%・共有）
+  - 連撃20%減（上限50%・共有） [scope=self, unit=percent, val4=-20.0, cap={'rule': 'no_cap', 'cap_value': -50.0, 'note': 'xlsx備考由来の固定%上限', 'shared': True}, stack=additive]
+
+=== 満龍 (満龍) ===
+  rarity=橙 / troop=歩兵 / slot=知性
+  base_general_id=None
+  xlsx_remarks=抑制40%減（上限80%）、貫通20%減（上限50%）
+  - 抑制40%減（上限80%） [scope=self, unit=percent, val4=-40.0, cap={'rule': 'no_cap', 'cap_value': -80.0, 'note': 'xlsx備考由来の固定%上限'}, stack=additive]
+  - 貫通20%減（上限50%） [scope=self, unit=percent, val4=-20.0, cap={'rule': 'no_cap', 'cap_value': -50.0, 'note': 'xlsx備考由来の固定%上限'}, stack=additive]
+
+=== 王双 (王双) ===
+  rarity=橙 / troop=騎兵 / slot=武力
+  base_general_id=None
+  xlsx_remarks=抵抗10%減・10%増（上限30%、馬スキル時上限15%、典韋・曹仁の80%・共有）
+  - 抵抗10%減・10%増（上限30% [scope=self, unit=percent, val4=-10.0, cap=None, stack=additive]
+  - 馬スキル時上限15% [scope=self, unit=percent, val4=15.0, cap=None, stack=additive]
+  - 典韋・曹仁の80%・共有） [scope=self, unit=percent, val4=80.0, cap=None, stack=additive]
+
+=== 玄太史慈 (玄太史慈) ===
+  rarity=玄 / troop=万能 / slot=武力
+  base_general_id=None
+  xlsx_remarks=敵実ダメ15%反射（累加不可）、連撃8%増（累加不可）、【装備】集結陣内基礎軍紀10%増（上限無し）
+  - 敵実ダメ15%反射（累加不可） [scope=self, unit=percent, val4=15.0, cap=None, stack=non_stackable]
+  - 連撃8%増（累加不可） [scope=self, unit=percent, val4=8.0, cap=None, stack=non_stackable]
+  - 【装備】集結陣内基礎軍紀10%増（上限無し） [scope=rally, unit=percent, val4=10.0, cap={'rule': 'no_cap', 'note': 'xlsx備考で上限無しと明示'}, stack=additive]

@@ -1,0 +1,13 @@
+=== 関羽 ===
+  武聖 → attr=攻撃 dir=down val4=-10
+  強御・歩 → attr=防御 dir=up val4=10
+  過関斬将 → attr=その他 dir=up val4=5
+  敵貫通5%減（装備） → attr=貫通 dir=down val4=-5
+=== 張寧姫 ===
+  星火 → attr=攻撃 dir=up val4=20
+  克敵攻虎 → attr=攻撃 dir=up val4=5
+  疾風虎勁 → attr=連撃 dir=up val4=20
+=== 玄太史慈 ===
+  敵実ダメ15%反射（累加不可） → attr=その他 dir=down val4=15.0
+  連撃8%増（累加不可） → attr=連撃 dir=up val4=8.0
+  【装備】集結陣内基礎軍紀10%増（上限無し） → attr=その他 dir=up val4=10.0

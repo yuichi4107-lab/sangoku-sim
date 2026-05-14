@@ -1,0 +1,22 @@
+=== 玄孫権 (玄孫権) ===
+  rarity=玄 troop=歩兵 slot=統率
+  xlsx_remarks=連撃20%減（上限50%・共有）
+  - [rally] 連撃20%減（上限50%・共有） val4=-20.0 cap={'rule': 'no_cap', 'cap_value': -50.0, 'note': 'xlsx備考由来の固定%上限', 'shared': True} stack=additive
+
+=== 満龍 (満龍) ===
+  rarity=橙 troop=歩兵 slot=知性
+  xlsx_remarks=抑制40%減（上限80%）、貫通20%減（上限50%）
+  - [rally] 抑制40%減（上限80%） val4=-40.0 cap={'rule': 'no_cap', 'cap_value': -80.0, 'note': 'xlsx備考由来の固定%上限'} stack=additive
+  - [rally] 貫通20%減（上限50%） val4=-20.0 cap={'rule': 'no_cap', 'cap_value': -50.0, 'note': 'xlsx備考由来の固定%上限'} stack=additive
+
+=== 王双 (王双) ===
+  rarity=橙 troop=騎兵 slot=武力
+  xlsx_remarks=抵抗10%減・10%増（上限30%、馬スキル時上限15%、典韋・曹仁の80%・共有）
+  - [rally] 抵抗10%減・10%増（上限30%、馬スキル時上限15%、典 val4=-10.0 cap=None stack=additive
+
+=== 玄太史慈 (玄太史慈) ===
+  rarity=玄 troop=万能 slot=武力
+  xlsx_remarks=敵実ダメ15%反射（累加不可）、連撃8%増（累加不可）、【装備】集結陣内基礎軍紀10%増（上限無し）
+  - [self] 敵実ダメ15%反射（累加不可） val4=15.0 cap=None stack=non_stackable
+  - [self] 連撃8%増（累加不可） val4=8.0 cap=None stack=non_stackable
+  - [rally] 【装備】集結陣内基礎軍紀10%増（上限無し） val4=10.0 cap={'rule': 'no_cap', 'note': 'xlsx備考で上限無しと明示'} stack=additive

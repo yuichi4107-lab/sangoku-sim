@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>三国覇王戦記 編成シミュレーター</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #f7f5f1;
+    --fg: #222;
+    --muted: #777;
+    --border: #d0c9bf;
+    --accent: #8b4513;
+    --warn: #b9460e;
+    --ok: #2f7a3f;
+    --legion: #e8eef4;
+    --rally: #f5ebe0;
+    --array: #efe5f0;
+    --self: #f0f0e8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    background: var(--bg); color: var(--fg);
+    font-size: 14px; line-height: 1.5;
+  }
+  header {
+    padding: 12px 20px; background: #2f2a23; color: #f5efe2;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 3px solid var(--accent);
+  }
+  header h1 { margin: 0; font-size: 18px; font-weight: 600; }
+  header .meta { font-size: 12px; opacity: 0.8; }
+  main { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  .panel { background: #fff; border: 1px solid var(--border); padding: 12px; }
+  .panel h2 { margin: 0 0 8px; font-size: 15px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; align-items: center; }
+  .filters input, .filters select {
+    border: 1px solid var(--border); padding: 4px 6px; font-size: 13px;
+    background: #fff; font-family: inherit;
+  }
+  .filters label { font-size: 12px; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #ede7d9; padding: 4px 6px; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border); position: sticky; top: 0; }
+  td { padding: 3px 6px; border-bottom: 1px solid #eee5d6; vertical-align: middle; }
+  tr.owned td { background: #fafaf3; }
+  tr.selected td { background: #fff3e0; }
+  .roster-scroll { max-height: 70vh; overflow-y: auto; border: 1px solid var(--border); }
+  .badge { display: inline-block; padding: 1px 5px; font-size: 11px; border-radius: 2px; margin-right: 4px; }
+  .b-rarity-橙 { background: #f5a623; color: #fff; }
+  .b-rarity-玄 { background: #4a4a4a; color: #fff; }
+  .b-troop { background: #ddd; color: #333; }
+  .b-troop-歩兵 { background: #c7d8c0; }
+  .b-troop-騎兵 { background: #e6c5a3; }
+  .b-troop-弓兵 { background: #d9c0e0; }
+  .b-troop-戦車 { background: #c9d4e2; }
+  .b-troop-万能 { background: #ebe2c1; }
+  .progression { display: inline-flex; gap: 4px; align-items: center; }
+  .progression input[type="number"] { width: 36px; padding: 1px 2px; font-size: 12px; }
+  .progression input[type="checkbox"] { margin: 0; }
+  .progression label { font-size: 11px; color: var(--muted); }
+  .skill-row { padding: 4px 0; border-bottom: 1px dotted #ccc; }
+  .skill-row:last-child { border-bottom: none; }
+  .scope-badge { display: inline-block; padding: 1px 5px; font-size: 10px; border-radius: 2px; margin-right: 4px; }
+  .scope-legion { background: var(--legion); }
+  .scope-rally { background: var(--rally); }
+  .scope-array { background: var(--array); }
+  .scope-self { background: var(--self); }
+  .conf-low, .conf-unknown { color: var(--warn); font-weight: 600; }
+  .conf-medium { color: var(--accent); }
+  .conf-high { color: var(--ok); }
+  .summary-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px dotted #ccc; }
+  .summary-row .label { color: var(--muted); }
+  .summary-row .value { font-weight: 600; }
+  .overflow { color: var(--warn); }
+  .ok { color: var(--ok); }
+  button {
+    border: 1px solid var(--border); background: #fff; padding: 4px 10px;
+    cursor: pointer; font-family: inherit; font-size: 12px;
+  }
+  button:hover { background: #f0e8d8; }
+  .controls { margin-bottom: 8px; }
+  details { margin: 6px 0; }
+  summary { cursor: pointer; padding: 2px 0; font-weight: 600; }
+  .warn-banner { background: #fbecdc; border-left: 4px solid var(--warn); padding: 6px 10px; margin-bottom: 8px; font-size: 12px; }
+  .empty-slot { color: var(--muted); font-style: italic; }
+  .formation-grid { display: grid; grid-template-columns: 60px 1fr 1fr 1fr; gap: 4px; font-size: 12px; margin: 6px 0; }
+  .formation-grid .header { font-weight: 600; background: #ede7d9; padding: 2px 4px; text-align: center; }
+  .formation-grid .row-label { font-weight: 600; padding: 4px; background: #f5efe2; text-align: center; }
+  .formation-grid select { width: 100%; font-size: 11px; padding: 2px; border: 1px solid var(--border); font-family: inherit; background: #fff; }
+  .formation-grid .slot { padding: 2px; }
+  .formation-grid .array-row .row-label { background: var(--array); }
+  .attr-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .attr-table th, .attr-table td { border: 1px solid var(--border); padding: 4px 6px; text-align: center; }
+  .attr-table th { background: #ede7d9; font-weight: 600; }
+  .attr-table td.attr-name { text-align: left; font-weight: 600; background: #f5efe2; }
+  .attr-table td.up { color: var(--ok); }
+  .attr-table td.down { color: var(--warn); }
+  .attr-table td.zero { color: var(--muted); }
+  .attr-table td.empty { color: #ccc; }
+  .attr-list { font-size: 11px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>三国覇王戦記 編成シミュレーター</h1>
+  <div class="meta" id="meta-info">読込中…</div>
+</header>
+<!--DATA_START-->
+<script>window.GENERALS_DATA = {"meta":{"game":"三国覇王戦記～乱世の系譜～","publisher":"Six Waves Inc.","data_version":"0.5","last_updated":"2026-05-14","rarity_order":["緑","青","紫","橙","玄"],"troop_types":["歩兵","騎兵","弓兵","戦車","万能"],"slot_stats":["統率","武力","知性"],"progression_axes":{"breakthrough":{"label":"武将突破","values":[0,1,2,3,4]},"equipment":{"label":"装備","values":[0,1,2,3,4]},"level_break":{"label":"Lv突破","values":[false,true]},"seal":{"label":"将印","values":[0,1,2,3,4,5]}},"skill_scopes":{"self":"武将自身/所属部隊のみ","legion":"軍団全体（軍団上限の累加対象）","rally":"集結全体（集結上限の累加対象）","array":"角陣（戦車副陣）"},"cap_rules":{"no_cap":{"cap_type":"none","note":"上限なし。重ねるほど効果が伸びる"},"legion_buff_default":{"scope":"legion","cap_type":"unknown","note":"軍団内バフの累加上限は公開情報で未確認"},"rally_debuff_attack":{"scope":"rally","cap_type":"fixed_percent","cap_value":-50,"shared":true,"note":"集結・敵攻撃ダウン系（関羽武聖など）"},"rally_suppress":{"scope":"rally","cap_type":"fixed_percent","cap_value":80,"shared":true,"note":"集結・抑制操作系（張遼虎威など）"},"rally_shield_reduce":{"scope":"rally","cap_type":"fixed_value","cap_value":-10000000,"shared":true,"note":"集結・敵シールド減少（馬超一騎当千など）"},"rally_attack_up":{"scope":"rally","cap_type":"fixed_percent","cap_value":50,"shared":true,"note":"集結・全体攻撃up（張寧姫克敵攻虎など）。副条件として兵士1人当たり最大100pt増"},"rally_renge_up":{"scope":"rally","cap_type":"fixed_percent","cap_value":60,"shared":true,"note":"集結・連撃up（張寧姫疾風虎勁など）"},"rally_renge_down_shared":{"scope":"rally","cap_type":"fixed_percent","cap_value":-50,"shared":true,"note":"集結・連撃down系（玄孫権/関平など、共有プール）"},"rally_per_soldier_pt_50":{"scope":"rally","cap_type":"fixed_value","cap_value":50,"shared":false,"note":"兵士1人当たり最大50pt（玄趙雲死闘）"},"rally_target_ratio_dynamic":{"scope":"rally","cap_type":"dynamic_base","cap_value":0.1,"base_formula":"min(敵集結合計兵力, 自集結合計兵力)","shared":false,"note":"敵兵士負傷上限は集結軍団のうち合計兵力が少ない方の10%（関羽過関斬将）"},"convert_pierce_30":{"scope":"rally","cap_type":"ratio_of_base","cap_value":30,"cap_basis":"敵の元の貫通値","shared":false,"note":"貫通転化系の上限（張遼制敵主義）"}}},"generals":[{"id":"chouryou","name":"張遼","yomi":"ちょうりょう","base_rarity":"橙","troop_type":"万能","slot_stat":"統率","faction":"魏","role_tags":["集結デバフ","歩兵軍団バフ","覚醒推奨"],"skills":[{"name":"虎威","type":"debuff","scope":"rally","unlocked_at":0,"effect":"所属軍団の戦闘時に敵の全兵種の抑制係数をアップし、敵の全兵種の味方に対する抑制係数をダウンさせる","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20],"confidence":"medium"},"cap":{"rule":"rally_suppress","cap_value":80},"sources":["https://sangoku-haou.gamer-wiki.com/character/tyouryou"],"effect_attribute":"その他","direction":"both"},{"name":"突撃","type":"buff","scope":"legion","unlocked_at":0,"effect":"所属軍団の歩兵攻撃力+20%","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20],"confidence":"medium"},"cap":{"rule":"legion_buff_default","cap_value":null},"sources":["https://sangoku-haou.gamer-wiki.com/character/tyouryou"],"effect_attribute":"攻撃","direction":"up"},{"name":"制敵主義","type":"convert","scope":"rally","unlocked_at":4,"effect":"敵方全兵士の貫通を10％下げ、それを自軍の貫通力に転化（元の貫通の30%超過不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10],"confidence":"medium"},"cap":{"rule":"convert_pierce_30","cap_value":30,"cap_basis":"敵の元の貫通値"},"sources":["https://sangoku-haou.gamer-wiki.com/character/tyouryou"],"effect_attribute":"貫通","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"将印固有の強化。未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B83","https://sangoku-haou.gamer-wiki.com/character/tyouryou"]},{"id":"ukin","name":"于禁","yomi":"うきん","base_rarity":"橙","troop_type":"騎兵","slot_stat":"統率","faction":"魏","role_tags":["騎兵軍団触媒","集結強化","最優先育成"],"skills":[{"name":"恐弦","type":"buff","scope":"legion","unlocked_at":0,"effect":"今いる軍団の騎兵攻撃力+15%","unit":"percent","value":{"by_breakthrough":[null,null,null,null,15],"confidence":"medium"},"cap":{"rule":"legion_buff_default","cap_value":null},"effect_attribute":"攻撃","direction":"up"},{"name":"穀重","type":"buff","scope":"legion","unlocked_at":0,"effect":"所属軍団の各部隊の兵士が抵抗付加比率アップ、兵士基礎速度×30%","unit":"percent","value":{"by_breakthrough":[null,null,null,null,30],"confidence":"low"},"cap":{"rule":"legion_buff_default","cap_value":null},"effect_attribute":"抵抗","direction":"up"},{"name":"仮節鉞","type":"amplify","scope":"legion","unlocked_at":4,"effect":"所属武将軍団および宝物帯同武将の騎兵の付加スキル効果を50%アップ（触媒型）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,50],"confidence":"medium"},"cap":{"rule":"legion_buff_default","cap_value":null,"note":"触媒型。同種複数時の上限挙動は要検証"},"effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B43","https://sangoku-haou.gamer-wiki.com/character/uki-n"]},{"id":"kanu","name":"関羽","yomi":"かんう","base_rarity":"橙","troop_type":"歩兵","slot_stat":"武力","faction":"蜀","role_tags":["集結攻撃ダウン","覚醒推奨"],"skills":[{"name":"武聖","type":"debuff","scope":"rally","unlocked_at":0,"effect":"戦闘時に敵兵士攻撃力ボーナスを10%減少（集結時効果の重ね掛けで最大50%まで減少。兵士一人当たり最大で攻撃力を100pt減少）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-10],"confidence":"medium"},"cap":{"rule":"rally_debuff_attack","cap_value":-50,"per_skill_cap":null,"note":"副条件: 兵士1人当たり最大100pt減"},"effect_attribute":"攻撃","direction":"down"},{"name":"強御・歩","type":"buff","scope":"legion","unlocked_at":0,"effect":"今いる軍団の歩兵防御力+10%","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10],"confidence":"medium"},"cap":{"rule":"legion_buff_default","cap_value":null},"effect_attribute":"防御","direction":"up"},{"name":"過関斬将","type":"debuff","scope":"rally","unlocked_at":4,"effect":"戦闘時敵兵士の5%を負傷させ、戦闘に加えない（敵プレイヤーにのみ有効、敵兵士負傷上限は敵軍または自軍集結軍団で合計兵力が少ない方の10%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,5],"confidence":"high"},"cap":{"rule":"rally_target_ratio_dynamic","cap_value":0.1,"cap_basis":"min(敵集結合計兵力, 自集結合計兵力)"},"effect_attribute":"その他","direction":"up"},{"name":"敵貫通5%減（装備）","type":"debuff","scope":"rally","unlocked_at":0,"unlocked_at_equipment":1,"effect":"【装備】敵貫通5%減","unit":"percent","stacking":"non_stackable","value":{"by_breakthrough":[null,null,null,null,-5],"confidence":"high"},"cap":{"rule":"no_cap","note":"累加不可（同種複数あっても1つしか効かない）"},"effect_attribute":"貫通","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B10","https://sangoku-haou.gamer-wiki.com/character/kanu"]},{"id":"batyou","name":"馬超","yomi":"ばちょう","base_rarity":"橙","troop_type":"騎兵","slot_stat":"武力","faction":"蜀","role_tags":["集結シールド減少","覚醒推奨"],"skills":[{"name":"当千","type":"buff","scope":"legion","unlocked_at":0,"effect":"所属軍団の普通騎兵・強化普通騎兵の攻撃力+10%、特殊騎兵・強化特殊騎兵の攻撃力を追加で+10%","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10],"confidence":"medium"},"cap":{"rule":"legion_buff_default","cap_value":null,"note":"兵種別差分: 特殊騎兵には合計+20%"},"effect_attribute":"攻撃","direction":"up"},{"name":"銀槍","type":"proc","scope":"rally","unlocked_at":0,"effect":"参戦時、80%の確率で、敵軍団内の最大10名の武力が馬超未満の武将の武力付加を失効させる","unit":"count","proc_chance":80,"proc_max_targets":10,"value":{"by_breakthrough":[null,null,null,null,10],"confidence":"medium"},"cap":{"rule":"no_cap","note":"発動条件型。上限ではなく確率・対象数で制御"},"effect_attribute":"その他","direction":"down"},{"name":"一騎当千","type":"buff","scope":"legion","unlocked_at":4,"effect":"所属軍団の行軍速度+50%、戦闘時に敵兵士の基礎シールド値-10%（集結時、複数効果累計で最大-10000000ptまで）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,50],"confidence":"medium"},"effect_attribute":"シールド","direction":"both"},{"name":"一騎当千・シールド減少","type":"debuff","scope":"rally","unlocked_at":4,"effect":"戦闘時に敵兵士の基礎シールド値-10%（集結時、複数効果累計で最大-10000000ptまで）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-10],"confidence":"high"},"cap":{"rule":"rally_shield_reduce","cap_value":-10000000},"effect_attribute":"シールド","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B46","https://sangoku-haou.gamer-wiki.com/character/ba-tyou"]},{"id":"tyou_neiki","name":"張寧姫","yomi":"ちょうねいき","base_rarity":"橙","troop_type":"騎兵","slot_stat":"武力","faction":"群","role_tags":["集結攻撃up","集結連撃up","騎兵軍団バフ","覚醒推奨"],"skills":[{"name":"星火","type":"buff","scope":"legion","unlocked_at":0,"effect":"今いる軍団の騎兵攻撃力+20%","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20],"confidence":"medium"},"cap":{"rule":"legion_buff_default","cap_value":null},"effect_attribute":"攻撃","direction":"up"},{"name":"克敵攻虎","type":"buff","scope":"rally","unlocked_at":0,"effect":"味方集結軍団内の全兵士の攻撃力を5%アップ（集結時効果の重ね掛けで最大50%。兵士1人当たり最大100pt増）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,5],"confidence":"medium"},"cap":{"rule":"rally_attack_up","cap_value":50,"note":"副条件: 兵士1人当たり最大100pt増"},"effect_attribute":"攻撃","direction":"up"},{"name":"疾風虎勁","type":"buff","scope":"rally","unlocked_at":4,"effect":"戦闘時、味方集結軍団内の全兵士の連撃を20%アップ（集結時の重ねがけ効果は60%を超えない）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20],"confidence":"high"},"cap":{"rule":"rally_renge_up","cap_value":60},"effect_attribute":"連撃","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B29","https://sangoku-haou.gamer-wiki.com/character/tyou-ne-iki"]},{"id":"koutyuu","name":"黄忠","yomi":"こうちゅう","base_rarity":"橙","troop_type":"弓兵","slot_stat":"武力","faction":"蜀","role_tags":["集結連撃up","弓兵軍団バフ","上限なし"],"notes":"xlsxには未掲載。兵種・配置はwikiスキル文からの推定（confidence:medium）","skills":[{"name":"烈弓","type":"proc","scope":"self","unlocked_at":0,"effect":"戦闘勝利時に20%の確率で敵方武将に重傷を負わせる","unit":"percent","proc_chance":20,"value":{"by_breakthrough":[null,null,null,null,20],"confidence":"medium"},"effect_attribute":"その他","direction":"up"},{"name":"穿楊","type":"buff","scope":"legion","unlocked_at":0,"effect":"今いる軍団の弓兵攻撃力+20%","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20],"confidence":"medium"},"cap":{"rule":"legion_buff_default","cap_value":null},"effect_attribute":"攻撃","direction":"up"},{"name":"神射","type":"buff","scope":"rally","unlocked_at":4,"effect":"所属する集結軍団内の全弓兵の連撃が10%アップ（本スキルは集結による効果上限がなく）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10],"confidence":"high"},"cap":{"rule":"no_cap","note":"wikiで「集結による効果上限がなく」と明示"},"effect_attribute":"連撃","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["https://sangoku-haou.gamer-wiki.com/character/koutyuu"]},{"id":"kaki","name":"賈逵","yomi":"かき","base_rarity":"橙","troop_type":"歩兵","slot_stat":"知性","faction":"魏","role_tags":["歩兵軍団バフ","ダメージ軽減","集結抵抗up"],"skills":[{"name":"繕甲","type":"buff","scope":"legion","unlocked_at":0,"effect":"今いる軍団の歩兵防御力+15%","unit":"percent","value":{"by_breakthrough":[null,null,null,null,15],"confidence":"medium"},"cap":{"rule":"legion_buff_default","cap_value":null},"effect_attribute":"防御","direction":"up"},{"name":"後援","type":"buff","scope":"self","unlocked_at":0,"effect":"戦闘時、味方兵士が受ける実際のダメージを下げ、味方歩兵の比率×40%にする（複数のスキル効果を重ね掛け可能）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,40],"confidence":"high"},"cap":{"rule":"no_cap","cap_value":30,"note":"xlsx備考では上限30%と記載。wikiでは上限記載なし。要再確認"},"effect_attribute":"その他","direction":"up"},{"name":"盾防","type":"buff","scope":"rally","unlocked_at":4,"effect":"所属する集結軍団内の全歩兵の抵抗が10%アップ","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10],"confidence":"medium"},"cap":{"rule":"no_cap","note":"wiki・xlsx共に上限の明示記載なし（confidence:low の no_cap 仮置き）"},"effect_attribute":"抵抗","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B16","https://sangoku-haou.gamer-wiki.com/character/kaki"]},{"id":"chouun","name":"趙雲","yomi":"ちょううん","base_rarity":"橙","troop_type":"万能","slot_stat":"武力","faction":"蜀","role_tags":["陣バフ","覚醒推奨"],"awakened_id":"gen_chouun","notes":"xlsxには未掲載（玄趙雲のみ掲載）。兵種・配置は玄版からの推定","skills":[{"name":"龍威","type":"buff","scope":"legion","unlocked_at":0,"effect":"所属軍団が属する陣の兵士の攻撃力が基礎攻撃力×30%アップ","unit":"percent","value":{"by_breakthrough":[null,null,null,null,30],"confidence":"medium"},"cap":{"rule":"legion_buff_default","cap_value":null,"note":"「陣」表記。legionに寄せて扱う"},"effect_attribute":"攻撃","direction":"up"},{"name":"扶危","type":"buff","scope":"legion","unlocked_at":0,"effect":"所属軍団が属する陣の兵士の防御力が基礎防御力×30%アップ","unit":"percent","value":{"by_breakthrough":[null,null,null,null,30],"confidence":"medium"},"cap":{"rule":"legion_buff_default","cap_value":null},"effect_attribute":"防御","direction":"up"},{"name":"七進七出","type":"buff","scope":"legion","unlocked_at":4,"effect":"本軍団の歩兵の防御力が増加し所属軍団歩兵部隊数×10%、騎兵の攻撃力が増加し所属軍団騎兵部隊数×10%","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10],"confidence":"medium"},"cap":{"rule":"legion_buff_default","cap_value":null,"note":"部隊数依存（自部隊構成に応じて変動）"},"effect_attribute":"防御","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["https://sangoku-haou.gamer-wiki.com/character/tyouun"]},{"id":"gen_chouun","name":"玄趙雲","yomi":"げんちょううん","base_rarity":"玄","troop_type":"万能","slot_stat":"武力","faction":"蜀","role_tags":["集結兵種比率バフ","汎用","覚醒元あり"],"base_general_id":"chouun","skills":[{"name":"龍胆","type":"buff","scope":"legion","unlocked_at":0,"effect":"所属軍団全兵士の攻撃力+15%・防御力+15%、騎兵攻撃力を追加で+20%、歩兵防御力を追加で+20%","unit":"percent","value":{"by_breakthrough":[null,null,null,null,15],"confidence":"medium"},"cap":{"rule":"legion_buff_default","cap_value":null},"effect_attribute":"防御","direction":"up"},{"name":"死闘","type":"buff","scope":"rally","unlocked_at":0,"effect":"戦闘時、味方の攻撃を味方騎兵兵種比率×30%にアップ、味方の防御を味方歩兵兵種比率×30%にアップ（最高で50pt）","unit":"pt_per_soldier","value":{"by_breakthrough":[null,null,null,null,30],"confidence":"high"},"cap":{"rule":"rally_per_soldier_pt_50","cap_value":50},"effect_attribute":"防御","direction":"up"},{"name":"武神","type":"buff","scope":"rally","unlocked_at":0,"effect":"戦闘時、味方の連撃を味方騎兵兵種比率×22%にアップ、味方の抵抗を味方歩兵兵種比率×22%にアップ","unit":"percent","value":{"by_breakthrough":[null,null,null,null,22],"confidence":"medium"},"cap":{"rule":"no_cap","note":"wiki・xlsx共に上限の明示記載なし"},"effect_attribute":"連撃","direction":"up"},{"name":"実ダメ兵種比率（装備）","type":"buff","scope":"rally","unlocked_at":0,"unlocked_at_equipment":1,"effect":"【装備】実ダメ歩比率×8%増、実ダメ馬比率×8%減（上限5%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,8],"confidence":"high"},"cap":{"rule":"no_cap","cap_value":5,"note":"上限5%（xlsx備考より）"},"effect_attribute":"その他","direction":"both"},{"name":"兵種比率バフ（xlsx備考主スキル）","type":"buff","scope":"rally","unlocked_at":0,"effect":"連撃馬比率×20%増、抵抗歩比率×20%増（上限30%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20],"confidence":"high"},"cap":{"rule":"no_cap","cap_value":30,"note":"上限30%（xlsx備考より）"},"effect_attribute":"連撃","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"縁結: 趙雲（七進七出、全軍兵士攻撃力5%アップ）、豪龍胆との宝物縁結","confidence":"low"},"sources":["xlsx:3_20251224.xlsx#武将!B90","https://sangoku-haou.gamer-wiki.com/character/gen-chouun"]},{"id":"玄孫権","name":"玄孫権","yomi":null,"base_rarity":"玄","troop_type":"歩兵","slot_stat":"統率","role_tags":[],"skills":[{"name":"連撃20%減（上限50%・共有）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"連撃20%減（上限50%・共有）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-20.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-50.0,"note":"xlsx備考由来の固定%上限","shared":true},"effect_attribute":"連撃","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B4"],"xlsx_remarks":"連撃20%減（上限50%・共有）"},{"id":"玄孫策","name":"玄孫策","yomi":null,"base_rarity":"玄","troop_type":"歩兵","slot_stat":"統率","role_tags":[],"skills":[{"name":"連撃歩比率×40%増（上限50%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"連撃歩比率×40%増（上限50%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,40.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":50.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"連撃","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B5"],"xlsx_remarks":"連撃歩比率×40%増（上限50%）"},{"id":"司馬昭","name":"司馬昭","yomi":null,"base_rarity":"橙","troop_type":"歩兵","slot_stat":"知性","role_tags":[],"skills":[{"name":"ダメ10%反射（上限30%）","type":"passive","scope":"rally","unlocked_at":0,"effect":"ダメ10%反射（上限30%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":30.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B6"],"xlsx_remarks":"ダメ10%反射（上限30%）"},{"id":"玄鄧艾","name":"玄鄧艾","yomi":null,"base_rarity":"玄","troop_type":"歩兵","slot_stat":"統率","role_tags":[],"skills":[{"name":"ダメ部隊100%増（上限25%）","type":"buff","scope":"legion","unlocked_at":0,"effect":"ダメ部隊100%増（上限25%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,100.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":25.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B7"],"xlsx_remarks":"ダメ部隊100%増（上限25%）"},{"id":"李典","name":"李典","yomi":null,"base_rarity":"橙","troop_type":"歩兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"抑制40%増（上限80%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"抑制40%増（上限80%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,40.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":80.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B8"],"xlsx_remarks":"抑制40%増（上限80%）"},{"id":"満龍","name":"満龍","yomi":null,"base_rarity":"橙","troop_type":"歩兵","slot_stat":"知性","role_tags":[],"skills":[{"name":"抑制40%減（上限80%）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"抑制40%減（上限80%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-40.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-80.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"down"},{"name":"貫通20%減（上限50%）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"貫通20%減（上限50%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-20.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-50.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"貫通","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B9"],"xlsx_remarks":"抑制40%減（上限80%）、貫通20%減（上限50%）"},{"id":"玄龐徳","name":"玄龐徳","yomi":null,"base_rarity":"玄","troop_type":"歩兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"貫通歩比率×40%増（上限50%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"貫通歩比率×40%増（上限50%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,40.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":50.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"貫通","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B11"],"xlsx_remarks":"貫通歩比率×40%増（上限50%）"},{"id":"真田幸村","name":"真田幸村","yomi":null,"base_rarity":"橙","troop_type":"歩兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"追加ダメ比率歩部隊数×2%（上限15%）","type":"passive","scope":"legion","unlocked_at":0,"effect":"追加ダメ比率歩部隊数×2%（上限15%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,2.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":15.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B12"],"xlsx_remarks":"追加ダメ比率歩部隊数×2%（上限15%）"},{"id":"玄大喬","name":"玄大喬","yomi":null,"base_rarity":"玄","troop_type":"歩兵","slot_stat":"知性","role_tags":[],"skills":[{"name":"ダメ15%減（累加不可）","type":"debuff","scope":"self","unlocked_at":0,"effect":"ダメ15%減（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-15.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"その他","direction":"down"},{"name":"最終抵抗1%高×0.5減（上限25%・上限累加可、1スキル上","type":"debuff","scope":"rally","unlocked_at":0,"effect":"最終抵抗1%高×0.5減（上限25%・上限累加可、1スキル上限10%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-1.0],"confidence":"medium"},"effect_attribute":"抵抗","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B13"],"xlsx_remarks":"ダメ15%減（累加不可）、最終抵抗1%高×0.5減（上限25%・上限累加可、1スキル上限10%）"},{"id":"曹仁","name":"曹仁","yomi":null,"base_rarity":"橙","troop_type":"歩兵","slot_stat":"統率","role_tags":[],"skills":[{"name":"抵抗歩部隊数×4%減（上限80%・共有）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"抵抗歩部隊数×4%減（上限80%・共有）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-4.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-80.0,"note":"xlsx備考由来の固定%上限","shared":true},"effect_attribute":"抵抗","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B14"],"xlsx_remarks":"抵抗歩部隊数×4%減（上限80%・共有）"},{"id":"玄許褚","name":"玄許褚","yomi":null,"base_rarity":"玄","troop_type":"歩兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"ダメ15%減（累加不可）","type":"debuff","scope":"self","unlocked_at":0,"effect":"ダメ15%減（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-15.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"その他","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B15"],"xlsx_remarks":"ダメ15%減（累加不可）"},{"id":"玄荀攸","name":"玄荀攸","yomi":null,"base_rarity":"玄","troop_type":"歩兵","slot_stat":"知性","role_tags":[],"skills":[{"name":"ダメ18%減","type":"debuff","scope":"self","unlocked_at":0,"effect":"ダメ18%減","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-18.0],"confidence":"medium"},"effect_attribute":"その他","direction":"down"},{"name":"元兵敵より大+5%減（累加不可）","type":"debuff","scope":"self","unlocked_at":0,"effect":"元兵敵より大+5%減（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-5.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"その他","direction":"both"},{"name":"【装備】抵抗5%増（上限10%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"抵抗5%増（上限10%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,5.0],"confidence":"medium"},"unlocked_at_equipment":1,"cap":{"rule":"no_cap","cap_value":10.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"抵抗","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B17"],"xlsx_remarks":"ダメ18%減、元兵敵より大+5%減（累加不可）、【装備】抵抗5%増（上限10%）","base_general_id":"荀攸"},{"id":"麹義","name":"麹義","yomi":null,"base_rarity":"橙","troop_type":"歩兵","slot_stat":"統率","role_tags":[],"skills":[{"name":"敵抑制大時・被抑制12%増（味方抑制大時・抑制12%増）（累","type":"buff","scope":"self","unlocked_at":0,"effect":"敵抑制大時・被抑制12%増（味方抑制大時・抑制12%増）（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,12.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"その他","direction":"up"},{"name":"武府連撃大/抵抗大/連抗同・連撃20%/抵抗20%/連撃10","type":"buff","scope":"rally","unlocked_at":0,"effect":"武府連撃大/抵抗大/連抗同・連撃20%/抵抗20%/連撃10%抵抗10%増（上限25%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":25.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"連撃","direction":"up"},{"name":"【装備】防御6%増（上限12%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"防御6%増（上限12%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,6.0],"confidence":"medium"},"unlocked_at_equipment":1,"cap":{"rule":"no_cap","cap_value":12.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"防御","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B18"],"xlsx_remarks":"敵抑制大時・被抑制12%増（味方抑制大時・抑制12%増）（累加不可）、武府連撃大/抵抗大/連抗同・連撃20%/抵抗20%/連撃10%抵抗10%増（上限25%）、【装備】防御6%増（上限12%）"},{"id":"全琮","name":"全琮","yomi":null,"base_rarity":"橙","troop_type":"歩兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"ダメージ増（味方残存兵士率x16.5%）","type":"buff","scope":"self","unlocked_at":0,"effect":"ダメージ増（味方残存兵士率x16.5%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,16.5],"confidence":"medium"},"effect_attribute":"その他","direction":"up"},{"name":"ダメージ減（敵方残存兵士率x16.5%）","type":"debuff","scope":"self","unlocked_at":0,"effect":"ダメージ減（敵方残存兵士率x16.5%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-16.5],"confidence":"medium"},"effect_attribute":"その他","direction":"down"},{"name":"【装備】敵軍紀5%減（累加不可）","type":"debuff","scope":"self","unlocked_at":0,"effect":"敵軍紀5%減（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-5.0],"confidence":"medium"},"unlocked_at_equipment":1,"stacking":"non_stackable","effect_attribute":"その他","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B19"],"xlsx_remarks":"ダメージ増（味方残存兵士率x16.5%）、ダメージ減（敵方残存兵士率x16.5%）【装備】敵軍紀5%減（累加不可）"},{"id":"玄周泰","name":"玄周泰","yomi":null,"base_rarity":"玄","troop_type":"歩兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"ダメージ増（味方残シールド率x27.5%）","type":"buff","scope":"self","unlocked_at":0,"effect":"ダメージ増（味方残シールド率x27.5%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,27.5],"confidence":"medium"},"effect_attribute":"シールド","direction":"up"},{"name":"【装備】貫通抵抗5%増（累加不可）","type":"buff","scope":"self","unlocked_at":0,"effect":"貫通抵抗5%増（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,5.0],"confidence":"medium"},"unlocked_at_equipment":1,"stacking":"non_stackable","effect_attribute":"貫通抵抗","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B20"],"xlsx_remarks":"ダメージ増（味方残シールド率x27.5%）【装備】貫通抵抗5%増（累加不可）"},{"id":"姜維","name":"姜維","yomi":null,"base_rarity":"橙","troop_type":"歩兵","slot_stat":"統率","role_tags":[],"skills":[{"name":"副将に一人で十分","type":"passive","scope":"self","unlocked_at":0,"effect":"副将に一人で十分","unit":"value","value":{"by_breakthrough":[null,null,null,null,null],"confidence":"low"},"effect_attribute":"その他","direction":null}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B21"],"xlsx_remarks":"副将に一人で十分"},{"id":"潘璋","name":"潘璋","yomi":null,"base_rarity":"橙","troop_type":"歩兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"ダメージ増（抵抗勝の場合追加5.5％）","type":"buff","scope":"self","unlocked_at":0,"effect":"ダメージ増（抵抗勝の場合追加5.5％）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,5.5],"confidence":"medium"},"effect_attribute":"抵抗","direction":"up"},{"name":"【装備】抵抗低下5％＋敵方歩兵比率×3％","type":"passive","scope":"self","unlocked_at":0,"effect":"抵抗低下5％＋敵方歩兵比率×3％","unit":"percent","value":{"by_breakthrough":[null,null,null,null,5.0],"confidence":"medium"},"unlocked_at_equipment":1,"effect_attribute":"抵抗","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B22"],"xlsx_remarks":"ダメージ増（抵抗勝の場合追加5.5％）【装備】抵抗低下5％＋敵方歩兵比率×3％"},{"id":"楽進","name":"楽進","yomi":null,"base_rarity":"橙","troop_type":"歩兵","slot_stat":"統率","role_tags":[],"skills":[],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B23"]},{"id":"関平","name":"関平","yomi":null,"base_rarity":"橙","troop_type":"騎兵","slot_stat":"統率","role_tags":[],"skills":[{"name":"連撃馬部隊数×5%減（上限50%・共有）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"連撃馬部隊数×5%減（上限50%・共有）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-5.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-50.0,"note":"xlsx備考由来の固定%上限","shared":true},"effect_attribute":"連撃","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B26"],"xlsx_remarks":"連撃馬部隊数×5%減（上限50%・共有）"},{"id":"文醜","name":"文醜","yomi":null,"base_rarity":"橙","troop_type":"騎兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"抑制40%減（上限80%）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"抑制40%減（上限80%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-40.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-80.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B27"],"xlsx_remarks":"抑制40%減（上限80%）"},{"id":"玄公孫瓚","name":"玄公孫瓚","yomi":null,"base_rarity":"玄","troop_type":"騎兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"抵抗20%減（上限50%・非共有）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"抵抗20%減（上限50%・非共有）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-20.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-50.0,"note":"xlsx備考由来の固定%上限","shared":false},"effect_attribute":"抵抗","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B28"],"xlsx_remarks":"抵抗20%減（上限50%・非共有）"},{"id":"玄司馬懿","name":"玄司馬懿","yomi":null,"base_rarity":"玄","troop_type":"騎兵","slot_stat":"統率","role_tags":[],"skills":[{"name":"ダメ味方兵比率×20増","type":"buff","scope":"self","unlocked_at":0,"effect":"ダメ味方兵比率×20増","unit":"value","value":{"by_breakthrough":[null,null,null,null,null],"confidence":"low"},"effect_attribute":"その他","direction":"up"},{"name":"ダメ敵方兵比率×20減（上限25%増、10%減）","type":"buff","scope":"rally","unlocked_at":0,"effect":"ダメ敵方兵比率×20減（上限25%増、10%減）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-25.0],"confidence":"medium"},"effect_attribute":"その他","direction":"both"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B30"],"xlsx_remarks":"ダメ味方兵比率×20増、ダメ敵方兵比率×20減（上限25%増、10%減）","base_general_id":"司馬懿"},{"id":"玄郭嘉","name":"玄郭嘉","yomi":null,"base_rarity":"玄","troop_type":"騎兵","slot_stat":"知性","role_tags":[],"skills":[{"name":"兵20%増（上限30%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"兵20%増（上限30%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":30.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B31"],"xlsx_remarks":"兵20%増（上限30%）"},{"id":"夏侯惇","name":"夏侯惇","yomi":null,"base_rarity":"橙","troop_type":"騎兵","slot_stat":"統率","role_tags":[],"skills":[{"name":"追加ダメ損失兵×60%増（上限ダメ20%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"追加ダメ損失兵×60%増（上限ダメ20%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,60.0],"confidence":"medium"},"effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B32"],"xlsx_remarks":"追加ダメ損失兵×60%増（上限ダメ20%）"},{"id":"武田信玄","name":"武田信玄","yomi":null,"base_rarity":"橙","troop_type":"騎兵","slot_stat":"統率","role_tags":[],"skills":[{"name":"貫通集結馬部隊数×1.5%増（上限15%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"貫通集結馬部隊数×1.5%増（上限15%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,1.5],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":15.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"貫通","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B33"],"xlsx_remarks":"貫通集結馬部隊数×1.5%増（上限15%）"},{"id":"閻行","name":"閻行","yomi":null,"base_rarity":"橙","troop_type":"騎兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"貫通抵抗10%増（上限30%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"貫通抵抗10%増（上限30%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":30.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"貫通抵抗","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B34"],"xlsx_remarks":"貫通抵抗10%増（上限30%）"},{"id":"玄賈詡","name":"玄賈詡","yomi":null,"base_rarity":"玄","troop_type":"騎兵","slot_stat":"知性","role_tags":[],"skills":[{"name":"実ダメ25%減（上限40%）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"実ダメ25%減（上限40%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-25.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-40.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"down"},{"name":"兵50%未満時・実ダメ15%減（上限25%）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"兵50%未満時・実ダメ15%減（上限25%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-50.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-25.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B35"],"xlsx_remarks":"実ダメ25%減（上限40%）、兵50%未満時・実ダメ15%減（上限25%）"},{"id":"王双","name":"王双","yomi":null,"base_rarity":"橙","troop_type":"騎兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"抵抗10%減・10%増（上限30%、馬スキル時上限15%、典","type":"buff","scope":"rally","unlocked_at":0,"effect":"抵抗10%減・10%増（上限30%、馬スキル時上限15%、典韋・曹仁の80%・共有）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-10.0],"confidence":"medium"},"effect_attribute":"抵抗","direction":"both"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B36"],"xlsx_remarks":"抵抗10%減・10%増（上限30%、馬スキル時上限15%、典韋・曹仁の80%・共有）"},{"id":"玄馬雲騄","name":"玄馬雲騄","yomi":null,"base_rarity":"玄","troop_type":"騎兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"貫通抵抗15%減（上限40%）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"貫通抵抗15%減（上限40%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-15.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-40.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"貫通抵抗","direction":"down"},{"name":"実ダメ10%増（累加不可）","type":"buff","scope":"self","unlocked_at":0,"effect":"実ダメ10%増（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B37"],"xlsx_remarks":"貫通抵抗15%減（上限40%）、実ダメ10%増（累加不可）"},{"id":"玄馬超","name":"玄馬超","yomi":null,"base_rarity":"玄","troop_type":"騎兵","slot_stat":"統率","role_tags":[],"skills":[{"name":"最終ダメ20%増（累加不可）","type":"buff","scope":"self","unlocked_at":0,"effect":"最終ダメ20%増（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"その他","direction":"up"},{"name":"速度が敵より大5%増","type":"buff","scope":"self","unlocked_at":0,"effect":"速度が敵より大5%増","unit":"percent","value":{"by_breakthrough":[null,null,null,null,5.0],"confidence":"medium"},"effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B38"],"xlsx_remarks":"最終ダメ20%増（累加不可）、速度が敵より大5%増","base_general_id":"batyou"},{"id":"曹洪","name":"曹洪","yomi":null,"base_rarity":"橙","troop_type":"騎兵","slot_stat":"統率","role_tags":[],"skills":[{"name":"味方貫通10%増・敵10%減（上限20%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"味方貫通10%増・敵10%減（上限20%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-10.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-20.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"貫通","direction":"both"},{"name":"【装備】連撃5%増（上限10%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"連撃5%増（上限10%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,5.0],"confidence":"medium"},"unlocked_at_equipment":1,"cap":{"rule":"no_cap","cap_value":10.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"連撃","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B39"],"xlsx_remarks":"味方貫通10%増・敵10%減（上限20%）、【装備】連撃5%増（上限10%）"},{"id":"夏侯玄","name":"夏侯玄","yomi":null,"base_rarity":"橙","troop_type":"騎兵","slot_stat":"知性","role_tags":[],"skills":[{"name":"シールド敵より大・次交戦ダメ10％減（累加不可）","type":"debuff","scope":"self","unlocked_at":0,"effect":"シールド敵より大・次交戦ダメ10％減（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-10.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"シールド","direction":"down"},{"name":"敵貫通15%減（累加不可）","type":"debuff","scope":"self","unlocked_at":0,"effect":"敵貫通15%減（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-15.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"貫通","direction":"down"},{"name":"所在馬敵防御力8%減（上限16%）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"所在馬敵防御力8%減（上限16%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-8.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-16.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"防御","direction":"down"},{"name":"【装備】抵抗基礎速度×15%（累加不可）","type":"passive","scope":"self","unlocked_at":0,"effect":"抵抗基礎速度×15%（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,15.0],"confidence":"medium"},"unlocked_at_equipment":1,"stacking":"non_stackable","effect_attribute":"抵抗","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B40"],"xlsx_remarks":"シールド敵より大・次交戦ダメ10％減（累加不可）、敵貫通15%減（累加不可）、所在馬敵防御力8%減（上限16%）【装備】抵抗基礎速度×15%（累加不可）"},{"id":"審配","name":"審配","yomi":null,"base_rarity":"橙","troop_type":"騎兵","slot_stat":"知性","role_tags":[],"skills":[{"name":"攻撃力×15%増（上限25%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"攻撃力×15%増（上限25%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,15.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":25.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"攻撃","direction":"up"},{"name":"兵種比率20%毎抑制5%増（累加不可）","type":"buff","scope":"self","unlocked_at":0,"effect":"兵種比率20%毎抑制5%増（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"その他","direction":"up"},{"name":"シールド5%増（上限10%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"シールド5%増（上限10%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,5.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":10.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"シールド","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B41"],"xlsx_remarks":"攻撃力×15%増（上限25%）、兵種比率20%毎抑制5%増（累加不可）、シールド5%増（上限10%）"},{"id":"高覧","name":"高覧","yomi":null,"base_rarity":"橙","troop_type":"騎兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"軍紀19.8％ダウン(上限30％)","type":"passive","scope":"self","unlocked_at":0,"effect":"軍紀19.8％ダウン(上限30％)","unit":"percent","value":{"by_breakthrough":[null,null,null,null,19.8],"confidence":"medium"},"effect_attribute":"その他","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B42"],"xlsx_remarks":"軍紀19.8％ダウン(上限30％)"},{"id":"沙摩柯","name":"沙摩柯","yomi":null,"base_rarity":"橙","troop_type":"騎兵","slot_stat":null,"role_tags":[],"skills":[],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B44"]},{"id":"臧覇","name":"臧覇","yomi":null,"base_rarity":"橙","troop_type":"騎兵","slot_stat":"統率","role_tags":[],"skills":[{"name":"基礎貫通抵抗10%馬増","type":"buff","scope":"self","unlocked_at":0,"effect":"基礎貫通抵抗10%馬増","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10.0],"confidence":"medium"},"effect_attribute":"貫通抵抗","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B45"],"xlsx_remarks":"基礎貫通抵抗10%馬増"},{"id":"呉国太","name":"呉国太","yomi":null,"base_rarity":"橙","troop_type":"弓兵","slot_stat":"知性","role_tags":[],"skills":[{"name":"抑制40%減（上限80%）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"抑制40%減（上限80%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-40.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-80.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B49"],"xlsx_remarks":"抑制40%減（上限80%）"},{"id":"玄孫尚香","name":"玄孫尚香","yomi":null,"base_rarity":"玄","troop_type":"弓兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"抵抗15%+弓配置10%増（上限40%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"抵抗15%+弓配置10%増（上限40%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,15.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":40.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"抵抗","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B50"],"xlsx_remarks":"抵抗15%+弓配置10%増（上限40%）"},{"id":"龐統","name":"龐統","yomi":null,"base_rarity":"橙","troop_type":"弓兵","slot_stat":"知性","role_tags":[],"skills":[{"name":"敵兵10%移動（上限10%）","type":"passive","scope":"rally","unlocked_at":0,"effect":"敵兵10%移動（上限10%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":10.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"up"},{"name":"追加ダメ敵非参戦数×100%（ダメ上限20%）","type":"passive","scope":"rally","unlocked_at":0,"effect":"追加ダメ敵非参戦数×100%（ダメ上限20%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,100.0],"confidence":"medium"},"effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B51"],"xlsx_remarks":"敵兵10%移動（上限10%）、追加ダメ敵非参戦数×100%（ダメ上限20%）"},{"id":"玄陸遜","name":"玄陸遜","yomi":null,"base_rarity":"玄","troop_type":"弓兵","slot_stat":"統率","role_tags":[],"skills":[{"name":"ダメ20%減（累加不可）","type":"debuff","scope":"self","unlocked_at":0,"effect":"ダメ20%減（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-20.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"その他","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B52"],"xlsx_remarks":"ダメ20%減（累加不可）","base_general_id":"陸遜"},{"id":"陸遜","name":"陸遜","yomi":null,"base_rarity":"橙","troop_type":"弓兵","slot_stat":"統率","role_tags":[],"skills":[{"name":"追加ダメ35%確率5%増（上限10%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"追加ダメ35%確率5%増（上限10%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,35.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":10.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B53"],"xlsx_remarks":"追加ダメ35%確率5%増（上限10%）"},{"id":"織田信長","name":"織田信長","yomi":null,"base_rarity":"橙","troop_type":"弓兵","slot_stat":"統率","role_tags":[],"skills":[{"name":"兵数1%多で連撃1%増（下限10%、上限20%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"兵数1%多で連撃1%増（下限10%、上限20%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,1.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":20,"floor_value":10,"note":"xlsx備考の下限/上限ペア"},"effect_attribute":"連撃","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B54"],"xlsx_remarks":"兵数1%多で連撃1%増（下限10%、上限20%）"},{"id":"玄貂蝉","name":"玄貂蝉","yomi":null,"base_rarity":"玄","troop_type":"弓兵","slot_stat":"知性","role_tags":[],"skills":[{"name":"ダメ男武将比率×0.2減（上限20%）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"ダメ男武将比率×0.2減（上限20%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-20.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-20.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B55"],"xlsx_remarks":"ダメ男武将比率×0.2減（上限20%）"},{"id":"玄呂布","name":"玄呂布","yomi":null,"base_rarity":"玄","troop_type":"弓兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"連撃武力差分×3%増（上限35%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"連撃武力差分×3%増（上限35%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,3.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":35.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"連撃","direction":"up"},{"name":"【装備】ダメージ増（連撃増% x 20%）","type":"buff","scope":"self","unlocked_at":0,"effect":"ダメージ増（連撃増% x 20%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20.0],"confidence":"medium"},"unlocked_at_equipment":1,"effect_attribute":"連撃","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B56"],"xlsx_remarks":"連撃武力差分×3%増（上限35%）【装備】ダメージ増（連撃増% x 20%）","base_general_id":"呂布"},{"id":"玄徐庶","name":"玄徐庶","yomi":null,"base_rarity":"玄","troop_type":"弓兵","slot_stat":"知性","role_tags":[],"skills":[{"name":"ダメ15%増（累加不可）","type":"buff","scope":"self","unlocked_at":0,"effect":"ダメ15%増（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,15.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"その他","direction":"up"},{"name":"最終連撃1%高×0.5増（上限25%・上限累加可、1スキル上","type":"buff","scope":"rally","unlocked_at":0,"effect":"最終連撃1%高×0.5増（上限25%・上限累加可、1スキル上限10%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,1.0],"confidence":"medium"},"effect_attribute":"連撃","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B57"],"xlsx_remarks":"ダメ15%増（累加不可）、最終連撃1%高×0.5増（上限25%・上限累加可、1スキル上限10%）"},{"id":"玄丁奉","name":"玄丁奉","yomi":null,"base_rarity":"玄","troop_type":"弓兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"ダメ18%減","type":"debuff","scope":"self","unlocked_at":0,"effect":"ダメ18%減","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-18.0],"confidence":"medium"},"effect_attribute":"その他","direction":"down"},{"name":"最終連撃高の場合ダメ5%減追加（累加不可）","type":"debuff","scope":"self","unlocked_at":0,"effect":"最終連撃高の場合ダメ5%減追加（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-5.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"連撃","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B58"],"xlsx_remarks":"ダメ18%減、最終連撃高の場合ダメ5%減追加（累加不可）"},{"id":"玄夏侯淵","name":"玄夏侯淵","yomi":null,"base_rarity":"玄","troop_type":"弓兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"貫通抵抗弓比率×40%増（上限50%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"貫通抵抗弓比率×40%増（上限50%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,40.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":50.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"貫通抵抗","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B59"],"xlsx_remarks":"貫通抵抗弓比率×40%増（上限50%）"},{"id":"玄小喬","name":"玄小喬","yomi":null,"base_rarity":"玄","troop_type":"弓兵","slot_stat":"知性","role_tags":[],"skills":[{"name":"貫通20%減（上限40%）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"貫通20%減（上限40%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-20.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-40.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"貫通","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B60"],"xlsx_remarks":"貫通20%減（上限40%）"},{"id":"玄蔡文姫","name":"玄蔡文姫","yomi":null,"base_rarity":"玄","troop_type":"弓兵","slot_stat":"知性","role_tags":[],"skills":[{"name":"貫通減16.5％（上限20％）貫通アップ5.5％（10％）","type":"debuff","scope":"self","unlocked_at":0,"effect":"貫通減16.5％（上限20％）貫通アップ5.5％（10％）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-16.5],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-20.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"貫通","direction":"both"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B61"],"xlsx_remarks":"貫通減16.5％（上限20％）貫通アップ5.5％（10％）"},{"id":"賀斉","name":"賀斉","yomi":null,"base_rarity":"橙","troop_type":"弓兵","slot_stat":null,"role_tags":[],"skills":[],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B62"]},{"id":"周瑜","name":"周瑜","yomi":null,"base_rarity":"橙","troop_type":"弓兵","slot_stat":"統率","role_tags":[],"skills":[],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B63"]},{"id":"玄祝融","name":"玄祝融","yomi":null,"base_rarity":"玄","troop_type":"弓兵","slot_stat":"武力","role_tags":[],"skills":[{"name":"防御力×15%増（上限25%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"防御力×15%増（上限25%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,15.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":25.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"防御","direction":"up"},{"name":"兵種比率20%毎敵抑制5%減（累加不可）","type":"debuff","scope":"self","unlocked_at":0,"effect":"兵種比率20%毎敵抑制5%減（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-20.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"その他","direction":"down"},{"name":"戦時軍紀5%増（上限10%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"戦時軍紀5%増（上限10%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,5.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":10.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"up"},{"name":"【装備】敵貫通抵抗5%減（累加不可）","type":"debuff","scope":"self","unlocked_at":0,"effect":"敵貫通抵抗5%減（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-5.0],"confidence":"medium"},"unlocked_at_equipment":1,"stacking":"non_stackable","effect_attribute":"貫通抵抗","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B64"],"xlsx_remarks":"防御力×15%増（上限25%）、兵種比率20%毎敵抑制5%減（累加不可）、戦時軍紀5%増（上限10%）、【装備】敵貫通抵抗5%減（累加不可）"},{"id":"玄程昱","name":"玄程昱","yomi":null,"base_rarity":"玄","troop_type":"弓兵","slot_stat":"知性","role_tags":[],"skills":[{"name":"実ダメ15%増（上限20％）","type":"buff","scope":"rally","unlocked_at":0,"effect":"実ダメ15%増（上限20％）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,15.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":20.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"up"},{"name":"確率75%実ダメ10％増（累加不可）","type":"buff","scope":"self","unlocked_at":0,"effect":"確率75%実ダメ10％増（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,75.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"その他","direction":"up"},{"name":"【装備】攻撃力6%増（上限12%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"攻撃力6%増（上限12%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,6.0],"confidence":"medium"},"unlocked_at_equipment":1,"cap":{"rule":"no_cap","cap_value":12.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"攻撃","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B65"],"xlsx_remarks":"実ダメ15%増（上限20％）、確率75%実ダメ10％増（累加不可）、【装備】攻撃力6%増（上限12%）"},{"id":"荀攸","name":"荀攸","yomi":null,"base_rarity":"橙","troop_type":"弓兵","slot_stat":"知性","role_tags":[],"skills":[{"name":"連撃20%減（上限50%・共有）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"連撃20%減（上限50%・共有）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-20.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-50.0,"note":"xlsx備考由来の固定%上限","shared":true},"effect_attribute":"連撃","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B66"],"xlsx_remarks":"連撃20%減（上限50%・共有）"},{"id":"歩練師","name":"歩練師","yomi":null,"base_rarity":"橙","troop_type":"弓兵","slot_stat":"知性","role_tags":[],"skills":[{"name":"貫通10%増（上限30%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"貫通10%増（上限30%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":30.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"貫通","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B67"],"xlsx_remarks":"貫通10%増（上限30%）"},{"id":"玄董卓","name":"玄董卓","yomi":null,"base_rarity":"玄","troop_type":"戦車","slot_stat":"武力","role_tags":[],"skills":[{"name":"貫通20%増（上限40%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"貫通20%増（上限40%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":40.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"貫通","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B70"],"xlsx_remarks":"貫通20%増（上限40%）"},{"id":"黄月英","name":"黄月英","yomi":null,"base_rarity":"橙","troop_type":"戦車","slot_stat":"知性","role_tags":[],"skills":[{"name":"連撃10%増（上限30%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"連撃10%増（上限30%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":30.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"連撃","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B71"],"xlsx_remarks":"連撃10%増（上限30%）"},{"id":"玄黄月英","name":"玄黄月英","yomi":null,"base_rarity":"玄","troop_type":"戦車","slot_stat":"知性","role_tags":[],"skills":[{"name":"主陣ダメ15%減（累加不可）","type":"debuff","scope":"self","unlocked_at":0,"effect":"主陣ダメ15%減（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-15.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"その他","direction":"down"},{"name":"角陣ダメ15%減（上限30%）","type":"debuff","scope":"array","unlocked_at":0,"effect":"角陣ダメ15%減（上限30%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-15.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-30.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"down"},{"name":"【装備】交戦毎兵士4%増","type":"buff","scope":"self","unlocked_at":0,"effect":"交戦毎兵士4%増","unit":"percent","value":{"by_breakthrough":[null,null,null,null,4.0],"confidence":"medium"},"unlocked_at_equipment":1,"effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B72"],"xlsx_remarks":"主陣ダメ15%減（累加不可）、角陣ダメ15%減（上限30%）、【装備】交戦毎兵士4%増","base_general_id":"黄月英"},{"id":"玄陳宮","name":"玄陳宮","yomi":null,"base_rarity":"玄","troop_type":"戦車","slot_stat":"知性","role_tags":[],"skills":[{"name":"支援率10%増（上限20%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"支援率10%増（上限20%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":20.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B73"],"xlsx_remarks":"支援率10%増（上限20%）"},{"id":"玄曹植","name":"玄曹植","yomi":null,"base_rarity":"玄","troop_type":"戦車","slot_stat":"知性","role_tags":[],"skills":[{"name":"シールド10%増（上限30%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"シールド10%増（上限30%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":30.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"シールド","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B74"],"xlsx_remarks":"シールド10%増（上限30%）"},{"id":"呂蒙","name":"呂蒙","yomi":null,"base_rarity":"橙","troop_type":"戦車","slot_stat":"統率","role_tags":[],"skills":[{"name":"ダメ20%×味方/敵攻城値（上限40%）","type":"passive","scope":"rally","unlocked_at":0,"effect":"ダメ20%×味方/敵攻城値（上限40%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":40.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B75"],"xlsx_remarks":"ダメ20%×味方/敵攻城値（上限40%）"},{"id":"陳登","name":"陳登","yomi":null,"base_rarity":"橙","troop_type":"戦車","slot_stat":"知性","role_tags":[],"skills":[{"name":"主陣実ダメ増（味方角陣初回交戦攻撃力 / 敵角陣初回交戦攻撃","type":"buff","scope":"array","unlocked_at":0,"effect":"主陣実ダメ増（味方角陣初回交戦攻撃力 / 敵角陣初回交戦攻撃力) x 16.5%（累計不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,16.5],"confidence":"medium"},"effect_attribute":"攻撃","direction":"up"},{"name":"【装備】味方角陣連撃12%増","type":"buff","scope":"array","unlocked_at":0,"effect":"味方角陣連撃12%増","unit":"percent","value":{"by_breakthrough":[null,null,null,null,12.0],"confidence":"medium"},"unlocked_at_equipment":1,"effect_attribute":"連撃","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B76"],"xlsx_remarks":"主陣実ダメ増（味方角陣初回交戦攻撃力 / 敵角陣初回交戦攻撃力) x 16.5%（累計不可）　【装備】味方角陣連撃12%増"},{"id":"玄廖化","name":"玄廖化","yomi":null,"base_rarity":"玄","troop_type":"戦車","slot_stat":"武力","role_tags":[],"skills":[{"name":"主陣ダメ15%増（累加不可）","type":"buff","scope":"self","unlocked_at":0,"effect":"主陣ダメ15%増（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,15.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"その他","direction":"up"},{"name":"角陣ダメ15%増（上限30%）","type":"buff","scope":"array","unlocked_at":0,"effect":"角陣ダメ15%増（上限30%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,15.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":30.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"up"},{"name":"【装備】戦車基礎軍紀×20%増","type":"buff","scope":"self","unlocked_at":0,"effect":"戦車基礎軍紀×20%増","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20.0],"confidence":"medium"},"unlocked_at_equipment":1,"effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B77"],"xlsx_remarks":"主陣ダメ15%増（累加不可）、角陣ダメ15%増（上限30%）、【装備】戦車基礎軍紀×20%増"},{"id":"朱然","name":"朱然","yomi":null,"base_rarity":"橙","troop_type":"戦車","slot_stat":"武力","role_tags":[],"skills":[{"name":"実ダメ減（味方角陣防御 / 敵角陣防御) x 16.5%","type":"debuff","scope":"array","unlocked_at":0,"effect":"実ダメ減（味方角陣防御 / 敵角陣防御) x 16.5%","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-16.5],"confidence":"medium"},"effect_attribute":"防御","direction":"down"},{"name":"【装備】味方角陣連撃12%増","type":"buff","scope":"array","unlocked_at":0,"effect":"味方角陣連撃12%増","unit":"percent","value":{"by_breakthrough":[null,null,null,null,12.0],"confidence":"medium"},"unlocked_at_equipment":1,"effect_attribute":"連撃","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B78"],"xlsx_remarks":"実ダメ減（味方角陣防御 / 敵角陣防御) x 16.5%【装備】味方角陣連撃12%増"},{"id":"馬鈞","name":"馬鈞","yomi":null,"base_rarity":"橙","troop_type":"戦車","slot_stat":"統率","role_tags":[],"skills":[{"name":"抵抗20%増（上限40%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"抵抗20%増（上限40%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":40.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"抵抗","direction":"up"},{"name":"ダメ損失比率×10%減（上限30%）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"ダメ損失比率×10%減（上限30%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-10.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-30.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B79"],"xlsx_remarks":"抵抗20%増（上限40%）、ダメ損失比率×10%減（上限30%）"},{"id":"玄諸葛亮","name":"玄諸葛亮","yomi":null,"base_rarity":"玄","troop_type":"万能","slot_stat":"知性","role_tags":[],"skills":[],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B82"]},{"id":"玄張角","name":"玄張角","yomi":null,"base_rarity":"玄","troop_type":"万能","slot_stat":"統率","role_tags":[],"skills":[{"name":"被抑制10%減・プレイヤー数差×20%減","type":"debuff","scope":"rally","unlocked_at":0,"effect":"被抑制10%減・プレイヤー数差×20%減","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-10.0],"confidence":"medium"},"effect_attribute":"その他","direction":"down"},{"name":"ダメ5%減・5%増（累加不可）","type":"buff","scope":"self","unlocked_at":0,"effect":"ダメ5%減・5%増（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-5.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"その他","direction":"both"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B84"],"xlsx_remarks":"被抑制10%減・プレイヤー数差×20%減、ダメ5%減・5%増（累加不可）"},{"id":"玄曹操","name":"玄曹操","yomi":null,"base_rarity":"玄","troop_type":"万能","slot_stat":"統率","role_tags":[],"skills":[{"name":"抑制10%減・プレイヤー数差×20%減","type":"debuff","scope":"rally","unlocked_at":0,"effect":"抑制10%減・プレイヤー数差×20%減","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-10.0],"confidence":"medium"},"effect_attribute":"その他","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B85"],"xlsx_remarks":"抑制10%減・プレイヤー数差×20%減"},{"id":"司馬炎","name":"司馬炎","yomi":null,"base_rarity":"橙","troop_type":"万能","slot_stat":"統率","role_tags":[],"skills":[{"name":"1属性15%増（上限50%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"1属性15%増（上限50%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,15.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":50.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B86"],"xlsx_remarks":"1属性15%増（上限50%）"},{"id":"曹真","name":"曹真","yomi":null,"base_rarity":"橙","troop_type":"万能","slot_stat":"統率","role_tags":[],"skills":[{"name":"抵抗20%増（上限60%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"抵抗20%増（上限60%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":60.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"抵抗","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B87"],"xlsx_remarks":"抵抗20%増（上限60%）"},{"id":"玄徐晃","name":"玄徐晃","yomi":null,"base_rarity":"玄","troop_type":"万能","slot_stat":"統率","role_tags":[],"skills":[{"name":"貫通20%減（上限50%）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"貫通20%減（上限50%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-20.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-50.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"貫通","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B88"],"xlsx_remarks":"貫通20%減（上限50%）"},{"id":"皇甫嵩","name":"皇甫嵩","yomi":null,"base_rarity":"橙","troop_type":"万能","slot_stat":"統率","role_tags":[],"skills":[{"name":"貫通/シールド20%増（上限50%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"貫通/シールド20%増（上限50%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":50.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"シールド","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B89"],"xlsx_remarks":"貫通/シールド20%増（上限50%）"},{"id":"司馬師","name":"司馬師","yomi":null,"base_rarity":"橙","troop_type":"万能","slot_stat":"知性","role_tags":[],"skills":[{"name":"味方連撃10%増・敵10%減（上限30%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"味方連撃10%増・敵10%減（上限30%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-10.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-30.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"連撃","direction":"both"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B91"],"xlsx_remarks":"味方連撃10%増・敵10%減（上限30%）"},{"id":"玄周瑜","name":"玄周瑜","yomi":null,"base_rarity":"玄","troop_type":"万能","slot_stat":"統率","role_tags":[],"skills":[],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B92"],"base_general_id":"周瑜"},{"id":"王允","name":"王允","yomi":null,"base_rarity":"橙","troop_type":"万能","slot_stat":"知性","role_tags":[],"skills":[{"name":"貫通10%増（上限30%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"貫通10%増（上限30%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":30.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"貫通","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B93"],"xlsx_remarks":"貫通10%増（上限30%）"},{"id":"呂布","name":"呂布","yomi":null,"base_rarity":"橙","troop_type":"万能","slot_stat":"武力","role_tags":[],"skills":[{"name":"ダメ(プレイヤー数差+1)×10%増（累加不可）","type":"buff","scope":"self","unlocked_at":0,"effect":"ダメ(プレイヤー数差+1)×10%増（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B94"],"xlsx_remarks":"ダメ(プレイヤー数差+1)×10%増（累加不可）"},{"id":"玄関羽","name":"玄関羽","yomi":null,"base_rarity":"玄","troop_type":"万能","slot_stat":"武力","role_tags":[],"skills":[{"name":"実ダメ15%増（累加不可）","type":"buff","scope":"self","unlocked_at":0,"effect":"実ダメ15%増（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,15.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B95"],"xlsx_remarks":"実ダメ15%増（累加不可）","base_general_id":"kanu"},{"id":"于吉","name":"于吉","yomi":null,"base_rarity":"橙","troop_type":"万能","slot_stat":"知性","role_tags":[],"skills":[{"name":"スキル増益10%増","type":"buff","scope":"self","unlocked_at":0,"effect":"スキル増益10%増","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10.0],"confidence":"medium"},"effect_attribute":"その他","direction":"up"},{"name":"スキル減益10%減（上限20%）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"スキル減益10%減（上限20%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-10.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-20.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B96"],"xlsx_remarks":"スキル増益10%増、スキル減益10%減（上限20%）"},{"id":"玄荀彧","name":"玄荀彧","yomi":null,"base_rarity":"玄","troop_type":"万能","slot_stat":"知性","role_tags":[],"skills":[{"name":"連撃20%増（上限30%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"連撃20%増（上限30%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":30.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"連撃","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B97"],"xlsx_remarks":"連撃20%増（上限30%）"},{"id":"玄呂蒙","name":"玄呂蒙","yomi":null,"base_rarity":"玄","troop_type":"万能","slot_stat":["武力","知性"],"role_tags":[],"skills":[{"name":"抵抗20%増（上限30%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"抵抗20%増（上限30%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":30.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"抵抗","direction":"up"},{"name":"実ダメ6%増／減（上限10%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"実ダメ6%増／減（上限10%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-6.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-10.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"both"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B98"],"xlsx_remarks":"抵抗20%増（上限30%）、実ダメ6%増／減（上限10%）","base_general_id":"呂蒙"},{"id":"司馬懿","name":"司馬懿","yomi":null,"base_rarity":"橙","troop_type":"万能","slot_stat":"統率","role_tags":[],"skills":[{"name":"連撃(プレイヤー数差+1)×10%増（上限50%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"連撃(プレイヤー数差+1)×10%増（上限50%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":50.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"連撃","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B99"],"xlsx_remarks":"連撃(プレイヤー数差+1)×10%増（上限50%）"},{"id":"管路","name":"管路","yomi":null,"base_rarity":"橙","troop_type":"万能","slot_stat":"知性","role_tags":[],"skills":[{"name":"抵抗(プレイヤー数差+1)×10%増（上限50%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"抵抗(プレイヤー数差+1)×10%増（上限50%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":50.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"抵抗","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B100"],"xlsx_remarks":"抵抗(プレイヤー数差+1)×10%増（上限50%）"},{"id":"玄甘寧","name":"玄甘寧","yomi":null,"base_rarity":"玄","troop_type":"万能","slot_stat":"武力","role_tags":[],"skills":[{"name":"ダメ歩比率×20%増","type":"buff","scope":"self","unlocked_at":0,"effect":"ダメ歩比率×20%増","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20.0],"confidence":"medium"},"effect_attribute":"その他","direction":"up"},{"name":"弓比率×20%減（上限25%）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"弓比率×20%減（上限25%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-20.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-25.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B101"],"xlsx_remarks":"ダメ歩比率×20%増、弓比率×20%減（上限25%）"},{"id":"玄太史慈","name":"玄太史慈","yomi":null,"base_rarity":"玄","troop_type":"万能","slot_stat":"武力","role_tags":[],"skills":[{"name":"敵実ダメ15%反射（累加不可）","type":"passive","scope":"self","unlocked_at":0,"effect":"敵実ダメ15%反射（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,15.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"その他","direction":"down"},{"name":"連撃8%増（累加不可）","type":"buff","scope":"self","unlocked_at":0,"effect":"連撃8%増（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,8.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"連撃","direction":"up"},{"name":"【装備】集結陣内基礎軍紀10%増（上限無し）","type":"buff","scope":"rally","unlocked_at":0,"effect":"集結陣内基礎軍紀10%増（上限無し）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10.0],"confidence":"medium"},"unlocked_at_equipment":1,"cap":{"rule":"no_cap","note":"xlsx備考で上限無しと明示"},"effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B102"],"xlsx_remarks":"敵実ダメ15%反射（累加不可）、連撃8%増（累加不可）、【装備】集結陣内基礎軍紀10%増（上限無し）"},{"id":"玄張郃","name":"玄張郃","yomi":null,"base_rarity":"玄","troop_type":"万能","slot_stat":"統率","role_tags":[],"skills":[{"name":"兵種比率20%毎抵抗4%増（累加不可）","type":"buff","scope":"self","unlocked_at":0,"effect":"兵種比率20%毎抵抗4%増（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"抵抗","direction":"up"},{"name":"戦時軍紀15%増（上限25%）","type":"buff","scope":"rally","unlocked_at":0,"effect":"戦時軍紀15%増（上限25%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,15.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":25.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"up"},{"name":"【装備】敵の参戦可能兵士5%が味方にダメージ与えられない（累加不可）","type":"passive","scope":"self","unlocked_at":0,"effect":"敵の参戦可能兵士5%が味方にダメージ与えられない（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,5.0],"confidence":"medium"},"unlocked_at_equipment":1,"stacking":"non_stackable","effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B103"],"xlsx_remarks":"兵種比率20%毎抵抗4%増（累加不可）、戦時軍紀15%増（上限25%）【装備】敵の参戦可能兵士5%が味方にダメージ与えられない（累加不可）"},{"id":"玄曹彰","name":"玄曹彰","yomi":null,"base_rarity":"玄","troop_type":"万能","slot_stat":"武力","role_tags":[],"skills":[{"name":"兵種比率20%毎連撃4%増（累加不可）","type":"buff","scope":"self","unlocked_at":0,"effect":"兵種比率20%毎連撃4%増（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,20.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"連撃","direction":"up"},{"name":"戦時軍紀 馬比率x22%増","type":"buff","scope":"self","unlocked_at":0,"effect":"戦時軍紀 馬比率x22%増","unit":"percent","value":{"by_breakthrough":[null,null,null,null,22.0],"confidence":"medium"},"effect_attribute":"その他","direction":"up"},{"name":"弓比率x22%減","type":"debuff","scope":"self","unlocked_at":0,"effect":"弓比率x22%減","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-22.0],"confidence":"medium"},"effect_attribute":"その他","direction":"down"},{"name":"【装備】敵の防御6%減","type":"debuff","scope":"self","unlocked_at":0,"effect":"敵の防御6%減","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-6.0],"confidence":"medium"},"unlocked_at_equipment":1,"effect_attribute":"防御","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B104"],"xlsx_remarks":"兵種比率20%毎連撃4%増（累加不可）、戦時軍紀 馬比率x22%増、弓比率x22%減【装備】敵の防御6%減"},{"id":"玄黄蓋","name":"玄黄蓋","yomi":null,"base_rarity":"玄","troop_type":"万能","slot_stat":"武力","role_tags":[],"skills":[{"name":"初回交戦味方参戦可能兵士数の10％ダメージ","type":"passive","scope":"self","unlocked_at":0,"effect":"初回交戦味方参戦可能兵士数の10％ダメージ","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10.0],"confidence":"medium"},"effect_attribute":"その他","direction":"up"},{"name":"毎回交戦敵方参戦兵士の10％がダメージ与えられない（累計不可","type":"passive","scope":"self","unlocked_at":0,"effect":"毎回交戦敵方参戦兵士の10％がダメージ与えられない（累計不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,10.0],"confidence":"medium"},"effect_attribute":"その他","direction":"up"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B105"],"xlsx_remarks":"初回交戦味方参戦可能兵士数の10％ダメージ、毎回交戦敵方参戦兵士の10％がダメージ与えられない（累計不可）"},{"id":"馬岱","name":"馬岱","yomi":null,"base_rarity":"橙","troop_type":"万能","slot_stat":"武力","role_tags":[],"skills":[],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B106"]},{"id":"華佗","name":"華佗","yomi":null,"base_rarity":"橙","troop_type":"万能","slot_stat":"知性","role_tags":[],"skills":[{"name":"実ダメ10%減（上限10%）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"実ダメ10%減（上限10%）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-10.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-10.0,"note":"xlsx備考由来の固定%上限"},"effect_attribute":"その他","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B107"],"xlsx_remarks":"実ダメ10%減（上限10%）"},{"id":"左慈","name":"左慈","yomi":null,"base_rarity":"橙","troop_type":"万能","slot_stat":"知性","role_tags":[],"skills":[],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B108"]},{"id":"玄魏延","name":"玄魏延","yomi":null,"base_rarity":"玄","troop_type":"万能","slot_stat":"統率","role_tags":[],"skills":[{"name":"貫通12%減（累加不可）","type":"debuff","scope":"self","unlocked_at":0,"effect":"貫通12%減（累加不可）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-12.0],"confidence":"medium"},"stacking":"non_stackable","effect_attribute":"貫通","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B109"],"xlsx_remarks":"貫通12%減（累加不可）"},{"id":"典韋","name":"典韋","yomi":null,"base_rarity":"橙","troop_type":"万能","slot_stat":"武力","role_tags":[],"skills":[{"name":"抵抗35%減（上限80%・共有）","type":"debuff","scope":"rally","unlocked_at":0,"effect":"抵抗35%減（上限80%・共有）","unit":"percent","value":{"by_breakthrough":[null,null,null,null,-35.0],"confidence":"medium"},"cap":{"rule":"no_cap","cap_value":-80.0,"note":"xlsx備考由来の固定%上限","shared":true},"effect_attribute":"抵抗","direction":"down"}],"seal_bonus":{"by_seal":[null,null,null,null,null,null],"effect_note":"未確認","confidence":"unknown"},"sources":["xlsx:3_20251224.xlsx#武将!B110"],"xlsx_remarks":"抵抗35%減（上限80%・共有）"}]};</script>
+<!--DATA_END-->
+
+<div id="loading-banner" class="warn-banner" style="margin: 12px 20px;display:none;">
+  <strong>データ読込失敗</strong>: 埋め込みデータ <code>#generals-data</code> が見つかりませんでした。
+</div>
+
+<main id="app">
+
+  <section class="panel">
+    <h2>武将一覧 <span id="roster-count" style="font-weight:normal;font-size:12px;color:var(--muted);"></span></h2>
+    <div id="user-tabs" style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;align-items:center;font-size:12px;"></div>
+    <div class="filters">
+      <label>兵種<select id="filter-troop"><option value="">全</option></select></label>
+      <label>レア<select id="filter-rarity"><option value="">全</option></select></label>
+      <label>検索<input id="filter-search" type="text" placeholder="武将名" style="width:120px;"></label>
+      <label><input type="checkbox" id="filter-owned-only">所持のみ</label>
+      <button id="btn-clear-state">状態リセット</button>
+      <button id="btn-export-state" title="所持・編成・プレイヤー設定をJSONファイルとして保存">エクスポート</button>
+      <button id="btn-import-state" title="JSONファイルから読み込み（現在の状態は上書きされます）">インポート</button>
+      <input id="file-import-state" type="file" accept="application/json,.json" style="display:none;">
+    </div>
+    <div class="filters" style="border-top:1px dotted var(--border);padding-top:6px;">
+      <span style="font-size:12px;color:var(--muted);">一括（表示中の武将に適用）:</span>
+      <label><input type="checkbox" id="bulk-owned">所持</label>
+      <label><input type="checkbox" id="bulk-breakthrough">突破</label>
+      <label><input type="checkbox" id="bulk-equipment">装</label>
+      <label><input type="checkbox" id="bulk-level-break">Lv</label>
+    </div>
+    <div class="roster-scroll">
+      <table id="roster-table">
+        <thead><tr>
+          <th>所持</th><th>武将</th><th>属性</th><th style="width:200px;">育成段階</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>編成</h2>
+    <div class="controls" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+      <button id="btn-auto-build-all" style="background:#ede7d9;font-weight:600;">選択中の軍団をまとめて自動編成</button>
+      <label style="font-size:12px;">
+        <input type="radio" name="agg-mode" value="formation" checked> 編成内のみ集計
+      </label>
+      <label style="font-size:12px;">
+        <input type="radio" name="agg-mode" value="owned-all"> 全所持武将で集計
+      </label>
+      <button id="btn-clear-formation">全軍団クリア</button>
+    </div>
+    <div id="formation"></div>
+
+    <h2 style="margin-top:16px;">属性マトリクス</h2>
+    <div id="attr-matrix"></div>
+
+    <h2 style="margin-top:16px;">cap_rule 別集計</h2>
+    <div id="summary"></div>
+
+    <h2 style="margin-top:16px;">スキル詳細</h2>
+    <div id="skill-detail"></div>
+  </section>
+
+</main>
+
+<script>
+'use strict';
+
+// JS エラーを画面に表示するためのフォールバック
+window.addEventListener('error', (e) => {
+  const banner = document.getElementById('loading-banner');
+  if (banner) {
+    banner.style.display = '';
+    banner.innerHTML = `<strong>JSエラー:</strong> ${e.message}<br><code style="font-size:11px;">${(e.error && e.error.stack) || ''}</code>`;
+  }
+});
+
+// ============================================================
+// 状態管理
+// ============================================================
+const STORAGE_KEY = 'sangoku_sim_v06';   // 4ユーザー化のため鍵を変更
+const SLOT_KEYS = ['統率', '武力', '知性'];
+const MAIN_TROOPS = ['歩兵', '騎兵', '弓兵'];   // 主陣の兵種は3種のみ（万能はワイルドカード扱い）
+const DEFAULT_NUM_USERS = 4;  // 初回起動時の規定プレイヤー数
+const NUM_LEGIONS = 8;        // 最大4人×2軍団 = 8軍団
+
+// Launch preview などのサンドボックス環境では window.prompt / confirm が
+// 利用できないため、DOMベースの簡易モーダルで代替する。
+// Enter で確定 / Escape または背景クリックでキャンセル。
+function openModal({ message, defaultValue, withInput, okLabel, cancelLabel, alertOnly }) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:9999;';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#fff;padding:16px 18px;border-radius:6px;min-width:280px;max-width:90vw;box-shadow:0 4px 16px rgba(0,0,0,0.2);font-family:inherit;';
+    const msg = document.createElement('div');
+    msg.style.cssText = 'white-space:pre-wrap;margin-bottom:12px;font-size:13px;line-height:1.5;';
+    msg.textContent = message;
+    box.appendChild(msg);
+    let input = null;
+    if (withInput) {
+      input = document.createElement('input');
+      input.type = 'text';
+      input.value = defaultValue ?? '';
+      input.style.cssText = 'width:100%;padding:6px 8px;font-size:14px;font-family:inherit;border:1px solid #bbb;border-radius:4px;box-sizing:border-box;margin-bottom:12px;';
+      box.appendChild(input);
+    }
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;';
+    const cancel = document.createElement('button');
+    cancel.type = 'button';
+    cancel.textContent = cancelLabel || 'キャンセル';
+    cancel.style.cssText = 'padding:4px 12px;border:1px solid #bbb;background:#fff;border-radius:4px;cursor:pointer;font-family:inherit;';
+    const ok = document.createElement('button');
+    ok.type = 'button';
+    ok.textContent = okLabel || 'OK';
+    ok.style.cssText = 'padding:4px 12px;border:1px solid var(--accent,#1976d2);background:var(--accent,#1976d2);color:#fff;border-radius:4px;cursor:pointer;font-family:inherit;';
+    if (!alertOnly) row.appendChild(cancel);
+    row.appendChild(ok);
+    box.appendChild(row);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    const close = (v) => { document.body.removeChild(overlay); resolve(v); };
+    cancel.addEventListener('click', () => close(withInput ? null : false));
+    ok.addEventListener('click', () => close(withInput ? (input.value ?? '') : true));
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(withInput ? null : false); });
+    if (input) {
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); close(input.value ?? ''); }
+        else if (e.key === 'Escape') { e.preventDefault(); close(null); }
+      });
+      setTimeout(() => { input.focus(); input.select(); }, 0);
+    } else {
+      setTimeout(() => ok.focus(), 0);
+    }
+  });
+}
+function askText(message, defaultValue = '') {
+  return openModal({ message, defaultValue, withInput: true });
+}
+function askConfirm(message) {
+  return openModal({ message, withInput: false });
+}
+function notify(message) {
+  return openModal({ message, withInput: false, alertOnly: true });
+}
+
+function emptyBattalion() { return { 統率: null, 武力: null, 知性: null }; }
+function defaultUsers() {
+  return Array.from({ length: DEFAULT_NUM_USERS }, (_, i) => ({ id: i + 1, name: `プレイヤー${i + 1}` }));
+}
+// ユニークな新規ユーザーIDを生成
+function nextUserId() {
+  return state.users.reduce((m, u) => Math.max(m, u.id), 0) + 1;
+}
+function emptyFormation(userId = 1) {
+  return {
+    user_id: userId,
+    selected: true,
+    troop_type: null,
+    battalions: [emptyBattalion(), emptyBattalion(), emptyBattalion(), emptyBattalion(), emptyBattalion()],
+    array: emptyBattalion(),
+    auto: { pri1: '', pri2: '' },
+  };
+}
+function defaultFormations() {
+  // 軍団1〜8 は plr1×2, plr2×2, plr3×2, plr4×2 をデフォルト割り当て
+  return Array.from({ length: NUM_LEGIONS }, (_, i) => emptyFormation(Math.floor(i / 2) + 1));
+}
+
+function canPlaceInTroop(general, troop) {
+  if (!troop) return true;
+  if (general.troop_type === troop) return true;
+  if (general.troop_type === '万能') return true;
+  return false;
+}
+
+const state = {
+  data: null,
+  users: defaultUsers(),
+  ownerships: { 1: {}, 2: {}, 3: {}, 4: {} },  // userId -> { genId -> ownEntry }（動的に増減）
+  activeUserId: 1,
+  filters: { troop: '', rarity: '', search: '', ownedOnly: false },
+  formations: defaultFormations(),
+  aggMode: 'formation',
+};
+
+// 指定IDのプレイヤーを削除（所持データ／関連軍団もクリーンアップ）
+function deleteUser(userId) {
+  if (state.users.length <= 1) {
+    notify('最後の1人は削除できません');
+    return;
+  }
+  state.users = state.users.filter(u => u.id !== userId);
+  delete state.ownerships[userId];
+  // このユーザーに割り当たっていた軍団は、残ったユーザー先頭に再割当＋配置クリア
+  const fallback = state.users[0].id;
+  state.formations.forEach((f, idx) => {
+    if (f.user_id === userId) {
+      state.formations[idx] = emptyFormation(fallback);
+    }
+  });
+  if (state.activeUserId === userId) state.activeUserId = fallback;
+}
+
+// プレイヤー追加
+function addUser(name) {
+  const id = nextUserId();
+  state.users.push({ id, name: name || `プレイヤー${id}` });
+  state.ownerships[id] = {};
+  return id;
+}
+
+function loadState() {
+  try {
+    const v6 = localStorage.getItem(STORAGE_KEY);
+    const v5 = localStorage.getItem('sangoku_sim_v05');
+    const v4 = localStorage.getItem('sangoku_sim_v04');
+    const raw = v6 || v5 || v4;
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (s.filters) Object.assign(state.filters, s.filters);
+    if (s.aggMode) state.aggMode = s.aggMode;
+
+    // users（可変人数対応）
+    if (Array.isArray(s.users) && s.users.length >= 1) {
+      state.users = s.users.map((u, i) => ({ id: u.id ?? (i + 1), name: u.name || `プレイヤー${i + 1}` }));
+    }
+    if (s.activeUserId) state.activeUserId = s.activeUserId;
+
+    // ownerships（v6: 動的キー / v5以前: 単一）
+    state.ownerships = {};
+    if (s.ownerships && typeof s.ownerships === 'object') {
+      for (const u of state.users) {
+        state.ownerships[u.id] = s.ownerships[u.id] || s.ownerships[String(u.id)] || {};
+      }
+    } else if (s.ownership) {
+      // 旧データはプレイヤー1へ移行
+      state.ownerships[1] = s.ownership;
+    }
+    // 不足キーを補完
+    for (const u of state.users) {
+      if (!state.ownerships[u.id]) state.ownerships[u.id] = {};
+    }
+    // activeUserId が消えたユーザーを指していたら先頭に戻す
+    if (!state.users.find(u => u.id === state.activeUserId)) {
+      state.activeUserId = state.users[0].id;
+    }
+
+    // formations: v6=8軍団 / v5=3軍団（プレイヤー1扱い） / v4=単一（プレイヤー1の軍団1扱い）
+    const normFormation = (f, userId = 1) => ({
+      user_id: f.user_id ?? userId,
+      selected: f.selected !== false,
+      troop_type: f.troop_type ?? null,
+      battalions: (f.battalions && f.battalions.length === 5) ? f.battalions : [emptyBattalion(),emptyBattalion(),emptyBattalion(),emptyBattalion(),emptyBattalion()],
+      array: f.array || emptyBattalion(),
+      auto: f.auto || { pri1: '', pri2: '' },
+    });
+    if (Array.isArray(s.formations) && s.formations.length === NUM_LEGIONS) {
+      state.formations = s.formations.map(f => normFormation(f));
+    } else if (Array.isArray(s.formations)) {
+      // 旧3軍団 → 軍団1〜3 へ移行、残り5軍団は新規
+      const old = s.formations.map(f => normFormation(f, 1));
+      state.formations = defaultFormations();
+      old.forEach((f, i) => { if (i < NUM_LEGIONS) state.formations[i] = f; });
+    } else if (s.formation && Array.isArray(s.formation.battalions) && s.formation.battalions.length === 5) {
+      state.formations[0] = normFormation(s.formation, 1);
+    }
+  } catch (e) { console.warn('localStorage load failed', e); }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      users: state.users,
+      ownerships: state.ownerships,
+      activeUserId: state.activeUserId,
+      filters: state.filters,
+      formations: state.formations,
+      aggMode: state.aggMode,
+    }));
+  } catch (e) { console.warn('localStorage save failed', e); }
+}
+
+// 指定ユーザーの武将所持エントリを取得（初期化込み）
+function getOwn(userId, genId) {
+  // 旧コール署名 getOwn(genId) との後方互換: 第二引数が省略されたら activeUserId 扱い
+  if (genId === undefined) { genId = userId; userId = state.activeUserId; }
+  if (!state.ownerships[userId]) state.ownerships[userId] = {};
+  if (!state.ownerships[userId][genId]) {
+    state.ownerships[userId][genId] = { owned: false, breakthrough: 0, equipment: 0, level_break: false, seal: 0 };
+  }
+  return state.ownerships[userId][genId];
+}
+// その軍団 (formation) の所属ユーザーで武将所持を取得
+function getOwnByFormation(formation, genId) {
+  return getOwn(formation.user_id, genId);
+}
+
+// ============================================================
+// データ読込（HTMLに埋め込まれた window.GENERALS_DATA から）
+// ============================================================
+function loadData() {
+  if (!window.GENERALS_DATA) {
+    document.getElementById('loading-banner').style.display = '';
+    document.getElementById('app').style.display = 'none';
+    throw new Error('window.GENERALS_DATA missing');
+  }
+  state.data = window.GENERALS_DATA;
+  document.getElementById('meta-info').textContent =
+    `data v${state.data.meta.data_version} / ${state.data.generals.length}体 / 更新 ${state.data.meta.last_updated}`;
+}
+
+// ============================================================
+// スキル解決ロジック
+// ============================================================
+// 単一スキルの実効値を計算（突破段・装備段に応じる）
+function resolveSkillValue(skill, own) {
+  // 突破段で未解放？
+  if ((skill.unlocked_at ?? 0) > own.breakthrough) return null;
+  // 装備段で未解放？
+  if (skill.unlocked_at_equipment != null && skill.unlocked_at_equipment > own.equipment) return null;
+
+  const v = skill.value || {};
+  const bt = (v.by_breakthrough || [])[own.breakthrough];
+  const eq = (v.by_equipment || [])[own.equipment];
+  if (bt == null) return null;  // 未登録段
+  let total = bt;
+  if (typeof eq === 'number') total += eq;
+  return total;
+}
+
+// 編成内の (userId, genId) 配置エントリを返す
+function formationPlacements() {
+  const out = [];
+  for (const f of state.formations) {
+    for (const bat of f.battalions) {
+      for (const k of SLOT_KEYS) if (bat[k]) out.push({ userId: f.user_id, genId: bat[k] });
+    }
+    for (const k of SLOT_KEYS) if (f.array[k]) out.push({ userId: f.user_id, genId: f.array[k] });
+  }
+  return out;
+}
+
+// 編成全体の効果集計（4プレイヤー×8軍団）
+function aggregate() {
+  if (!state.data) return {};
+  const buckets = { legion: {}, rally: {}, array: {}, self: {} };
+  const issues = [];
+  const breakdown = [];
+
+  // 評価対象の (general, own) ペアを集める
+  const targets = [];  // { g, own, userName }
+  const userById = Object.fromEntries(state.users.map(u => [u.id, u]));
+  if (state.aggMode === 'formation') {
+    for (const p of formationPlacements()) {
+      const g = state.data.generals.find(x => x.id === p.genId);
+      if (!g) continue;
+      const own = getOwn(p.userId, p.genId);
+      targets.push({ g, own, userName: userById[p.userId]?.name || '' });
+    }
+  } else {
+    // 'owned-all': アクティブユーザーの所持武将のみ
+    const uid = state.activeUserId;
+    for (const g of state.data.generals) {
+      const own = getOwn(uid, g.id);
+      if (!own.owned) continue;
+      targets.push({ g, own, userName: userById[uid]?.name || '' });
+    }
+  }
+
+  for (const { g, own, userName } of targets) {
+    for (const sk of g.skills) {
+      const eff = resolveSkillValue(sk, own);
+      const entry = {
+        general: userName ? `${userName}・${g.name}` : g.name,
+        skill: sk.name,
+        scope: sk.scope,
+        unit: sk.unit,
+        value: eff,
+        cap: sk.cap || null,
+        stacking: sk.stacking || 'additive',
+        confidence: (sk.value && sk.value.confidence) || 'unknown',
+        unlocked_at: sk.unlocked_at,
+        unlocked_at_equipment: sk.unlocked_at_equipment,
+        attribute: sk.effect_attribute || 'その他',
+        direction: sk.direction || null,
+      };
+      breakdown.push(entry);
+
+      if (eff == null) {
+        // 値未登録 or 未解放
+        if ((sk.unlocked_at ?? 0) > own.breakthrough) {
+          // 未解放: 計算に含めない
+        } else {
+          issues.push(`${g.name}/${sk.name}: 段階別実数が未登録（要ゲーム内確認）`);
+        }
+        continue;
+      }
+
+      // scope毎に振り分け、cap_ruleキーでグループ集計
+      const scope = sk.scope || 'self';
+      if (!buckets[scope]) buckets[scope] = {};
+      const ruleKey = (sk.cap && sk.cap.rule) || 'no_cap_implicit';
+      const groupKey = (sk.cap && sk.cap.shared) ? ruleKey + '#shared' : `${g.id}/${sk.name}#${ruleKey}`;
+      // shared: 同じrule (共有) → 同じ bucket key で合算
+      // 非shared: 個別bucket
+      if (!buckets[scope][ruleKey]) buckets[scope][ruleKey] = [];
+      buckets[scope][ruleKey].push(entry);
+    }
+  }
+
+  // cap適用
+  const aggregated = {};
+  for (const scope of Object.keys(buckets)) {
+    aggregated[scope] = [];
+    for (const ruleKey of Object.keys(buckets[scope])) {
+      const items = buckets[scope][ruleKey];
+      if (!items.length) continue;
+      // 累加不可スキル: 最大値のみ採用
+      const additive = items.filter(i => i.stacking !== 'non_stackable');
+      const nonStack = items.filter(i => i.stacking === 'non_stackable');
+      let sum = additive.reduce((s, i) => s + (i.value || 0), 0);
+      if (nonStack.length) {
+        // 同じ rule の non_stackable は max
+        const maxVal = Math.max(...nonStack.map(i => Math.abs(i.value || 0))) * (nonStack[0].value < 0 ? -1 : 1);
+        sum += maxVal;
+      }
+      // capRule をデータから取得
+      const ruleDef = state.data.meta.cap_rules[ruleKey];
+      let capValue = null;
+      let isShared = false;
+      if (ruleDef) {
+        capValue = ruleDef.cap_value;
+        isShared = !!ruleDef.shared;
+      }
+      // 個別スキルが cap.cap_value を上書き指定している場合も考慮
+      // (簡易: 最初のitemの cap.cap_value を見る)
+      if (items[0].cap && items[0].cap.cap_value != null) capValue = items[0].cap.cap_value;
+
+      let capped = sum;
+      let overflow = false;
+      if (capValue != null) {
+        if (capValue > 0 && sum > capValue) { capped = capValue; overflow = true; }
+        if (capValue < 0 && sum < capValue) { capped = capValue; overflow = true; }
+      }
+      aggregated[scope].push({
+        ruleKey, items, sum, capped, capValue, overflow,
+        ruleNote: ruleDef ? ruleDef.note : null,
+        isShared,
+      });
+    }
+  }
+  return { aggregated, issues, breakdown };
+}
+
+// ============================================================
+// 描画
+// ============================================================
+// 武将一覧上部のユーザータブ（可変人数の追加/削除/編集）
+function renderUserTabs() {
+  const el = document.getElementById('user-tabs');
+  if (!el) return;
+  el.innerHTML = '';
+  const label = document.createElement('span');
+  label.style.color = 'var(--muted)';
+  label.textContent = '対象プレイヤー:';
+  el.appendChild(label);
+
+  state.users.forEach(u => {
+    const wrap = document.createElement('span');
+    wrap.style.cssText = 'display:inline-flex;gap:2px;align-items:center;padding:2px 4px;border:1px solid var(--border);' +
+      (u.id === state.activeUserId ? 'background:#fff3e0;font-weight:600;' : 'background:#fff;');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.style.cssText = 'border:none;background:transparent;cursor:pointer;font-family:inherit;padding:1px 4px;';
+    btn.textContent = u.name;
+    btn.title = 'このプレイヤーの所持を編集';
+    btn.addEventListener('click', () => {
+      state.activeUserId = u.id;
+      saveState();
+      renderUserTabs();
+      renderRoster();
+    });
+    wrap.appendChild(btn);
+
+    const edit = document.createElement('button');
+    edit.type = 'button';
+    edit.style.cssText = 'border:none;background:transparent;cursor:pointer;font-size:11px;color:var(--muted);padding:1px 2px;';
+    edit.textContent = '✎';
+    edit.title = '名前を変更';
+    edit.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const newName = await askText('プレイヤー名', u.name);
+      if (newName && newName.trim()) {
+        u.name = newName.trim();
+        saveState(); renderUserTabs(); renderFormation();
+      }
+    });
+    wrap.appendChild(edit);
+
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.style.cssText = 'border:none;background:transparent;cursor:pointer;font-size:11px;color:var(--warn);padding:1px 2px;';
+    del.textContent = '×';
+    del.title = `${u.name} を削除（所持データと割当軍団もクリア）`;
+    del.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!await askConfirm(`${u.name} を削除します。\n所持武将データと、このプレイヤーに割り当たっていた軍団の配置がクリアされます。よろしいですか？`)) return;
+      deleteUser(u.id);
+      saveState(); renderUserTabs(); renderRoster(); renderFormation(); renderSummary();
+    });
+    wrap.appendChild(del);
+
+    el.appendChild(wrap);
+  });
+
+  // 追加ボタン
+  const add = document.createElement('button');
+  add.type = 'button';
+  add.style.cssText = 'border:1px dashed var(--border);background:#fff;cursor:pointer;font-family:inherit;padding:2px 8px;color:var(--accent);';
+  add.textContent = '＋ プレイヤー追加';
+  add.addEventListener('click', async () => {
+    const name = await askText('追加するプレイヤー名', `プレイヤー${state.users.length + 1}`);
+    if (!name || !name.trim()) return;
+    const newId = addUser(name.trim());
+    state.activeUserId = newId;
+    saveState(); renderUserTabs(); renderRoster(); renderFormation();
+  });
+  el.appendChild(add);
+}
+
+function renderFilters() {
+  const troopSel = document.getElementById('filter-troop');
+  const raritySel = document.getElementById('filter-rarity');
+  state.data.meta.troop_types.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t; opt.textContent = t;
+    troopSel.appendChild(opt);
+  });
+  state.data.meta.rarity_order.forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r; opt.textContent = r;
+    raritySel.appendChild(opt);
+  });
+  troopSel.value = state.filters.troop;
+  raritySel.value = state.filters.rarity;
+  document.getElementById('filter-search').value = state.filters.search;
+  document.getElementById('filter-owned-only').checked = state.filters.ownedOnly;
+
+  troopSel.addEventListener('change', e => { state.filters.troop = e.target.value; saveState(); renderRoster(); });
+  raritySel.addEventListener('change', e => { state.filters.rarity = e.target.value; saveState(); renderRoster(); });
+  document.getElementById('filter-search').addEventListener('input', e => { state.filters.search = e.target.value; saveState(); renderRoster(); });
+  document.getElementById('filter-owned-only').addEventListener('change', e => { state.filters.ownedOnly = e.target.checked; saveState(); renderRoster(); });
+
+  document.getElementById('btn-clear-state').addEventListener('click', async () => {
+    if (!await askConfirm('全プレイヤーの所持・育成段階をリセットします。よろしいですか？')) return;
+    state.ownerships = {};
+    for (const u of state.users) state.ownerships[u.id] = {};
+    saveState();
+    renderRoster();
+    renderFormation();
+    renderSummary();
+  });
+
+  // エクスポート: 現在の状態を JSON ファイルとしてダウンロード
+  document.getElementById('btn-export-state').addEventListener('click', () => {
+    const payload = {
+      schema: 'sangoku_sim_v06',
+      exported_at: new Date().toISOString(),
+      users: state.users,
+      ownerships: state.ownerships,
+      activeUserId: state.activeUserId,
+      filters: state.filters,
+      formations: state.formations,
+      aggMode: state.aggMode,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const ts = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const fname = `sangoku_sim_${ts.getFullYear()}${pad(ts.getMonth()+1)}${pad(ts.getDate())}_${pad(ts.getHours())}${pad(ts.getMinutes())}.json`;
+    const a = document.createElement('a');
+    a.href = url; a.download = fname;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+
+  // インポート: ファイル選択 → JSON 読込 → loadState で復元 → 再描画
+  const fileInput = document.getElementById('file-import-state');
+  document.getElementById('btn-import-state').addEventListener('click', async () => {
+    if (!await askConfirm('JSONファイルから読み込みます。\n現在の所持・編成・プレイヤー設定は上書きされます。よろしいですか？')) return;
+    fileInput.value = '';
+    fileInput.click();
+  });
+  fileInput.addEventListener('change', async () => {
+    const f = fileInput.files && fileInput.files[0];
+    if (!f) return;
+    try {
+      const text = await f.text();
+      const obj = JSON.parse(text);
+      // 既存の loadState ロジックを再利用するため localStorage に書いてから読み直す
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+      // state を初期化してから loadState
+      state.users = defaultUsers();
+      state.ownerships = {};
+      state.activeUserId = 1;
+      state.formations = defaultFormations();
+      loadState();
+      renderUserTabs();
+      renderRoster();
+      renderFormation();
+      renderSummary();
+      notify(`読み込み完了: プレイヤー${state.users.length}名 / 軍団${state.formations.length}件`);
+    } catch (e) {
+      console.error(e);
+      notify(`読み込みに失敗しました\n${e.message || e}`);
+    }
+  });
+
+  // 集計モード切替
+  document.querySelectorAll('input[name="agg-mode"]').forEach(r => {
+    if (r.value === state.aggMode) r.checked = true;
+    r.addEventListener('change', () => {
+      if (r.checked) {
+        state.aggMode = r.value;
+        saveState();
+        renderSummary();
+      }
+    });
+  });
+
+  // 一括チェックボックス
+  const bulkBindings = [
+    {
+      id: 'bulk-owned',
+      apply: (own, on, g) => {
+        own.owned = on;
+        // 所持解除時はそのプレイヤー所属の軍団から外す
+        if (!on) {
+          for (const f of state.formations) {
+            if (f.user_id !== state.activeUserId) continue;
+            for (const bat of f.battalions) {
+              for (const k of SLOT_KEYS) if (bat[k] === g.id) bat[k] = null;
+            }
+            for (const k of SLOT_KEYS) if (f.array[k] === g.id) f.array[k] = null;
+          }
+        }
+      },
+    },
+    { id: 'bulk-breakthrough', apply: (own, on) => { own.breakthrough = on ? 4 : 0; } },
+    { id: 'bulk-equipment',    apply: (own, on) => { own.equipment    = on ? 4 : 0; } },
+    { id: 'bulk-level-break',  apply: (own, on) => { own.level_break  = on; } },
+  ];
+  for (const b of bulkBindings) {
+    const cb = document.getElementById(b.id);
+    if (!cb) continue;
+    cb.addEventListener('change', () => {
+      const on = cb.checked;
+      const filtered = filteredGenerals();
+      for (const g of filtered) {
+        const own = getOwn(g.id);
+        b.apply(own, on, g);
+      }
+      saveState();
+      renderRoster();
+      renderFormation();
+      renderSummary();
+    });
+  }
+
+  // 選択中の軍団をまとめて自動編成
+  document.getElementById('btn-auto-build-all').addEventListener('click', async () => {
+    const targets = state.formations
+      .map((f, idx) => ({ f, idx }))
+      .filter(({ f }) => f.selected);
+    if (!targets.length) {
+      notify('チェックを入れた軍団がありません');
+      return;
+    }
+    // 設定不足チェック
+    const missing = targets.filter(({ f }) => !f.troop_type || (!f.auto.pri1 && !f.auto.pri2));
+    if (missing.length) {
+      const names = missing.map(({ idx }) => `軍団${idx + 1}`).join('、');
+      if (!await askConfirm(`${names} は兵種または優先設定が未指定です。\nスキップして他軍団のみ編成しますか？`)) return;
+    }
+    // 対象軍団を順番に編成（pool は runAutoBuilderFor 内で他軍団から自動集計）
+    for (const { idx, f } of targets) {
+      if (!f.troop_type) continue;
+      if (!f.auto.pri1 && !f.auto.pri2) continue;
+      runAutoBuilderFor(idx);
+    }
+  });
+
+  // 編成クリア（全軍団）
+  document.getElementById('btn-clear-formation').addEventListener('click', async () => {
+    if (!await askConfirm(`全${NUM_LEGIONS}軍団の編成をクリアします。よろしいですか？`)) return;
+    state.formations = state.formations.map(f => emptyFormation(f.user_id));
+    saveState();
+    renderFormation();
+    renderSummary();
+  });
+}
+
+// ============================================================
+// 自動編成ビルダー
+// ============================================================
+// CORE_ATTRS は下で定義されている定数を参照するため、関数化して遅延評価する
+function buildPriorityOptions() {
+  const out = [{ value: '', label: '— なし —' }];
+  for (const a of CORE_ATTRS) {
+    out.push({ value: `${a}/up`,   label: `${a} up`   });
+    out.push({ value: `${a}/down`, label: `${a} down` });
+  }
+  return out;
+}
+
+// 旧 initAutoBuilder は撤去。auto-builder は renderFormation 内で軍団ごとに描画する。
+
+// スキルの cap 情報を取得
+function getCapInfo(sk) {
+  const ruleKey = (sk.cap && sk.cap.rule) || null;
+  const isShared = !!(sk.cap && sk.cap.shared);
+  const ruleDef = ruleKey && state.data ? state.data.meta.cap_rules[ruleKey] : null;
+  let capValue = null;
+  if (sk.cap && sk.cap.cap_value != null) capValue = sk.cap.cap_value;
+  else if (ruleDef && ruleDef.cap_value != null) capValue = ruleDef.cap_value;
+  // shared プールキー（個別の場合は null → 都度独立判定）
+  const scope = sk.scope || 'self';
+  const bucketKey = isShared && ruleKey ? `${scope}#${ruleKey}#shared` : null;
+  return { ruleKey, isShared, capValue, scope, bucketKey };
+}
+
+// 与えられた pool 状態のもとで、この武将を編成に加えたときの限界貢献スコアを計算
+// pool は { bucketKey: 現在の合計 } のマップ。返す newPool は更新版。
+function marginalContribution(g, pri1, pri2, pool, userId) {
+  const own = getOwn(userId != null ? userId : state.activeUserId, g.id);
+  let s1 = 0, s2 = 0;
+  const newPool = { ...pool };
+  for (const sk of (g.skills || [])) {
+    const eff = resolveSkillValue(sk, own);
+    if (eff == null) continue;
+    const key = `${sk.effect_attribute}/${sk.direction}`;
+    const matchP1 = pri1 && key === pri1;
+    const matchP2 = pri2 && key === pri2;
+    if (!matchP1 && !matchP2) continue;
+    const info = getCapInfo(sk);
+    let marginal = eff;
+    if (info.bucketKey && info.capValue != null) {
+      // 共有プール: 現在合計を見て cap 超過分はカット
+      const before = newPool[info.bucketKey] || 0;
+      let after;
+      if (info.capValue > 0) {
+        after = (before >= info.capValue) ? before : Math.min(before + eff, info.capValue);
+      } else {
+        after = (before <= info.capValue) ? before : Math.max(before + eff, info.capValue);
+      }
+      marginal = after - before;
+      newPool[info.bucketKey] = after;
+    } else if (info.capValue != null) {
+      // 個別 cap: このスキル単独で cap 超過分カット
+      if (info.capValue > 0) marginal = Math.min(eff, info.capValue);
+      else marginal = Math.max(eff, info.capValue);
+    }
+    const absM = Math.abs(marginal);
+    if (matchP1) s1 += absM;
+    if (matchP2) s2 += absM;
+  }
+  return { score: s1 * 2 + s2, newPool };
+}
+
+function runAutoBuilderFor(legionIdx) {
+  const f = state.formations[legionIdx];
+  const userId = f.user_id;
+  const troop = f.troop_type;
+  const pri1 = f.auto.pri1;
+  const pri2 = f.auto.pri2;
+  if (!pri1 && !pri2) {
+    notify('第一優先または第二優先を指定してください');
+    return;
+  }
+  if (!troop) {
+    notify('兵種を指定してください');
+    return;
+  }
+
+  // 同じユーザーの他軍団で使用中の武将を除外
+  const usedByOtherSameUser = new Set();
+  state.formations.forEach((other, idx) => {
+    if (idx === legionIdx) return;
+    if (other.user_id !== userId) return;
+    for (const b of other.battalions) for (const k of SLOT_KEYS) if (b[k]) usedByOtherSameUser.add(b[k]);
+    for (const k of SLOT_KEYS) if (other.array[k]) usedByOtherSameUser.add(other.array[k]);
+  });
+
+  const ownedGens = state.data.generals.filter(g => getOwn(userId, g.id).owned && !usedByOtherSameUser.has(g.id));
+
+  // この軍団をクリア（他軍団は触らない）
+  state.formations[legionIdx] = {
+    user_id: userId,
+    selected: f.selected,
+    troop_type: troop,
+    battalions: [emptyBattalion(), emptyBattalion(), emptyBattalion(), emptyBattalion(), emptyBattalion()],
+    array: emptyBattalion(),
+    auto: { pri1, pri2 },
+  };
+  const fNew = state.formations[legionIdx];
+  const used = new Set();
+  let pool = {};
+
+  // 全軍団（他ユーザー含む）に既に置かれた武将のスキルから集結 cap プール初期値を計算
+  for (const other of state.formations) {
+    if (other === fNew) continue;
+    const placed = new Set();
+    for (const b of other.battalions) for (const k of SLOT_KEYS) if (b[k]) placed.add(b[k]);
+    for (const k of SLOT_KEYS) if (other.array[k]) placed.add(other.array[k]);
+    for (const gid of placed) {
+      const g = state.data.generals.find(x => x.id === gid);
+      if (!g) continue;
+      const own = getOwn(other.user_id, g.id);
+      for (const sk of (g.skills || [])) {
+        const eff = resolveSkillValue(sk, own);
+        if (eff == null) continue;
+        const info = getCapInfo(sk);
+        if (info.bucketKey) pool[info.bucketKey] = (pool[info.bucketKey] || 0) + eff;
+      }
+    }
+  }
+
+  function slotMatch(g, slot) {
+    const ss = g.slot_stat;
+    if (ss == null) return true;
+    if (Array.isArray(ss)) return ss.includes(slot);
+    return ss === slot;
+  }
+
+  function pickBest(candidateFilter) {
+    let best = null;
+    for (const g of ownedGens) {
+      if (used.has(g.id)) continue;
+      if (!candidateFilter(g)) continue;
+      const { score, newPool } = marginalContribution(g, pri1, pri2, pool, userId);
+      if (best === null || score > best.score) {
+        best = { g, score, newPool };
+      }
+    }
+    return best;
+  }
+
+  for (let bi = 0; bi < 5; bi++) {
+    const bat = fNew.battalions[bi];
+    for (const slot of SLOT_KEYS) {
+      const best = pickBest(g => canPlaceInTroop(g, troop) && slotMatch(g, slot));
+      if (best) {
+        bat[slot] = best.g.id;
+        used.add(best.g.id);
+        pool = best.newPool;
+      }
+    }
+  }
+  for (const slot of SLOT_KEYS) {
+    let best = pickBest(g => g.troop_type === '戦車' && slotMatch(g, slot));
+    if (!best) best = pickBest(g => slotMatch(g, slot));
+    if (best) {
+      fNew.array[slot] = best.g.id;
+      used.add(best.g.id);
+      pool = best.newPool;
+    }
+  }
+
+  saveState();
+  renderFormation();
+  renderSummary();
+}
+
+function renderFormation() {
+  const container = document.getElementById('formation');
+  container.innerHTML = '';
+
+  state.formations.forEach((f, li) => {
+    const panel = document.createElement('details');
+    panel.open = true;
+    panel.style.cssText = 'border:1px solid var(--border);margin-bottom:10px;padding:6px 8px;background:#fcfaf3;';
+    const summary = document.createElement('summary');
+    summary.style.cssText = 'font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;flex-wrap:wrap;';
+    const t = f.troop_type;
+    const badge = t ? `<span class="badge b-troop b-troop-${t}">${t}</span>` : `<span style="color:var(--muted);font-weight:normal;">兵種未指定</span>`;
+    const userOpts = state.users.map(u =>
+      `<option value="${u.id}" ${u.id === f.user_id ? 'selected' : ''}>${u.name}</option>`
+    ).join('');
+    summary.innerHTML = `
+      <input type="checkbox" data-legion="${li}" data-ab="select" ${f.selected ? 'checked' : ''} title="一括自動編成の対象にする">
+      <span>軍団${li + 1}</span>
+      <select data-legion="${li}" data-ab="user" title="プレイヤー" style="font-size:12px;">${userOpts}</select>
+      ${badge}
+    `;
+    panel.appendChild(summary);
+    // 子要素のクリックで折りたたみが切り替わらないように
+    const cb = summary.querySelector('input[type="checkbox"]');
+    cb.addEventListener('click', (e) => e.stopPropagation());
+    cb.addEventListener('change', (e) => {
+      f.selected = e.target.checked;
+      saveState();
+      renderFormation();
+    });
+    const userSel = summary.querySelector('select[data-ab="user"]');
+    userSel.addEventListener('click', (e) => e.stopPropagation());
+    userSel.addEventListener('change', (e) => {
+      const newUid = parseInt(e.target.value, 10);
+      // ユーザー変更時はこの軍団の配置をクリア（別ユーザーの所持武将は使えない）
+      f.user_id = newUid;
+      f.battalions = [emptyBattalion(),emptyBattalion(),emptyBattalion(),emptyBattalion(),emptyBattalion()];
+      f.array = emptyBattalion();
+      saveState();
+      renderFormation();
+      renderSummary();
+    });
+
+    // 自動編成コントロール（軍団ごと: 兵種・第一・第二優先のみ。実行は一括ボタンで）
+    const ctrl = document.createElement('div');
+    ctrl.style.cssText = 'background:#fafaf3;border:1px dashed var(--border);padding:6px;margin:6px 0;font-size:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;';
+    ctrl.innerHTML = `
+      <strong>自動編成設定:</strong>
+      <label>兵種<select data-legion="${li}" data-ab="troop"></select></label>
+      <label>第一優先<select data-legion="${li}" data-ab="pri1"></select></label>
+      <label>第二優先<select data-legion="${li}" data-ab="pri2"></select></label>
+      <button data-legion="${li}" data-ab="clear">この軍団をクリア</button>
+    `;
+    panel.appendChild(ctrl);
+    // selectsを埋める
+    const troopSel = ctrl.querySelector('select[data-ab="troop"]');
+    troopSel.innerHTML = '<option value="">— 兵種未指定 —</option>' + MAIN_TROOPS.map(t => `<option value="${t}">${t}</option>`).join('');
+    if (f.troop_type) troopSel.value = f.troop_type;
+    troopSel.addEventListener('change', () => {
+      f.troop_type = troopSel.value || null;
+      saveState(); renderFormation(); renderSummary();
+    });
+    const priOpts = buildPriorityOptions();
+    for (const key of ['pri1', 'pri2']) {
+      const sel = ctrl.querySelector(`select[data-ab="${key}"]`);
+      sel.innerHTML = priOpts.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
+      sel.value = f.auto[key] || '';
+      sel.addEventListener('change', () => { f.auto[key] = sel.value; saveState(); });
+    }
+    ctrl.querySelector('button[data-ab="clear"]').addEventListener('click', async () => {
+      if (!await askConfirm(`軍団${li + 1} をクリアします`)) return;
+      const keepUid = state.formations[li].user_id;
+      state.formations[li] = emptyFormation(keepUid);
+      saveState(); renderFormation(); renderSummary();
+    });
+
+    // 主陣
+    const mainGrid = document.createElement('div');
+    mainGrid.className = 'formation-grid';
+    mainGrid.appendChild(makeHeaderCell(''));
+    for (const s of SLOT_KEYS) mainGrid.appendChild(makeHeaderCell(s));
+    f.battalions.forEach((bat, idx) => {
+      const lab = document.createElement('div');
+      lab.className = 'row-label';
+      lab.textContent = `部隊${idx + 1}`;
+      mainGrid.appendChild(lab);
+      for (const slot of SLOT_KEYS) {
+        mainGrid.appendChild(makeSlotCell(bat, slot, { isArray: false, legionIdx: li }));
+      }
+    });
+    panel.appendChild(mainGrid);
+
+    // 角陣
+    const arrayGrid = document.createElement('div');
+    arrayGrid.className = 'formation-grid array-row';
+    arrayGrid.appendChild(makeHeaderCell(''));
+    for (const s of SLOT_KEYS) arrayGrid.appendChild(makeHeaderCell(s));
+    const arrLab = document.createElement('div');
+    arrLab.className = 'row-label';
+    arrLab.textContent = '角陣';
+    arrLab.title = '戦車優先・他兵種も可';
+    arrayGrid.appendChild(arrLab);
+    for (const slot of SLOT_KEYS) {
+      arrayGrid.appendChild(makeSlotCell(f.array, slot, { isArray: true, legionIdx: li }));
+    }
+    panel.appendChild(arrayGrid);
+
+    container.appendChild(panel);
+  });
+}
+
+function makeHeaderCell(text) {
+  const div = document.createElement('div');
+  div.className = 'header';
+  div.textContent = text;
+  return div;
+}
+
+function makeSlotCell(bat, slot, opts) {
+  const wrap = document.createElement('div');
+  wrap.className = 'slot';
+  const sel = document.createElement('select');
+  const optEmpty = document.createElement('option');
+  optEmpty.value = ''; optEmpty.textContent = '— 空 —';
+  sel.appendChild(optEmpty);
+
+  const legionIdx = opts.legionIdx;
+  const formation = (legionIdx != null) ? state.formations[legionIdx] : null;
+  const userId = formation ? formation.user_id : state.activeUserId;
+
+  // 同じユーザーの他軍団スロットで使用中の武将を除外
+  const usedElsewhere = new Set();
+  for (const f of state.formations) {
+    if (f.user_id !== userId) continue;
+    for (const b of f.battalions) {
+      for (const k of SLOT_KEYS) {
+        if (!b[k]) continue;
+        if (b === bat && k === slot) continue;
+        usedElsewhere.add(b[k]);
+      }
+    }
+    for (const k of SLOT_KEYS) {
+      if (!f.array[k]) continue;
+      if (f.array === bat && k === slot) continue;
+      usedElsewhere.add(f.array[k]);
+    }
+  }
+
+  const legionTroop = formation ? formation.troop_type : null;
+
+  const candidates = state.data.generals.filter(g => {
+    const own = getOwn(userId, g.id);
+    if (!own.owned) return false;
+    if (usedElsewhere.has(g.id)) return false;
+    if (!opts.isArray) {
+      if (!canPlaceInTroop(g, legionTroop)) return false;
+    }
+    const ss = g.slot_stat;
+    if (ss == null) return true;
+    if (Array.isArray(ss)) return ss.includes(slot);
+    return ss === slot;
+  });
+  for (const g of candidates) {
+    const o = document.createElement('option');
+    o.value = g.id;
+    o.textContent = `${g.name} (${g.troop_type}/${g.base_rarity})`;
+    if (bat[slot] === g.id) o.selected = true;
+    sel.appendChild(o);
+  }
+  sel.addEventListener('change', () => {
+    bat[slot] = sel.value || null;
+    saveState();
+    renderFormation();  // 他軍団のドロップダウンも更新
+    renderSummary();
+  });
+  wrap.appendChild(sel);
+  return wrap;
+}
+
+function filteredGenerals() {
+  return state.data.generals.filter(g => {
+    if (state.filters.troop && g.troop_type !== state.filters.troop) return false;
+    if (state.filters.rarity && g.base_rarity !== state.filters.rarity) return false;
+    if (state.filters.search && !g.name.includes(state.filters.search) && !(g.yomi || '').includes(state.filters.search)) return false;
+    if (state.filters.ownedOnly && !getOwn(g.id).owned) return false;
+    return true;
+  });
+}
+
+function updateBulkCheckboxes() {
+  const filtered = filteredGenerals();
+  if (!filtered.length) return;
+  const axes = [
+    { id: 'bulk-owned',         pick: o => o.owned },
+    { id: 'bulk-breakthrough',  pick: o => o.breakthrough === 4 },
+    { id: 'bulk-equipment',     pick: o => o.equipment === 4 },
+    { id: 'bulk-level-break',   pick: o => o.level_break },
+  ];
+  for (const a of axes) {
+    const cb = document.getElementById(a.id);
+    if (!cb) continue;
+    const states = filtered.map(g => a.pick(getOwn(g.id)));
+    const allOn = states.every(Boolean);
+    const allOff = states.every(s => !s);
+    cb.checked = allOn;
+    cb.indeterminate = !allOn && !allOff;
+  }
+}
+
+function renderRoster() {
+  const tbody = document.querySelector('#roster-table tbody');
+  tbody.innerHTML = '';
+  const filtered = filteredGenerals();
+
+  document.getElementById('roster-count').textContent = `(${filtered.length} / ${state.data.generals.length})`;
+
+  for (const g of filtered) {
+    const own = getOwn(g.id);
+    const tr = document.createElement('tr');
+    if (own.owned) tr.classList.add('owned');
+
+    // 所持チェック
+    const tdOwn = document.createElement('td');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.checked = own.owned;
+    cb.addEventListener('change', () => {
+      own.owned = cb.checked;
+      // 所持解除した武将を、このプレイヤー所属の軍団から外す
+      if (!cb.checked) {
+        for (const f of state.formations) {
+          if (f.user_id !== state.activeUserId) continue;
+          for (const bat of f.battalions) {
+            for (const k of SLOT_KEYS) if (bat[k] === g.id) bat[k] = null;
+          }
+          for (const k of SLOT_KEYS) if (f.array[k] === g.id) f.array[k] = null;
+        }
+      }
+      saveState(); renderRoster(); renderFormation(); renderSummary();
+    });
+    tdOwn.appendChild(cb);
+    tr.appendChild(tdOwn);
+
+    // 武将名
+    const tdName = document.createElement('td');
+    tdName.innerHTML = `<strong>${g.name}</strong>${g.yomi ? `<span style="color:var(--muted);font-size:11px;"> (${g.yomi})</span>` : ''}`;
+    tr.appendChild(tdName);
+
+    // 属性
+    const tdAttr = document.createElement('td');
+    const slotS = Array.isArray(g.slot_stat) ? g.slot_stat.join('/') : (g.slot_stat || '?');
+    tdAttr.innerHTML =
+      `<span class="badge b-rarity-${g.base_rarity}">${g.base_rarity}</span>` +
+      `<span class="badge b-troop b-troop-${g.troop_type}">${g.troop_type}</span>` +
+      `<span style="font-size:11px;color:var(--muted);">${slotS}</span>`;
+    tr.appendChild(tdAttr);
+
+    // 育成段階（突破・装備は実用上 0 or 4 の2値 → チェックボックス）
+    const tdProg = document.createElement('td');
+    tdProg.innerHTML = `
+      <span class="progression">
+        <label>突破<input type="checkbox" ${own.breakthrough === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="breakthrough_bool"></label>
+        <label>装<input type="checkbox" ${own.equipment === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="equipment_bool"></label>
+        <label>Lv<input type="checkbox" ${own.level_break ? 'checked' : ''} data-id="${g.id}" data-axis="level_break"></label>
+        <label>印<input type="number" min="0" max="5" value="${own.seal}" data-id="${g.id}" data-axis="seal"></label>
+      </span>
+    `;
+    tr.appendChild(tdProg);
+
+    tbody.appendChild(tr);
+  }
+
+  updateBulkCheckboxes();
+
+  // bind progression inputs
+  tbody.querySelectorAll('input[data-axis]').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const id = inp.dataset.id;
+      const axis = inp.dataset.axis;
+      const own = getOwn(id);
+      if (axis === 'level_break') {
+        own.level_break = inp.checked;
+      } else if (axis === 'breakthrough_bool') {
+        own.breakthrough = inp.checked ? 4 : 0;
+      } else if (axis === 'equipment_bool') {
+        own.equipment = inp.checked ? 4 : 0;
+      } else {
+        own[axis] = parseInt(inp.value, 10) || 0;
+      }
+      saveState();
+      renderSummary();
+    });
+  });
+}
+
+function fmtVal(v, unit) {
+  if (v == null) return '—';
+  if (unit === 'percent') return `${v > 0 ? '+' : ''}${v}%`;
+  return `${v}`;
+}
+
+const CORE_ATTRS = ['攻撃', '防御', '連撃', '貫通', '抵抗', 'シールド', '貫通抵抗'];
+const SCOPE_LABELS = { legion: '軍団', rally: '集結', array: '角陣', self: '自部隊' };
+
+// 属性マトリクス集計
+function aggregateByAttribute(breakdown) {
+  // 戻り値: { [attr]: { [scope]: { up: [items], down: [items], both: [items] } }, その他: [items] }
+  const matrix = {};
+  for (const attr of [...CORE_ATTRS, 'その他']) {
+    matrix[attr] = { legion: {up:[], down:[], both:[]}, rally: {up:[], down:[], both:[]}, array: {up:[], down:[], both:[]}, self: {up:[], down:[], both:[]} };
+  }
+  for (const b of breakdown) {
+    if (b.value == null) continue;
+    const attr = b.attribute || 'その他';
+    const dir = b.direction || (b.value > 0 ? 'up' : (b.value < 0 ? 'down' : null));
+    if (!dir) continue;
+    const scope = b.scope || 'self';
+    if (!matrix[attr] || !matrix[attr][scope]) continue;
+    if (!matrix[attr][scope][dir]) matrix[attr][scope][dir] = [];
+    matrix[attr][scope][dir].push(b);
+  }
+  return matrix;
+}
+
+function renderAttributeMatrix(breakdown) {
+  const el = document.getElementById('attr-matrix');
+  el.innerHTML = '';
+  if (!breakdown.length) {
+    el.innerHTML = '<em style="color:var(--muted);">集計対象の武将がありません。</em>';
+    return;
+  }
+  const matrix = aggregateByAttribute(breakdown);
+
+  const table = document.createElement('table');
+  table.className = 'attr-table';
+  const thead = document.createElement('thead');
+  thead.innerHTML = `
+    <tr>
+      <th rowspan="2">属性</th>
+      <th colspan="2">集結 (rally)</th>
+      <th colspan="2">軍団 (legion)</th>
+      <th colspan="2">角陣 (array)</th>
+      <th colspan="2">自部隊 (self)</th>
+    </tr>
+    <tr>
+      <th>up</th><th>down</th>
+      <th>up</th><th>down</th>
+      <th>up</th><th>down</th>
+      <th>up</th><th>down</th>
+    </tr>
+  `;
+  table.appendChild(thead);
+  const tbody = document.createElement('tbody');
+
+  for (const attr of CORE_ATTRS) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="attr-name">${attr}</td>`;
+    for (const scope of ['rally', 'legion', 'array', 'self']) {
+      for (const dir of ['up', 'down']) {
+        const items = matrix[attr][scope][dir] || [];
+        const both = matrix[attr][scope].both || [];
+        const effective = [...items, ...both];
+        const td = document.createElement('td');
+        if (effective.length === 0) {
+          td.className = 'empty';
+          td.textContent = '—';
+        } else {
+          const sum = effective.reduce((s, i) => s + (i.value || 0), 0);
+          td.className = sum > 0 ? 'up' : (sum < 0 ? 'down' : 'zero');
+          td.innerHTML = `<strong>${fmtVal(sum, 'percent')}</strong>` +
+            `<div class="attr-list">${effective.map(i => `${i.general}/${i.skill.slice(0,12)}`).join('<br>')}</div>`;
+        }
+        tr.appendChild(td);
+      }
+    }
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  el.appendChild(table);
+
+  // その他は別枠でリスト表示
+  const others = [];
+  for (const scope of ['rally','legion','array','self']) {
+    for (const dir of ['up','down','both']) {
+      for (const b of (matrix['その他'][scope][dir] || [])) others.push(b);
+    }
+  }
+  if (others.length) {
+    const ol = document.createElement('details');
+    ol.style.marginTop = '8px';
+    const sum = document.createElement('summary');
+    sum.textContent = `その他 (${others.length}件)`;
+    ol.appendChild(sum);
+    for (const b of others) {
+      const row = document.createElement('div');
+      row.className = 'skill-row';
+      row.innerHTML = `<span class="scope-badge scope-${b.scope}">${SCOPE_LABELS[b.scope]||b.scope}</span> <strong>${b.general}/${b.skill}</strong> → ${fmtVal(b.value, b.unit)}`;
+      ol.appendChild(row);
+    }
+    el.appendChild(ol);
+  }
+}
+
+function renderSummary() {
+  const { aggregated, issues, breakdown } = aggregate();
+
+  // 属性マトリクスを最初に描画
+  renderAttributeMatrix(breakdown);
+
+  const summaryEl = document.getElementById('summary');
+  summaryEl.innerHTML = '';
+
+  const scopeLabels = SCOPE_LABELS;
+
+  for (const scope of ['rally', 'legion', 'array', 'self']) {
+    const groups = aggregated[scope] || [];
+    if (!groups.length) continue;
+    const section = document.createElement('details');
+    section.open = (scope === 'rally' || scope === 'legion');
+    const sum = document.createElement('summary');
+    sum.innerHTML = `<span class="scope-badge scope-${scope}">${scopeLabels[scope]}</span> ${groups.length}グループ`;
+    section.appendChild(sum);
+
+    for (const grp of groups) {
+      const row = document.createElement('div');
+      row.className = 'summary-row';
+      const labels = grp.items.map(i => `${i.general}/${i.skill}`).join(', ');
+      const capLabel = grp.capValue == null ? '上限未指定' :
+                       (grp.overflow ? `上限${grp.capValue}（超過）` : `上限${grp.capValue}`);
+      const valLabel = `合算 ${fmtVal(grp.sum, grp.items[0].unit)} → 実効 ${fmtVal(grp.capped, grp.items[0].unit)}`;
+      const sharedLabel = grp.isShared ? '<span class="badge" style="background:#ddd;">共有</span>' : '';
+      row.innerHTML = `
+        <div class="label">${sharedLabel}${grp.ruleKey}<br><span style="font-size:11px;">${labels}</span></div>
+        <div class="value ${grp.overflow ? 'overflow' : 'ok'}">${valLabel}<br><span style="font-size:11px;color:var(--muted);">${capLabel}</span></div>
+      `;
+      section.appendChild(row);
+    }
+    summaryEl.appendChild(section);
+  }
+
+  // 警告
+  if (issues.length) {
+    const warnEl = document.createElement('div');
+    warnEl.className = 'warn-banner';
+    warnEl.innerHTML = `<strong>要確認 (${issues.length}件):</strong><ul style="margin:4px 0 0 16px;padding:0;">` +
+      issues.map(i => `<li>${i}</li>`).join('') + '</ul>';
+    summaryEl.appendChild(warnEl);
+  }
+
+  if (!groupsHadAnyContent(aggregated)) {
+    summaryEl.innerHTML = '<em style="color:var(--muted);">所持武将がありません。一覧から所持にチェックを入れてください。</em>';
+  }
+
+  // スキル詳細
+  const detailEl = document.getElementById('skill-detail');
+  if (breakdown.length === 0) {
+    detailEl.innerHTML = '<em style="color:var(--muted);">所持武将のスキルがここに表示されます。</em>';
+    return;
+  }
+  detailEl.innerHTML = '';
+  const byGeneral = {};
+  for (const b of breakdown) {
+    if (!byGeneral[b.general]) byGeneral[b.general] = [];
+    byGeneral[b.general].push(b);
+  }
+  for (const gname of Object.keys(byGeneral)) {
+    const d = document.createElement('details');
+    const s = document.createElement('summary');
+    s.textContent = gname;
+    d.appendChild(s);
+    for (const b of byGeneral[gname]) {
+      const row = document.createElement('div');
+      row.className = 'skill-row';
+      const lockedNote = b.value == null
+        ? (b.unlocked_at > 0 ? `（突破${b.unlocked_at}で解放／現状未解放 or 未登録）` : '（値未登録）')
+        : '';
+      row.innerHTML = `
+        <span class="scope-badge scope-${b.scope}">${scopeLabels[b.scope] || b.scope}</span>
+        <strong>${b.skill}</strong>
+        <span class="conf-${b.confidence}">[${b.confidence}]</span>
+        ${b.stacking === 'non_stackable' ? '<span class="badge" style="background:#fbecdc;">累加不可</span>' : ''}
+        ${b.unlocked_at_equipment != null ? `<span class="badge" style="background:#e8eef4;">装備${b.unlocked_at_equipment}</span>` : ''}
+        → 値=${fmtVal(b.value, b.unit)} ${lockedNote}
+      `;
+      d.appendChild(row);
+    }
+    detailEl.appendChild(d);
+  }
+}
+
+function groupsHadAnyContent(aggregated) {
+  for (const s of Object.keys(aggregated)) {
+    if (aggregated[s] && aggregated[s].length) return true;
+  }
+  return false;
+}
+
+// ============================================================
+// 起動
+// ============================================================
+(async () => {
+  loadState();
+  try {
+    await loadData();
+  } catch (e) {
+    return;
+  }
+  renderUserTabs();
+  renderFilters();
+  renderRoster();
+  renderFormation();
+  renderSummary();
+})();
+
+</script>
+</body>
+</html>
