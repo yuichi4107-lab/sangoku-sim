@@ -137,6 +137,18 @@ meta:
       cap_value: -50
       shared: false
       note: 集結・敵連撃ダウン（個別プール、上限50%）
+  floor_rules:
+    attack: 10
+    defense: 10
+    rensa: 20
+    resist: 20
+    pierce: 20
+    pierce_resist: 20
+    shield: 20
+    discipline: 20
+    final_damage: 10
+    source: ゲーム内ルール説明ポップアップ (IMG_0671/0672, 2026-05-15)
+    note: 敵方デバフが下げきれない下限。属性ごとに10%または20%。
 generals:
 - id: chouryou
   name: 張遼
