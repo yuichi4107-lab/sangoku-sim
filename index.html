@@ -148,9 +148,9 @@
     <div class="filters" style="border-top:1px dotted var(--border);padding-top:6px;">
       <span style="font-size:12px;color:var(--muted);">一括（表示中の武将に適用）:</span>
       <label><input type="checkbox" id="bulk-owned">所持</label>
-      <label><input type="checkbox" id="bulk-bt3">突3</label>
-      <label><input type="checkbox" id="bulk-bt4">突4</label>
-      <label><input type="checkbox" id="bulk-equipment">装4</label>
+      <label><input type="checkbox" id="bulk-bt3">3突</label>
+      <label><input type="checkbox" id="bulk-bt4">4突</label>
+      <label><input type="checkbox" id="bulk-equipment">4装</label>
     </div>
     <div class="roster-scroll">
       <table id="roster-table">
@@ -1313,9 +1313,9 @@ function renderRoster() {
     const tdProg = document.createElement('td');
     tdProg.innerHTML = `
       <span class="progression">
-        <label>突3<input type="checkbox" ${own.breakthrough === 3 ? 'checked' : ''} data-id="${g.id}" data-axis="bt3"></label>
-        <label>突4<input type="checkbox" ${own.breakthrough === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="bt4"></label>
-        <label>装4<input type="checkbox" ${own.equipment === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="equipment_bool"></label>
+        <label>3突<input type="checkbox" ${own.breakthrough === 3 ? 'checked' : ''} data-id="${g.id}" data-axis="bt3"></label>
+        <label>4突<input type="checkbox" ${own.breakthrough === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="bt4"></label>
+        <label>4装<input type="checkbox" ${own.equipment === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="equipment_bool"></label>
         <label>印<input type="number" min="0" max="5" value="${own.seal}" data-id="${g.id}" data-axis="seal"></label>
       </span>
     `;
