@@ -148,9 +148,9 @@
     <div class="filters" style="border-top:1px dotted var(--border);padding-top:6px;">
       <span style="font-size:12px;color:var(--muted);">一括（表示中の武将に適用）:</span>
       <label><input type="checkbox" id="bulk-owned">所持</label>
-      <label><input type="checkbox" id="bulk-breakthrough">突破</label>
-      <label><input type="checkbox" id="bulk-equipment">装</label>
-      <label><input type="checkbox" id="bulk-level-break">Lv</label>
+      <label><input type="checkbox" id="bulk-bt3">突3</label>
+      <label><input type="checkbox" id="bulk-bt4">突4</label>
+      <label><input type="checkbox" id="bulk-equipment">装4</label>
     </div>
     <div class="roster-scroll">
       <table id="roster-table">
@@ -827,9 +827,9 @@ function renderFilters() {
         }
       },
     },
-    { id: 'bulk-breakthrough', apply: (own, on) => { own.breakthrough = on ? 4 : 0; } },
+    { id: 'bulk-bt3',          apply: (own, on) => { own.breakthrough = on ? 3 : (own.breakthrough === 3 ? 0 : own.breakthrough); } },
+    { id: 'bulk-bt4',          apply: (own, on) => { own.breakthrough = on ? 4 : (own.breakthrough === 4 ? 0 : own.breakthrough); } },
     { id: 'bulk-equipment',    apply: (own, on) => { own.equipment    = on ? 4 : 0; } },
-    { id: 'bulk-level-break',  apply: (own, on) => { own.level_break  = on; } },
   ];
   for (const b of bulkBindings) {
     const cb = document.getElementById(b.id);
@@ -1247,9 +1247,9 @@ function updateBulkCheckboxes() {
   if (!filtered.length) return;
   const axes = [
     { id: 'bulk-owned',         pick: o => o.owned },
-    { id: 'bulk-breakthrough',  pick: o => o.breakthrough === 4 },
+    { id: 'bulk-bt3',           pick: o => o.breakthrough === 3 },
+    { id: 'bulk-bt4',           pick: o => o.breakthrough === 4 },
     { id: 'bulk-equipment',     pick: o => o.equipment === 4 },
-    { id: 'bulk-level-break',   pick: o => o.level_break },
   ];
   for (const a of axes) {
     const cb = document.getElementById(a.id);
@@ -1309,13 +1309,13 @@ function renderRoster() {
       `<span style="font-size:11px;color:var(--muted);">${slotS}</span>`;
     tr.appendChild(tdAttr);
 
-    // 育成段階（突破・装備は実用上 0 or 4 の2値 → チェックボックス）
+    // 育成段階（突破は 3段/4段、装備は 4段、将印は数値）
     const tdProg = document.createElement('td');
     tdProg.innerHTML = `
       <span class="progression">
-        <label>突破<input type="checkbox" ${own.breakthrough === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="breakthrough_bool"></label>
-        <label>装<input type="checkbox" ${own.equipment === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="equipment_bool"></label>
-        <label>Lv<input type="checkbox" ${own.level_break ? 'checked' : ''} data-id="${g.id}" data-axis="level_break"></label>
+        <label>突3<input type="checkbox" ${own.breakthrough === 3 ? 'checked' : ''} data-id="${g.id}" data-axis="bt3"></label>
+        <label>突4<input type="checkbox" ${own.breakthrough === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="bt4"></label>
+        <label>装4<input type="checkbox" ${own.equipment === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="equipment_bool"></label>
         <label>印<input type="number" min="0" max="5" value="${own.seal}" data-id="${g.id}" data-axis="seal"></label>
       </span>
     `;
@@ -1332,16 +1332,21 @@ function renderRoster() {
       const id = inp.dataset.id;
       const axis = inp.dataset.axis;
       const own = getOwn(id);
-      if (axis === 'level_break') {
-        own.level_break = inp.checked;
-      } else if (axis === 'breakthrough_bool') {
-        own.breakthrough = inp.checked ? 4 : 0;
+      if (axis === 'bt3') {
+        // 突3 ON: breakthrough=3、突4の方は自動でOFF
+        if (inp.checked) own.breakthrough = 3;
+        else if (own.breakthrough === 3) own.breakthrough = 0;
+      } else if (axis === 'bt4') {
+        if (inp.checked) own.breakthrough = 4;
+        else if (own.breakthrough === 4) own.breakthrough = 0;
       } else if (axis === 'equipment_bool') {
         own.equipment = inp.checked ? 4 : 0;
       } else {
         own[axis] = parseInt(inp.value, 10) || 0;
       }
       saveState();
+      // 突3/突4 は排他なのでロースタ全体を再描画して相手のチェック状態を反映
+      if (axis === 'bt3' || axis === 'bt4') renderRoster();
       renderSummary();
     });
   });
