@@ -885,7 +885,7 @@ generals:
     type: buff
     scope: legion
     unlocked_at: 0
-    effect: 軍団が属する陣の全兵士攻撃力が基礎攻撃力×15%、防御力が基礎防御力×15%アップ。騎兵攻撃力は追加で基礎攻撃力×20%アップ、歩兵防御力は追加で基礎防御力×20%アップ
+    effect: 軍団が属する陣の全兵士攻撃力が基礎攻撃力×15%、防御力が基礎防御力×15%アップ、騎兵攻撃力は追加で基礎攻撃力×20%アップ、歩兵防御力は追加で基礎防御力×20%アップ
     unit: percent
     value:
       by_breakthrough:
@@ -901,7 +901,7 @@ generals:
     type: buff
     scope: legion
     unlocked_at: 0
-    effect: 属する陣の戦闘時、味方攻撃アップ。数値は編成時の攻撃力×味方騎兵兵種比率×30%。味方防御アップ。数値は編成時の防御力×味方歩兵兵種比率×30%。アップする攻撃/防御は元の攻撃/防御の30%を超えず、最高は50pt
+    effect: 属する陣の戦闘時、味方攻撃アップ。数値は編成時の攻撃力×味方騎兵兵種比率×30%。味方防御アップ。数値は編成時の防御力×味方歩兵兵種比率×30%。同じ陣は別、アップする攻撃力/防御力の30%を超えず、最高は50pt
     unit: percent
     value:
       by_breakthrough:
@@ -917,11 +917,11 @@ generals:
       note: 上限30%、最高50pt
     effect_attribute: 防御
     direction: up
-  - name: 鉄壁・盾備
+  - name: 奮起・猛獣
     type: buff
     scope: self
     unlocked_at: 0
-    effect: 今いる部隊の槍盾兵防御力を基礎防御力×30%アップ
+    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×24%アップ
     unit: percent
     value:
       by_breakthrough:
@@ -929,15 +929,15 @@ generals:
       - null
       - null
       - null
-      - 30
+      - 24
       confidence: high
-    effect_attribute: 防御
+    effect_attribute: 攻撃
     direction: up
   - name: 武神
     type: buff
     scope: legion
     unlocked_at: 0
-    effect: 属する陣の戦闘時、味方連撃アップ。数値は編成時の抵抗×味方騎兵兵種比率×22%、味方歩兵兵種比率×30%。同率、所属武力陣（抵抗が30%を超えない）
+    effect: 属する陣の戦闘時、味方連撃アップ。数値は編成時の抵抗×味方歩兵兵種比率×22%、集結時、同じ陣の複数スキルが同率、アップする値は編成時の抵抗の30%を超えない
     unit: percent
     value:
       by_breakthrough:
@@ -946,18 +946,18 @@ generals:
       - null
       - null
       - 22
-      confidence: medium
+      confidence: high
     cap:
       rule: no_cap
       cap_value: 30
-      note: 抵抗30%超えない・武神
+      note: 抵抗30%超えない
     effect_attribute: 連撃
     direction: up
   - name: 単騎敵主
     type: buff
     scope: legion
     unlocked_at: 0
-    effect: 属する陣の戦闘時、味方が与える実ダメージアップ＋味方が受けるダメージ低下。数値は元のダメージ×（味方歩兵兵種比率×8%）、ダメージ低下は元のダメージ×（双方の合計兵士数）×22%。アップ/低下するダメージはそれぞれ最大5%まで
+    effect: 属する陣の戦闘時、味方が与える実ダメージがアップ。数値は（元の実ダメージ×味方歩兵兵種比率×8%）、味方が受けるダメージ低下、数値は（元の実ダメージ×味方歩兵兵種比率×8%）、集結時の同じ陣の累加可能。アップ/低下するダメージはそれぞれ最大5%まで
     unit: percent
     value:
       by_breakthrough:
@@ -966,7 +966,7 @@ generals:
       - null
       - null
       - 8
-      confidence: medium
+      confidence: high
     cap:
       rule: no_cap
       cap_value: 5
@@ -987,6 +987,7 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B90
   - https://sangoku-haou.gamer-wiki.com/character/gen-chouun
   - screenshot:IMG_0680.PNG
+  - screenshot:IMG_6347.png
 - id: 玄孫権
   name: 玄孫権
   yomi: null
@@ -1727,7 +1728,7 @@ generals:
     type: debuff
     scope: legion
     unlocked_at: 0
-    effect: 属する陣の戦闘時、2回目の交戦で敵方の攻撃力を10%低下させ、戦闘終了時で持続する（集結時の累加可能、同じ陣の累加可能。低下する軍紀は15%を超えない、絶対値上限なし）
+    effect: 属する陣の戦闘時、2回目の交戦で敵方の攻撃力を10%低下させ、戦闘終了時で持続する（集結による同じ陣の累加可能、低下する軍紀は15%を超えない、絶対値上限なし）
     unit: percent
     value:
       by_breakthrough:
@@ -1743,11 +1744,11 @@ generals:
       note: 低下軍紀15%まで
     effect_attribute: 攻撃
     direction: down
-  - name: 鉄壁・車
+  - name: 鉄壁・盾備
     type: buff
     scope: self
     unlocked_at: 0
-    effect: 今いる部隊の戦車防御力を基礎防御力×20%アップ
+    effect: 今いる部隊の槍盾兵防御力を基礎防御力×30%アップ
     unit: percent
     value:
       by_breakthrough:
@@ -1755,7 +1756,7 @@ generals:
       - null
       - null
       - null
-      - 20
+      - 30
       confidence: high
     effect_attribute: 防御
     direction: up
@@ -1763,7 +1764,7 @@ generals:
     type: buff
     scope: legion
     unlocked_at: 0
-    effect: 属する陣の毎回の交戦で味方が与えるダメージをアップ。アップ率は味方の残りシールド率×16.5%、属する陣の毎回の交戦で味方が受けるダメージを低下させる、低下率は敵方の残りシールド率×16.5%（集結による同じ陣の累加可能、アップ/低下する実ダメージはそれぞれ20%を超えない）
+    effect: 属する陣の毎回の交戦で味方が与える実ダメージをアップ。アップ率は味方の残りシールド率×16.5%、属する陣の毎回の交戦で味方が受けるダメージを低下させる、低下率は敵方の残りシールド率×16.5%（集結による同じ陣の累加可能、アップ/低下する実ダメージはそれぞれ20%を超えない）
     unit: percent
     value:
       by_breakthrough:
@@ -1809,6 +1810,7 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B19
   - screenshot:IMG_0691.PNG
+  - screenshot:ADD9C1DA.png
   xlsx_remarks: ダメージ増（味方残存兵士率x16.5%）、ダメージ減（敵方残存兵士率x16.5%）【装備】敵軍紀5%減（累加不可）
 - id: 玄周泰
   name: 玄周泰
@@ -1980,7 +1982,7 @@ generals:
     type: debuff
     scope: legion
     unlocked_at: 0
-    effect: 所属軍団が敵方武将を捕虜にする確率が50%アップ、属する陣の戦闘時、敵方の防御力が低下。低下率は軍団が属する陣内の捕虜確率上スキルを有する武将数×5%（宝物スキルは含めない、集結時の重ねかけ不可、効果が最高値のみ有効。低下率の上限は20%まで、絶対値の上限なし）
+    effect: 所属軍団が敵方武将を捕虜にする確率が50%アップ、属する陣の戦闘時、敵方の防御力が低下。低下率は軍団が属する陣内の捕虜上スキルを有する武将数×5%（宝物スキルは含めない、集結時の重ねかけ不可、効果が最高値のみ有効。低下率の上限は20%まで、絶対値の上限なし）
     unit: percent
     value:
       by_breakthrough:
@@ -2001,7 +2003,7 @@ generals:
     type: buff
     scope: self
     unlocked_at: 0
-    effect: 今いる部隊の槍盾兵防御力を基礎防御力×27%アップ
+    effect: 今いる部隊の槍盾兵防御力を基礎防御力×24%アップ
     unit: percent
     value:
       by_breakthrough:
@@ -2009,7 +2011,7 @@ generals:
       - null
       - null
       - null
-      - 27
+      - 24
       confidence: high
     effect_attribute: 防御
     direction: up
@@ -2017,7 +2019,7 @@ generals:
     type: buff
     scope: legion
     unlocked_at: 0
-    effect: 属する陣の戦闘時、味方が与えるダメージが元の数値×18%アップ、味方の最終抵抗が敵方より高い場合、さらに味方が与えるダメージが元の数値×5%アップ（集結時の重ねかけ不可、効果が最高値のみ有効。追加効果はプレイヤーに対してのみ有効）
+    effect: 属する陣の戦闘時、味方が与えるダメージが元の数値×19.8%アップ、味方の最終抵抗が敵方より高い場合、さらに味方が与えるダメージが元の数値×5.5%アップ（集結時の重ねかけ不可、効果が最高値のみ有効。追加効果はプレイヤーに対してのみ有効）
     unit: percent
     value:
       by_breakthrough:
@@ -2025,11 +2027,28 @@ generals:
       - null
       - null
       - null
-      - 18
+      - 19.8
       confidence: high
     stacking: non_stackable
     effect_attribute: 抵抗
     direction: up
+  - name: 伏甲撃襲
+    type: debuff
+    scope: legion
+    unlocked_at: 0
+    effect: 属する陣の戦闘時、敵方の抵抗が低下、低下率は（5%×敵方非兵比率×3%）（集結時の累加不可、効果が最も高いもののみ有効）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 5
+      confidence: high
+    stacking: non_stackable
+    effect_attribute: 抵抗
+    direction: down
   seal_bonus:
     by_seal:
     - null
@@ -2043,6 +2062,7 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B22
   - screenshot:IMG_0707.PNG
+  - screenshot:A93218F5.png
   xlsx_remarks: ダメージ増（抵抗勝の場合追加5.5％）【装備】抵抗低下5％＋敵方歩兵比率×3％
 - id: 楽進
   name: 楽進
@@ -3178,7 +3198,7 @@ generals:
     type: buff
     scope: self
     unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×30%アップ
+    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×27%アップ
     unit: percent
     value:
       by_breakthrough:
@@ -3186,7 +3206,7 @@ generals:
       - null
       - null
       - null
-      - 30
+      - 27
       confidence: high
     effect_attribute: 攻撃
     direction: up
@@ -3194,7 +3214,7 @@ generals:
     type: debuff
     scope: legion
     unlocked_at: 0
-    effect: 所属陣の戦闘時、敵方の軍紀×18%低下（集結時、同じ陣の累加は30%まで）。味方プレイヤーが1名しかいない場合、戦闘時、追加で元の軍紀×5%低下
+    effect: 所属陣の戦闘時、敵方の軍紀が元の軍紀×19.8%低下（集結時、同じ陣の累加は30%まで）。味方プレイヤーが1名しかいない場合、戦闘時、追加で元の軍紀×5.5%低下
     unit: percent
     value:
       by_breakthrough:
@@ -3202,13 +3222,30 @@ generals:
       - null
       - null
       - null
-      - 18
+      - 19.8
       confidence: high
     cap:
       rule: no_cap
       cap_value: 30
-      note: 累加上限30%（IMG_0709 ベース）
+      note: 累加上限30%
     effect_attribute: その他
+    direction: down
+  - name: 制敵攻略
+    type: debuff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属陣の戦闘時、敵方の連撃が低下、低下率は（5%×敵方騎兵比率×3%）（集結による累加不可、効果が最も高いのみ有効）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 5
+      confidence: high
+    stacking: non_stackable
+    effect_attribute: 連撃
     direction: down
   seal_bonus:
     by_seal:
@@ -3224,6 +3261,7 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B42
   - screenshot:IMG_0716.PNG
   - screenshot:IMG_0709.PNG
+  - screenshot:A333B1B6.png
   xlsx_remarks: 軍紀19.8％ダウン(上限30％)
 - id: 沙摩柯
   name: 沙摩柯
@@ -4468,11 +4506,27 @@ generals:
   slot_stat: 知性
   role_tags: []
   skills:
-  - name: 良才
+  - name: 興兵
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 統師となり子を率いる同時に、自身の率兵数×50%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 50
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 拓士
     type: buff
     scope: array
     unlocked_at: 0
-    effect: 所属陣が角陣の場合、戦闘時、味方角陣の抵抗が編成時の抵抗×10%アップ（集結時の累加は20%まで）
+    effect: 所属陣が角陣の場合、戦闘時、味方角陣が編成時の貫通抵抗×10%アップ（集結時、累加不可、効果が最高値のもののみ有効）
     unit: percent
     value:
       by_breakthrough:
@@ -4482,33 +4536,14 @@ generals:
       - null
       - 10
       confidence: high
-    cap:
-      rule: no_cap
-      cap_value: 20
-      note: 累加上限20%
-    effect_attribute: 抵抗
+    stacking: non_stackable
+    effect_attribute: 貫通抵抗
     direction: up
-  - name: 巧工
-    type: buff
-    scope: array
-    unlocked_at: 0
-    effect: 所属陣が角陣の場合、所属部隊の戦車支援率を基礎支援率×40%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 40
-      confidence: high
-    effect_attribute: その他
-    direction: up
-  - name: 攻城・車
+  - name: 鉄壁・車
     type: buff
     scope: self
     unlocked_at: 0
-    effect: 今いる部隊の戦車攻城値を基礎攻城値×16%アップ
+    effect: 今いる部隊の戦車防御力を基礎防御力×20%アップ
     unit: percent
     value:
       by_breakthrough:
@@ -4516,36 +4551,15 @@ generals:
       - null
       - null
       - null
-      - 16
+      - 20
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 防御
     direction: up
-  - name: 迷陣鼓
-    type: debuff
-    scope: legion
-    unlocked_at: 0
-    effect: 戦闘時、味方主陣が受けるダメージが元のダメージ×16.5%低下（集結時の累加は不可、効果が最高値のみ有効）。同時に、味方角陣が受けるダメージが元のダメージ×16.5%低下（集結時、複数効果の累加は30%を超えない）
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 16.5
-      confidence: high
-    stacking: non_stackable
-    cap:
-      rule: no_cap
-      cap_value: 30
-      note: 累加上限30%
-    effect_attribute: その他
-    direction: down
-  - name: 思考効角
+  - name: 威厳と思
     type: buff
     scope: array
     unlocked_at: 0
-    effect: 所属陣が角陣の場合、毎回交戦時、兵士数が初期参戦兵の4%減少する。累計で味方の初期参戦兵士の12%を超えない（集結による累加不可、効果は最高値のみ有効）
+    effect: 所属陣が角陣の場合、戦闘時、味方角陣が編成時の軍紀×11%アップ（集結時の累加は30%まで）。同時に味方角陣が受ける実ダメージを低下、低下率は33%×味方角陣の最終実ダメ÷敵方の最終実ダメ（集結時の累加は最低20%以上、最大40%まで）
     unit: percent
     value:
       by_breakthrough:
@@ -4553,15 +4567,30 @@ generals:
       - null
       - null
       - null
-      - 4
+      - 11
       confidence: high
-    stacking: non_stackable
     cap:
       rule: no_cap
-      cap_value: 12
-      note: 累計上限12%
+      cap_value: 40
+      note: 累加上限40%、下限20%
     effect_attribute: その他
-    direction: down
+    direction: both
+  - name: 辺境防衛
+    type: buff
+    scope: array
+    unlocked_at: 0
+    effect: 所属陣が角陣の場合、味方軍団の角陣の全戦車の支援率が基礎支援率×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: その他
+    direction: up
   seal_bonus:
     by_seal:
     - null
@@ -4575,6 +4604,7 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B72
   - screenshot:IMG_0703.PNG
+  - screenshot:EE27CEBC.png
   xlsx_remarks: 主陣ダメ15%減（累加不可）、角陣ダメ15%減（上限30%）、【装備】交戦毎兵士4%増
   base_general_id: 黄月英
 - id: 玄陳宮
@@ -4704,15 +4734,15 @@ generals:
   name: 陳登
   yomi: null
   base_rarity: 橙
-  troop_type: 戦車
+  troop_type: 歩兵
   slot_stat: 知性
   role_tags: []
   skills:
-  - name: 主陣実ダメ増（味方角陣初回交戦攻撃力 / 敵角陣初回交戦攻撃
+  - name: 忠魂
     type: buff
-    scope: array
+    scope: legion
     unlocked_at: 0
-    effect: 主陣実ダメ増（味方角陣初回交戦攻撃力 / 敵角陣初回交戦攻撃力) x 16.5%（累計不可）
+    effect: 所属陣の戦闘時、味方の軍紀がアップ。アップ率は編成時の軍紀×2%~8%のランダム（集結時の累加不可、効果は最高値のみ有効）
     unit: percent
     value:
       by_breakthrough:
@@ -4720,15 +4750,16 @@ generals:
       - null
       - null
       - null
-      - 16.5
-      confidence: medium
-    effect_attribute: 攻撃
+      - 8
+      confidence: high
+    stacking: non_stackable
+    effect_attribute: その他
     direction: up
-  - name: 味方角陣連撃12%増
+  - name: 替将
     type: buff
-    scope: array
+    scope: legion
     unlocked_at: 0
-    effect: 味方角陣連撃12%増
+    effect: 所属部隊が歩兵の場合、属する陣の戦闘時、防御力×20%アップ、集結時、同じ陣の累加可能、増加する防御力の上限は所属部隊兵士の基礎防御力の100%
     unit: percent
     value:
       by_breakthrough:
@@ -4736,10 +4767,59 @@ generals:
       - null
       - null
       - null
-      - 12.0
-      confidence: medium
-    unlocked_at_equipment: 1
-    effect_attribute: 連撃
+      - 20
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 鉄壁・盾備
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の槍盾兵防御力を基礎防御力×27%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 27
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 鋼鉄装骨
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の歩兵のシールドが基礎シールド×22%アップ。属する陣の毎回の交戦で味方が与えるダメージがアップ。アップ率は味方の残りシールド率×27.5%（集結時の累加不可、同じ陣の累加可能、アップするダメージは15%を下回らない）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 22
+      confidence: high
+    stacking: non_stackable
+    effect_attribute: シールド
+    direction: up
+  - name: 満身創痍
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属陣の戦闘時、味方の貫通抵抗が編成時の貫通抵抗×5%アップ（集結時の累加不可、効果は最高値のみ有効）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 5
+      confidence: high
+    stacking: non_stackable
+    effect_attribute: 貫通抵抗
     direction: up
   seal_bonus:
     by_seal:
@@ -4753,6 +4833,7 @@ generals:
     confidence: unknown
   sources:
   - xlsx:3_20251224.xlsx#武将!B76
+  - screenshot:4426ED34.png
   xlsx_remarks: 主陣実ダメ増（味方角陣初回交戦攻撃力 / 敵角陣初回交戦攻撃力) x 16.5%（累計不可）　【装備】味方角陣連撃12%増
 - id: 玄廖化
   name: 玄廖化
@@ -5141,15 +5222,15 @@ generals:
   name: 司馬炎
   yomi: null
   base_rarity: 橙
-  troop_type: 万能
+  troop_type: 弓兵
   slot_stat: 統率
   role_tags: []
   skills:
-  - name: 1属性15%増（上限50%）
-    type: buff
-    scope: rally
+  - name: 助使
+    type: debuff
+    scope: legion
     unlocked_at: 0
-    effect: 1属性15%増（上限50%）
+    effect: 軍団が属する陣の戦闘時、敵方全兵士のダメージ無効率が10%減少（プレイヤーにのみ有効、集結時に同じ陣の累加可能、このスキル減少は30%を超えない）
     unit: percent
     value:
       by_breakthrough:
@@ -5157,12 +5238,64 @@ generals:
       - null
       - null
       - null
-      - 15.0
-      confidence: medium
+      - 10
+      confidence: high
     cap:
       rule: no_cap
-      cap_value: 50.0
-      note: xlsx備考由来の固定%上限
+      cap_value: 30
+      note: 累加上限30%
+    effect_attribute: その他
+    direction: down
+  - name: 撤撃
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の歩兵士攻撃力が（基礎連撃×40/100%）アップ、防御力が（基礎奮兵×60/100%）アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 40
+      confidence: high
+    effect_attribute: 連撃
+    direction: up
+  - name: 奮起・連弩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 24
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 一統の威
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 属する陣の戦闘時、味方全兵士のランダムな1属性が15%アップ（集結時の同じ陣の累加可能。1属性のみアップ、このスキルアップは元の属性の50%を超えない）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 15
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: 50
+      note: 元属性50%上限
     effect_attribute: その他
     direction: up
   seal_bonus:
@@ -5177,6 +5310,7 @@ generals:
     confidence: unknown
   sources:
   - xlsx:3_20251224.xlsx#武将!B86
+  - screenshot:2EDA6658.png
   xlsx_remarks: 1属性15%増（上限50%）
 - id: 曹真
   name: 曹真
@@ -5757,15 +5891,15 @@ generals:
   name: 管路
   yomi: null
   base_rarity: 橙
-  troop_type: 万能
+  troop_type: 歩兵
   slot_stat: 知性
   role_tags: []
   skills:
-  - name: 抵抗(プレイヤー数差+1)×10%増（上限50%）
+  - name: 衛廉
     type: buff
-    scope: rally
+    scope: legion
     unlocked_at: 0
-    effect: 抵抗(プレイヤー数差+1)×10%増（上限50%）
+    effect: 軍団が属する陣の全兵士の抵抗が10%アップ。属する陣の戦闘時、味方が勝利する場合、敵方の負傷兵の30%が消滅（敵方プレイヤーにのみ有効、集結時は累加せず、確率も最も高いのみ有効）
     unit: percent
     value:
       by_breakthrough:
@@ -5773,12 +5907,61 @@ generals:
       - null
       - null
       - null
-      - 10.0
-      confidence: medium
+      - 10
+      confidence: high
+    stacking: non_stackable
+    effect_attribute: 抵抗
+    direction: up
+  - name: 知命
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の全兵士の防御力が基礎防御力×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 鉄壁・盾備
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の槍盾兵防御力を基礎防御力×27%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 27
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 破讒
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 属する陣の戦闘時、抵抗が味方10%×（敵方プレイヤー数÷味方プレイヤー数+1）アップ（プレイヤーとの戦闘時のみ有効。集結時に同じ陣の累加可能、アップする抵抗は元の抵抗の50%を超えず、且つ同じ陣集結内の効果が最も高いスキル数値を下回らない）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
     cap:
       rule: no_cap
-      cap_value: 50.0
-      note: xlsx備考由来の固定%上限
+      cap_value: 50
+      note: 抵抗50%上限
     effect_attribute: 抵抗
     direction: up
   seal_bonus:
@@ -5793,6 +5976,7 @@ generals:
     confidence: unknown
   sources:
   - xlsx:3_20251224.xlsx#武将!B100
+  - screenshot:9287B845.png
   xlsx_remarks: 抵抗(プレイヤー数差+1)×10%増（上限50%）
 - id: 玄甘寧
   name: 玄甘寧
@@ -5971,7 +6155,7 @@ generals:
     type: buff
     scope: self
     unlocked_at: 0
-    effect: 統帥を担当時、自身の率兵数が基礎率兵数×40%アップ
+    effect: 統師となり子を率いる同時に、自身の率兵数が基礎率兵数×40%アップ
     unit: percent
     value:
       by_breakthrough:
@@ -6000,11 +6184,11 @@ generals:
     stacking: non_stackable
     effect_attribute: 抵抗
     direction: up
-  - name: 奮起・猛獣
+  - name: 奮起・連弩
     type: buff
     scope: self
     unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×30%アップ
+    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
     unit: percent
     value:
       by_breakthrough:
@@ -6012,15 +6196,15 @@ generals:
       - null
       - null
       - null
-      - 30
+      - 27
       confidence: high
     effect_attribute: 攻撃
     direction: up
-  - name: 勢呂雪雁
+  - name: 助兵聚集
     type: buff
     scope: legion
     unlocked_at: 0
-    effect: 所属陣の戦闘時、味方の兵士軍紀が基礎軍紀×11%アップ。属する陣の交戦時で敵方より高い場合、次回交戦時、味方が受けるダメージが追加で11%低下（集結時の累加は不可、効果が最高値のみ有効）
+    effect: 軍団が属する兵士の軍紀が基礎軍紀×11%アップ。属する陣の戦闘時、味方軍紀が編成時の軍紀×16.5%アップ（集結時の同じ陣で累加可能、上限25%）。属する陣の交戦時で敵方より高い場合、次回交戦時、味方が受けるダメージが追加で11%低下（集結時の累加は不可、効果が最高値のみ有効）
     unit: percent
     value:
       by_breakthrough:
@@ -6028,16 +6212,19 @@ generals:
       - null
       - null
       - null
-      - 11
+      - 16.5
       confidence: high
-    stacking: non_stackable
+    cap:
+      rule: no_cap
+      cap_value: 25
+      note: 軍紀アップ累加上限25%
     effect_attribute: その他
     direction: both
   - name: 絶遁演棄
     type: buff
     scope: legion
     unlocked_at: 0
-    effect: 属する陣の毎回戦闘前に地形を利用して敵の部隊位置を変更、敵方の戦利兵士の5%が味方に有利になる（集結による同じ陣の累加不可、複数スキルの場合は効果は最高値のみ有効）
+    effect: 属する陣の毎回戦闘前に地形を利用して敵の部隊位置を変更し、5%の交戦で敵方の戦利兵士の5%を上回らない（集結時の累加不可、複数スキルの場合は効果は最高値のみ有効）
     unit: percent
     value:
       by_breakthrough:
@@ -6063,6 +6250,7 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B103
   - screenshot:IMG_0694.PNG
+  - screenshot:B4A8397E.png
   xlsx_remarks: 兵種比率20%毎抵抗4%増（累加不可）、戦時軍紀15%増（上限25%）【装備】敵の参戦可能兵士5%が味方にダメージ与えられない（累加不可）
 - id: 玄曹彰
   name: 玄曹彰
@@ -6092,7 +6280,7 @@ generals:
     type: buff
     scope: legion
     unlocked_at: 0
-    effect: 所属陣の戦闘時、味方の一兵種の比率が20%に達する場合、味方の連撃が編成時の連撃×4%アップ（集結による累加は不可、効果が最高値のみ有効）
+    effect: 所属陣の戦闘時、味方の一兵種の比率が20%に達する場合、味方が編成時の連撃×4%アップ（集結による累加は不可、効果が最高値のみ有効）
     unit: percent
     value:
       by_breakthrough:
@@ -6105,11 +6293,11 @@ generals:
     stacking: non_stackable
     effect_attribute: 連撃
     direction: up
-  - name: 奮起・猛獣
+  - name: 奮起・連弩
     type: buff
     scope: self
     unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×30%アップ
+    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
     unit: percent
     value:
       by_breakthrough:
@@ -6117,7 +6305,7 @@ generals:
       - null
       - null
       - null
-      - 30
+      - 27
       confidence: high
     effect_attribute: 攻撃
     direction: up
@@ -6125,7 +6313,7 @@ generals:
     type: buff
     scope: legion
     unlocked_at: 0
-    effect: 所属陣の戦闘時、味方の軍紀がアップ。数値は味方編成時の軍紀×（味方騎兵兵種比率×22%）。敵方の軍紀が低下。数値は敵方編成時の軍紀×（味方歩兵兵種比率×22%）（集結時は同じ陣の累加可能。アップ/低下する軍紀はそれぞれ25%まで）
+    effect: 所属陣の戦闘時、味方の軍紀がアップ。数値は味方編成時の軍紀×（味方歩兵兵種比率×22%）。敵方の軍紀が低下。数値は敵方編成時の軍紀×（味方歩兵兵種比率×22%）（集結時、同じ陣の累加可能。アップ/低下する軍紀はそれぞれ25%まで）
     unit: percent
     value:
       by_breakthrough:
@@ -6145,7 +6333,7 @@ generals:
     type: debuff
     scope: legion
     unlocked_at: 0
-    effect: 所属陣の戦闘時、敵方の防御力が編成時の防御力×6%低下（集結時は同じ陣の累加可能、12%を超えない、絶対値上限なし）
+    effect: 所属陣の戦闘時、敵方の防御力が編成時の防御力×6%低下（集結時、同じ陣の累加可能、12%まで、絶対値上限なし）
     unit: percent
     value:
       by_breakthrough:
@@ -6174,20 +6362,21 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B104
   - screenshot:IMG_0689.PNG
+  - screenshot:CFF32D4B.png
   xlsx_remarks: 兵種比率20%毎連撃4%増（累加不可）、戦時軍紀 馬比率x22%増、弓比率x22%減【装備】敵の防御6%減
 - id: 玄黄蓋
   name: 玄黄蓋
   yomi: null
   base_rarity: 玄
-  troop_type: 万能
+  troop_type: 弓兵
   slot_stat: 武力
   role_tags: []
   skills:
-  - name: 初回交戦味方参戦可能兵士数の10％ダメージ
-    type: passive
-    scope: self
+  - name: 炎舟
+    type: debuff
+    scope: legion
     unlocked_at: 0
-    effect: 初回交戦味方参戦可能兵士数の10％ダメージ
+    effect: 所属陣の毎回の交戦時、50%の確率で敵方を燃焼状態にする。燃焼状態:全てのダメージが5%低下。交戦2回分持続する（複数回数動可、集結時の累加は不可、効果が最高値のものみ有効）
     unit: percent
     value:
       by_breakthrough:
@@ -6195,15 +6384,33 @@ generals:
       - null
       - null
       - null
-      - 10.0
-      confidence: medium
+      - 5
+      confidence: high
+    stacking: non_stackable
+    effect_attribute: その他
+    direction: down
+  - name: 偽佐
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 玄黄蓋がいる兵を連れて誘陣する。所属陣の初回交戦で、味方の現在の参戦可能兵士の10%が敵方にダメージを与えない。また、毎回の交戦で敵方の参戦兵士の10%が味方にダメージを与えるかもしれない（集結時の重ねかけ不可、効果が最高値のものみ有効）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    stacking: non_stackable
     effect_attribute: その他
     direction: up
-  - name: 毎回交戦敵方参戦兵士の10％がダメージ与えられない（累計不可
-    type: passive
+  - name: 奮起・連弩
+    type: buff
     scope: self
     unlocked_at: 0
-    effect: 毎回交戦敵方参戦兵士の10％がダメージ与えられない（累計不可）
+    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
     unit: percent
     value:
       by_breakthrough:
@@ -6211,8 +6418,44 @@ generals:
       - null
       - null
       - null
-      - 10.0
-      confidence: medium
+      - 27
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 烈成猛攻
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属陣の毎回の交戦時、味方が与えるダメージがアップ。アップ率は敵方の初回参戦可能兵士の比率×22%（アップは最大15%まで、集結時に同じ陣の累加可能、上限20%まで）。敵方が燃焼状態にある場合、味方が与えるダメージがさらに5%アップ（集結による累加不可、効果は最高値のものみ有効）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 22
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: 20
+      note: 累加上限20%
+    effect_attribute: その他
+    direction: up
+  - name: 副将
+    type: passive
+    scope: self
+    unlocked_at: 0
+    effect: 副将スキル効果：96%
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 96
+      confidence: high
     effect_attribute: その他
     direction: up
   seal_bonus:
@@ -6227,6 +6470,7 @@ generals:
     confidence: unknown
   sources:
   - xlsx:3_20251224.xlsx#武将!B105
+  - screenshot:DDF7302D.png
   xlsx_remarks: 初回交戦味方参戦可能兵士数の10％ダメージ、毎回交戦敵方参戦兵士の10％がダメージ与えられない（累計不可）
 - id: 馬岱
   name: 馬岱
@@ -6622,23 +6866,7 @@ generals:
     type: buff
     scope: self
     unlocked_at: 0
-    effect: 探訪時にN%の確率で助かりの付加5%アップ（同付近を受けていない助力は有効）
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 5
-      confidence: high
-    effect_attribute: その他
-    direction: up
-  - name: 慧駁
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 探訪時に8%の確率で複数の武将を探訪きます
+    effect: 麾下の全ての未削付着の助力付加8%アップ（同付付加を受けていない助力は有効になりません）
     unit: percent
     value:
       by_breakthrough:
@@ -6650,11 +6878,27 @@ generals:
       confidence: high
     effect_attribute: その他
     direction: up
+  - name: 阜財
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 村落消遣時、村落の金銭取得率×16%分、武行の政治付加値をアップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 16
+      confidence: high
+    effect_attribute: その他
+    direction: up
   - name: 貞淑なる賢
     type: debuff
     scope: legion
     unlocked_at: 0
-    effect: 麾下に1属性を加えることに、戦闘時、敵方が与える実ダメージが元のダメージ×0.55%低下（派遣なしですぐに有効。低下する実ダメージは16%を超えない、プレイヤーの複数の場合、プレイヤー兵力に基づいて平均値を取る）
+    effect: 敵人を1人所有することに、戦闘時、敵方が与える実ダメージが元のダメージ×0.55%低下（派遣なしですぐに有効。低下する実ダメージは16%を超えない、プレイヤーが複数の場合、プレイヤー兵力に基づいて平均値を取る）
     unit: percent
     value:
       by_breakthrough:
@@ -6670,7 +6914,7 @@ generals:
       note: 実ダメ低下上限16%
     effect_attribute: その他
     direction: down
-  - name: 護衛守帝
+  - name: 護宝守帝
     type: buff
     scope: legion
     unlocked_at: 0
@@ -6688,6 +6932,7 @@ generals:
     direction: up
   sources:
   - screenshot:IMG_0702.PNG
+  - screenshot:B6260651.png
 - id: 玄黄忠
   name: 玄黄忠
   yomi: げんこうちゅう
@@ -6844,3 +7089,289 @@ generals:
     direction: down
   sources:
   - screenshot:IMG_0706.PNG
+- id: 玄夏侯惇
+  name: 玄夏侯惇
+  yomi: げんかこうとん
+  base_rarity: 玄
+  troop_type: 弓兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 闘武
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 統師を担当時、自身の率兵数が40%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 40
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 怒撃
+    type: debuff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属陣の戦闘時、敵方の防御力×6%低下（集結時、同じ陣の累加可能、上限12%、絶対値の上限はなし）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 6
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: 12
+      note: 累加上限12%
+    effect_attribute: 防御
+    direction: down
+  - name: 奮起・連弩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 略誅決死
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属陣の戦闘時、味方の軍紀がアップ、アップ率は属する陣の武将数×1.2%（集結時の同じ陣の累加可能。アップ率の上限は25%、集結時の累加は不可、効果が最高値のもののみ有効）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 1.2
+      confidence: high
+    stacking: non_stackable
+    cap:
+      rule: no_cap
+      cap_value: 25
+      note: 上限25%
+    effect_attribute: その他
+    direction: up
+  - name: 副将
+    type: passive
+    scope: self
+    unlocked_at: 0
+    effect: 副将スキル効果：12%
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 12
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:1984C071.png
+- id: 南華老仙
+  name: 南華老仙
+  yomi: なんかろうせん
+  base_rarity: 橙
+  troop_type: 歩兵
+  role_tags:
+  - support
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 神隠し
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属部隊が歩兵の場合、属する陣の戦闘時、味方の防御力×6%アップ（集結時、同じ陣で累加可能、上限12%、絶対値上限はなし）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 6
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: 12
+      note: 累加上限12%
+    effect_attribute: 防御
+    direction: up
+  - name: 慈用
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属陣の毎回の交戦時、味方の残り参戦可能兵士の5%を傷した参戦可能兵士の5%として回復する（集結による累加不可、効果が最も高いのみ有効、さらに戦闘終了時、今回重傷を上限1名回復する）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 5
+      confidence: high
+    stacking: non_stackable
+    effect_attribute: その他
+    direction: up
+  - name: 鉄壁・盾備
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の槍盾兵防御力を基礎防御力×27%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 27
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 苦の救済
+    type: debuff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属陣の毎回の交戦時、味方が受けるダメージを低下、低下率は20%×味方の最終防御力÷敵方の最終防御力（その他メージの25%、下限は15%、集結による累加不可、効果が最も高いものでのみ有効）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    stacking: non_stackable
+    cap:
+      rule: no_cap
+      cap_value: 25
+      note: 低下上限25%、下限15%
+    effect_attribute: 防御
+    direction: down
+  sources:
+  - screenshot:9D2F3B11.png
+- id: 羊徽瑜
+  name: 羊徽瑜
+  yomi: ようきゆ
+  base_rarity: 橙
+  troop_type: 万能
+  role_tags:
+  - support
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 慈威
+    type: debuff
+    scope: legion
+    unlocked_at: 0
+    effect: 敵方集結の全兵士の軍紀が基礎軍紀×8%低下（派遣不要ですぐに有効、敵方プレイヤーにのみ有効、複数人の集結時はプレイヤーの兵力に応じて平均値をとる）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 8
+      confidence: high
+    effect_attribute: その他
+    direction: down
+  - name: 温恵
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 味方主陣の集結回能兵士数の上限+10%、味方主陣の採取可能な敵援兵士数の上限+10%（派遣不要ですぐに有効）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 精工
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 所属軍団の採取効率が基礎採取効率×14%アップ（スキルの累加上限は基礎採取効率×200%を超えない）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 14
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 名門世育
+    type: debuff
+    scope: legion
+    unlocked_at: 0
+    effect: 戦闘時、敵方全兵士の貫通が編成時の貫通×10%低下、同時に敵方が味方シールドに与えるダメージが元の数値×10%低下（派遣不要ですぐに有効、複数人の集結時はプレイヤーの兵力に応じて平均値をとる）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: シールド
+    direction: down
+  sources:
+  - screenshot:B74AAD4A.png
