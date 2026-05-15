@@ -449,6 +449,31 @@ function getOwnByFormation(formation, genId) {
 }
 
 // ============================================================
+// 戦闘貢献の判定（編成候補フィルタ）
+// ============================================================
+// 戦闘系語彙（effect 文中に1つでも含まれれば戦闘貢献ありとみなす）
+// xlsx 由来の略記（ダメ・実ダメ・抑制 等）も含める
+const COMBAT_KEYWORDS = [
+  '攻撃', '防御', '連撃', '抵抗', '貫通', 'シールド', '軍紀',
+  'ダメージ', 'ダメ', '実ダメ', '抑制', '反射',
+  '兵力', '兵士', '兵', '率兵', '殺害', '損失', '参戦', '行軍速度', '速度',
+  '支援', 'スキル', '属性', '増益', '減益', '副将', '集結', '陣',
+];
+// 非戦闘系（戦闘外の用途のみ）の典型語彙: 派遣収益/内政/採集/建設/探索
+const NON_COMBAT_KEYWORDS = ['派遣収益', '内政', '採集', '建設', '探索', '研究'];
+// スキルが戦闘系か（effect 文判別。name は見ない）
+function isCombatSkill(sk) {
+  const eff = (sk && sk.effect) || '';
+  if (!eff) return false;
+  // 「派遣不要」自体は単なる発動条件ラベルなので戦闘判定に使わない
+  return COMBAT_KEYWORDS.some(kw => eff.includes(kw));
+}
+// 武将に1つでも戦闘系スキルがあるか
+function hasCombatSkill(g) {
+  return (g.skills || []).some(isCombatSkill);
+}
+
+// ============================================================
 // データ読込（HTMLに埋め込まれた window.GENERALS_DATA から）
 // ============================================================
 function loadData() {
@@ -952,7 +977,11 @@ function runAutoBuilderFor(legionIdx) {
     for (const k of SLOT_KEYS) if (other.array[k]) usedByOtherSameUser.add(other.array[k]);
   });
 
-  const ownedGens = state.data.generals.filter(g => getOwn(userId, g.id).owned && !usedByOtherSameUser.has(g.id));
+  const ownedGens = state.data.generals.filter(g =>
+    getOwn(userId, g.id).owned &&
+    !usedByOtherSameUser.has(g.id) &&
+    hasCombatSkill(g)  // 戦闘系スキルが無い武将は編成候補から除外
+  );
 
   // この軍団をクリア（他軍団は触らない）
   state.formations[legionIdx] = {
@@ -1177,6 +1206,7 @@ function makeSlotCell(bat, slot, opts) {
     const own = getOwn(userId, g.id);
     if (!own.owned) return false;
     if (usedElsewhere.has(g.id)) return false;
+    if (!hasCombatSkill(g)) return false;  // 戦闘貢献なしは候補に出さない
     if (!opts.isArray) {
       if (!canPlaceInTroop(g, legionTroop)) return false;
     }
