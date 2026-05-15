@@ -1504,20 +1504,37 @@ function renderCapPoolStatus(aggregated) {
       : (Math.abs(p.sum) >= Math.abs(p.capValue) ? `<span class="status-full">上限ぴったり</span>` : `<span class="status-room">${remainStr}</span>`);
 
     const scopeLabel = scopeLabels[p.scope] || p.scope;
+    // 構成スキルから属性・方向を導出（最頻値）
+    const attrCount = {};
+    const dirCount = {};
+    for (const it of p.items) {
+      const a = it.attribute || 'その他';
+      attrCount[a] = (attrCount[a]||0) + 1;
+      const d = it.direction || (it.value > 0 ? 'up' : (it.value < 0 ? 'down' : 'unknown'));
+      dirCount[d] = (dirCount[d]||0) + 1;
+    }
+    const topAttr = Object.entries(attrCount).sort((a,b)=>b[1]-a[1])[0][0];
+    const topDir = Object.entries(dirCount).sort((a,b)=>b[1]-a[1])[0][0];
+    const dirLabel = topDir === 'up' ? 'アップ' : (topDir === 'down' ? 'ダウン' : '');
+    const sharedLabel = p.isShared ? '共有' : '非共有';
+    const titleLabel = `${scopeLabel}・${topAttr}${dirLabel}（${sharedLabel}・上限${Math.abs(p.capValue)}%）`;
+
     card.innerHTML = `
       <div class="head">
-        <strong>${scopeLabel}/${p.ruleKey}</strong>
+        <strong>${titleLabel}</strong>
         <span>${fmtVal(p.capped, 'percent')} / ${fmtVal(p.capValue, 'percent')}</span>
         <span class="bar ${p.overflow ? 'overflow' : ''}"><span style="width:${ratio}%;"></span></span>
         ${statusHtml}
       </div>
-      ${p.ruleNote ? `<div class="pool-note">${p.ruleNote}</div>` : ''}
+      <div class="pool-note">rule: <code>${p.ruleKey}</code>${p.ruleNote ? ' — ' + p.ruleNote : ''}</div>
     `;
 
-    // 現メンバーリスト
+    // 現メンバーリスト（武将名 / 完全スキル名 / 値 を箇条書きで明示）
     const memDiv = document.createElement('div');
-    memDiv.className = 'pool-note';
-    memDiv.innerHTML = '構成: ' + p.items.map(i => `${i.general}/${i.skill.slice(0,12)}(${fmtVal(i.value,'percent')})`).join(', ');
+    memDiv.className = 'recs';
+    memDiv.innerHTML = '<strong>構成スキル:</strong><ul style="margin:2px 0 2px 18px;padding:0;">' +
+      p.items.map(i => `<li><strong>${i.general}</strong> / ${i.skill} <span style="color:var(--muted)">(${fmtVal(i.value,'percent')})</span></li>`).join('') +
+      '</ul>';
     card.appendChild(memDiv);
 
     // 余裕がある場合のみ候補表示
@@ -1527,8 +1544,9 @@ function renderCapPoolStatus(aggregated) {
       recDiv.className = 'recs';
       if (recs.length) {
         const top = recs.slice(0, 10);
-        recDiv.innerHTML = `➕ 候補武将 (${recs.length}件、上位${top.length}件): ` +
-          top.map(r => `${r.gname}/${r.sname}${r.value != null ? `(${fmtVal(r.value,'percent')})` : ''}`).join(', ');
+        recDiv.innerHTML = `<strong>➕ 候補武将 (${recs.length}件、上位${top.length}件):</strong><ul style="margin:2px 0 2px 18px;padding:0;">` +
+          top.map(r => `<li><strong>${r.gname}</strong> / ${r.sname}${r.value != null ? ` <span style="color:var(--muted)">(${fmtVal(r.value,'percent')})</span>` : ''}</li>`).join('') +
+          '</ul>';
       } else {
         recDiv.innerHTML = '<em>編成外に該当武将なし</em>';
       }
