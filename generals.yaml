@@ -862,7 +862,7 @@ generals:
   name: 玄趙雲
   yomi: げんちょううん
   base_rarity: 玄
-  troop_type: 万能
+  troop_type: 騎兵
   slot_stat: 武力
   faction: 蜀
   role_tags:
@@ -875,7 +875,7 @@ generals:
     type: buff
     scope: legion
     unlocked_at: 0
-    effect: 所属軍団全兵士の攻撃力+15%・防御力+15%、騎兵攻撃力を追加で+20%、歩兵防御力を追加で+20%
+    effect: 軍団が属する陣の全兵士攻撃力が基礎攻撃力×15%、防御力が基礎防御力×15%アップ。騎兵攻撃力は追加で基礎攻撃力×20%アップ、歩兵防御力は追加で基礎防御力×20%アップ
     unit: percent
     value:
       by_breakthrough:
@@ -884,18 +884,15 @@ generals:
       - null
       - null
       - 15
-      confidence: medium
-    cap:
-      rule: legion_buff_default
-      cap_value: null
+      confidence: high
     effect_attribute: 防御
     direction: up
   - name: 死闘
     type: buff
-    scope: rally
+    scope: legion
     unlocked_at: 0
-    effect: 戦闘時、味方の攻撃を味方騎兵兵種比率×30%にアップ、味方の防御を味方歩兵兵種比率×30%にアップ（最高で50pt）
-    unit: pt_per_soldier
+    effect: 属する陣の戦闘時、味方攻撃アップ。数値は編成時の攻撃力×味方騎兵兵種比率×30%。味方防御アップ。数値は編成時の防御力×味方歩兵兵種比率×30%。アップする攻撃/防御は元の攻撃/防御の30%を超えず、最高は50pt
+    unit: percent
     value:
       by_breakthrough:
       - null
@@ -905,15 +902,32 @@ generals:
       - 30
       confidence: high
     cap:
-      rule: rally_per_soldier_pt_50
-      cap_value: 50
+      rule: no_cap
+      cap_value: 30
+      note: 上限30%、最高50pt
+    effect_attribute: 防御
+    direction: up
+  - name: 鉄壁・盾備
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の槍盾兵防御力を基礎防御力×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
     effect_attribute: 防御
     direction: up
   - name: 武神
     type: buff
-    scope: rally
+    scope: legion
     unlocked_at: 0
-    effect: 戦闘時、味方の連撃を味方騎兵兵種比率×22%にアップ、味方の抵抗を味方歩兵兵種比率×22%にアップ
+    effect: 属する陣の戦闘時、味方連撃アップ。数値は編成時の抵抗×味方騎兵兵種比率×22%、味方歩兵兵種比率×30%。同率、所属武力陣（抵抗が30%を超えない）
     unit: percent
     value:
       by_breakthrough:
@@ -925,15 +939,15 @@ generals:
       confidence: medium
     cap:
       rule: no_cap
-      note: wiki・xlsx共に上限の明示記載なし
+      cap_value: 30
+      note: 抵抗30%超えない・武神
     effect_attribute: 連撃
     direction: up
-  - name: 実ダメ兵種比率（装備）
+  - name: 単騎敵主
     type: buff
-    scope: rally
+    scope: legion
     unlocked_at: 0
-    unlocked_at_equipment: 1
-    effect: 【装備】実ダメ歩比率×8%増、実ダメ馬比率×8%減（上限5%）
+    effect: 属する陣の戦闘時、味方が与える実ダメージアップ＋味方が受けるダメージ低下。数値は元のダメージ×（味方歩兵兵種比率×8%）、ダメージ低下は元のダメージ×（双方の合計兵士数）×22%。アップ/低下するダメージはそれぞれ最大5%まで
     unit: percent
     value:
       by_breakthrough:
@@ -942,33 +956,13 @@ generals:
       - null
       - null
       - 8
-      confidence: high
+      confidence: medium
     cap:
       rule: no_cap
       cap_value: 5
-      note: 上限5%（xlsx備考より）
+      note: アップ/低下それぞれ最大5%
     effect_attribute: その他
     direction: both
-  - name: 兵種比率バフ（xlsx備考主スキル）
-    type: buff
-    scope: rally
-    unlocked_at: 0
-    effect: 連撃馬比率×20%増、抵抗歩比率×20%増（上限30%）
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 20
-      confidence: high
-    cap:
-      rule: no_cap
-      cap_value: 30
-      note: 上限30%（xlsx備考より）
-    effect_attribute: 連撃
-    direction: up
   seal_bonus:
     by_seal:
     - null
@@ -982,6 +976,7 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B90
   - https://sangoku-haou.gamer-wiki.com/character/gen-chouun
+  - screenshot:IMG_0680.PNG
 - id: 玄孫権
   name: 玄孫権
   yomi: null
@@ -1990,27 +1985,11 @@ generals:
   slot_stat: 統率
   role_tags: []
   skills:
-  - name: ダメ味方兵比率×20増
+  - name: 将才
     type: buff
     scope: self
     unlocked_at: 0
-    effect: ダメ味方兵比率×20増
-    unit: value
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - null
-      confidence: low
-    effect_attribute: その他
-    direction: up
-  - name: ダメ敵方兵比率×20減（上限25%増、10%減）
-    type: buff
-    scope: rally
-    unlocked_at: 0
-    effect: ダメ敵方兵比率×20減（上限25%増、10%減）
+    effect: 統帥を担当時、自身の率兵数が基礎率兵数×30%アップ
     unit: percent
     value:
       by_breakthrough:
@@ -2018,10 +1997,80 @@ generals:
       - null
       - null
       - null
-      - -25.0
-      confidence: medium
+      - 30
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 威盛
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の騎兵の攻撃力が基礎攻撃力×20%アップ。所属陣の戦闘終了時、敵方の負傷兵の60%を殺害（同じ陣の複数スキルが、スキルは最高比率採用。殺害上限は玄・司馬懿の属する部隊ごとの騎兵兵力数の和の50%）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    stacking: non_stackable
+    effect_attribute: 攻撃
+    direction: up
+  - name: 鉄壁・車
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の戦車防御力を基礎防御力×16%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 16
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 兵勘若神
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属陣の戦闘時、味方ダメージがアップ。数値は元のダメージ×（味方の元の兵士数／双方の合計兵士数）×22%。敵方ダメージ低下、数値は元のダメージ×（敵方の元の兵士数／双方の合計兵士数）×22%（集結時に同じ陣の累加可能。アップするダメージは25%を超えず、低下するダメージは10%を超えない）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 22
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: 25
+      note: アップ上限25%、低下上限10%
     effect_attribute: その他
     direction: both
+  - name: 臨戒応変
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属陣の戦闘時、味方が与える実ダメージが5%アップ（集結による累加不可。効果は最高値のもののみ有効）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 5
+      confidence: high
+    stacking: non_stackable
+    effect_attribute: その他
+    direction: up
   seal_bonus:
     by_seal:
     - null
@@ -2034,6 +2083,7 @@ generals:
     confidence: unknown
   sources:
   - xlsx:3_20251224.xlsx#武将!B30
+  - screenshot:IMG_0681.PNG
   xlsx_remarks: ダメ味方兵比率×20増、ダメ敵方兵比率×20減（上限25%増、10%減）
   base_general_id: 司馬懿
 - id: 玄郭嘉
