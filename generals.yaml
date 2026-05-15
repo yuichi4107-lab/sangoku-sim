@@ -2269,6 +2269,10 @@ generals:
       confidence: medium
     effect_attribute: 抵抗
     direction: both
+    cap:
+      rule: rally_resist_down_80_shared
+      shared: true
+      note: 主cap=典韋/曹仁共有80%。個別上限30%、馬スキル時15%は近似のため省略
   seal_bonus:
     by_seal:
     - null
@@ -3032,11 +3036,11 @@ generals:
   slot_stat: 武力
   role_tags: []
   skills:
-  - name: 連撃武力差分×3%増（上限35%）
+  - name: 覇射
     type: buff
-    scope: rally
+    scope: legion
     unlocked_at: 0
-    effect: 連撃武力差分×3%増（上限35%）
+    effect: 軍団が属する陣の弓兵の防御力が基礎防御力×22%アップ、特殊兵は追加で基礎防御力×22%アップ
     unit: percent
     value:
       by_breakthrough:
@@ -3044,19 +3048,69 @@ generals:
       - null
       - null
       - null
-      - 3.0
-      confidence: medium
+      - 22
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 虎猛
+    type: debuff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属陣の戦闘時、相手が受ける実ダメージが元の実ダメージ×11%追加。ダメージ無効を無視し、相手の兵士を直接死亡させる（生じる死亡兵は相手の該当陣の実際の参戦兵力の5%を超えない）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 11
+      confidence: high
+    stacking: non_stackable
+    effect_attribute: その他
+    direction: up
+  - name: 奮起・連弩
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 27
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 寒星開月
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団の戦闘時、味方の連撃が編成時の連撃<(玄呂布の武力値・相手の最も低い前衛武力値)×3.3%アップ（集結時に同じ陣の累加可能。最低は10%を下回らず、最高は元の連撃の35%を超えない。相手がNPCの時、スキルは10%）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 3.3
+      confidence: high
     cap:
       rule: no_cap
-      cap_value: 35.0
-      note: xlsx備考由来の固定%上限
+      cap_value: 35
+      floor_value: 10
+      note: 武力差分×3.3%、下限10%上限35%、対NPC固定10%
     effect_attribute: 連撃
     direction: up
-  - name: ダメージ増（連撃増% x 20%）
+  - name: 射石飲羽
     type: buff
-    scope: self
+    scope: legion
     unlocked_at: 0
-    effect: ダメージ増（連撃増% x 20%）
+    effect: 所属軍団の戦闘時、味方が与えるダメージがアップ。アップする比率は寒星開月スキルの数値比率×20%（集結による累加は不可）
     unit: percent
     value:
       by_breakthrough:
@@ -3064,10 +3118,10 @@ generals:
       - null
       - null
       - null
-      - 20.0
-      confidence: medium
-    unlocked_at_equipment: 1
-    effect_attribute: 連撃
+      - 20
+      confidence: high
+    stacking: non_stackable
+    effect_attribute: その他
     direction: up
   seal_bonus:
     by_seal:
@@ -3081,6 +3135,7 @@ generals:
     confidence: unknown
   sources:
   - xlsx:3_20251224.xlsx#武将!B56
+  - screenshot:玄呂布_20260515
   xlsx_remarks: 連撃武力差分×3%増（上限35%）【装備】ダメージ増（連撃増% x 20%）
   base_general_id: 呂布
 - id: 玄徐庶
@@ -5345,3 +5400,198 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B110
   xlsx_remarks: 抵抗35%減（上限80%・共有）
+- id: 曹操
+  name: 曹操
+  yomi: そうそう
+  base_rarity: 橙
+  troop_type: 騎兵
+  slot_stat:
+  - 統率
+  - 知性
+  role_tags: []
+  skills:
+  - name: 将才
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 統帥を担当時、自身の率兵数が基礎率兵数×44%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 44
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 無双・騎
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の騎兵攻撃力が基礎攻撃力×27%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 27
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 奮起・猛獣
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×27%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 27
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 唯才
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の統帥が自身の率兵数を上げるスキルを有し、且つ自身の率兵数のみが上がる時、率兵数がさらに基礎率兵数×110%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 110
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 副将
+    type: passive
+    scope: self
+    unlocked_at: 0
+    effect: 副将スキル効果：120%
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 120
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  sources:
+  - screenshot:IMG_0675.jpg
+  - wiki:sangoku-haou.gamer-wiki.com/character/sousou
+- id: 諸葛亮
+  name: 諸葛亮
+  yomi: しょかつりょう
+  base_rarity: 橙
+  troop_type: 弓兵
+  slot_stat:
+  - 知性
+  - 統率
+  role_tags: []
+  skills:
+  - name: 空城
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の全兵士の防御力が基礎防御力×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 奮起・連
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 24
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 八陣
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 属する陣の戦闘時、所属部隊兵士の数の110%をコピーして追加参戦する（武将スキルはコピーしない。追加兵士数は軍団が属する陣の兵士の25%を超えない）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 110
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: 25
+      note: コピー上限25%（陣兵士基準）
+    effect_attribute: その他
+    direction: up
+  - name: 錦囊妙計
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 属する陣の戦闘時、味方が与えるダメージが元のダメージ×5%アップ（集結時の累加不可。効果が最も高いもののみ有効）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 5
+      confidence: high
+    stacking: non_stackable
+    effect_attribute: その他
+    direction: up
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  sources:
+  - screenshot:IMG_0678.PNG
+  - wiki:sangoku-haou.gamer-wiki.com/character/syokatu-ryou
