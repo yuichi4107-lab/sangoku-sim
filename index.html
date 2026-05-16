@@ -1843,20 +1843,18 @@ function initGroupLock() {
   groupPanel.style.cssText = 'display:none;margin:12px 0;padding:10px;background:#e8f0e0;border:1px solid #88a06a;';
   groupPanel.innerHTML = `
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-      <strong style="color:#3a5520;">🔓 グループ同期</strong>
-      <span id="group-status" style="font-size:11px;color:#666;">未接続</span>
+      <strong style="color:#3a5520;">🔓 グループ</strong>
+      <button id="btn-mode-toggle" title="同期モード ⇄ 試作モード をワンタッチで切替" style="background:#3a5520;color:#fff;border:none;padding:4px 10px;font-size:12px;cursor:pointer;border-radius:3px;">🔗 同期モード</button>
+      <span id="group-status" style="font-size:11px;color:#666;"></span>
       <button id="btn-group-lock" style="background:#999;color:#fff;border:none;padding:3px 8px;font-size:11px;cursor:pointer;margin-left:auto;">ロックに戻す</button>
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:12px;">
       <button id="btn-cloud-pull" title="クラウド上の最新データでこの端末を上書き">⬇️ クラウドから取得</button>
       <button id="btn-cloud-push" title="この端末の現在状態をクラウドへ保存（他端末に同期）" style="background:var(--accent);color:#fff;">⬆️ クラウドへ保存</button>
-      <label style="display:inline-flex;align-items:center;gap:4px;font-size:12px;background:#fff;border:1px solid var(--border);padding:3px 8px;">
-        <input type="checkbox" id="chk-live-sync"> ライブ同期(5秒)
-      </label>
     </div>
     <div style="font-size:11px;color:#777;margin-top:6px;">
-      ※ 全員が全員の所持・編成を編集可能。後勝ち（last-write-wins）方式。
-      <a href="https://github.com/yuichi4107-lab/sangoku-sim/blob/main/docs/group_sync.md" target="_blank" style="color:#3a5520;">📖 詳細ガイド</a>
+      ※ 後勝ち（last-write-wins）方式。試作モード中は保存ボタンが警告色になります。
+      <a href="https://github.com/yuichi4107-lab/sangoku-sim/blob/main/docs/group_sync.md" target="_blank" style="color:#3a5520;">📖 詳細</a>
     </div>
   `;
   // フッターの直前に挿入（aside がないので body 直下）
@@ -1890,11 +1888,6 @@ function initGroupLock() {
     if (await askConfirm('グループ機能をロックします。よろしいですか？\n（再解錠にはアクセスコードが必要です）')) {
       setGroupUnlocked(false);
       refresh();
-      // ライブ同期も停止
-      if (window.__liveSyncTimer) {
-        clearInterval(window.__liveSyncTimer);
-        window.__liveSyncTimer = null;
-      }
     }
   });
 }
@@ -1903,8 +1896,15 @@ function initGroupLock() {
 // クラウド同期（GAS Web App）
 // =========================
 const GROUP_API_URL = 'https://script.google.com/macros/s/AKfycbzHbJsj9mdyVqJvMl85_NkB5y4k4tbQ2hYXahT3gVNAPaQfCU4629xuvmnEtQJc6B26/exec';
-const LIVE_SYNC_KEY = 'sangoku_live_sync_v1';
+const GROUP_MODE_KEY = 'sangoku_group_mode_v1';  // "sync" | "draft"
 let lastCloudUpdatedAt = '';
+
+function getGroupMode() {
+  return localStorage.getItem(GROUP_MODE_KEY) === 'draft' ? 'draft' : 'sync';
+}
+function setGroupMode(m) {
+  localStorage.setItem(GROUP_MODE_KEY, m);
+}
 
 async function cloudGet() {
   const res = await fetch(GROUP_API_URL, { method: 'GET' });
@@ -1964,8 +1964,34 @@ function setGroupStatus(text, color) {
 function initCloudSync() {
   const btnPull = document.getElementById('btn-cloud-pull');
   const btnPush = document.getElementById('btn-cloud-push');
-  const chkLive = document.getElementById('chk-live-sync');
+  const btnMode = document.getElementById('btn-mode-toggle');
   if (!btnPull) return;
+
+  // モード表示の更新
+  function refreshModeUI() {
+    const mode = getGroupMode();
+    if (mode === 'draft') {
+      btnMode.textContent = '🧪 試作モード';
+      btnMode.style.background = '#a05a2a';
+      btnPush.style.background = '#c33';
+      btnPush.title = '⚠️ 試作モード中。押すと試作内容が本番に反映されます';
+      setGroupStatus('試作中（保存しても本番反映可、要確認）', '#a05a2a');
+    } else {
+      btnMode.textContent = '🔗 同期モード';
+      btnMode.style.background = '#3a5520';
+      btnPush.style.background = 'var(--accent)';
+      btnPush.title = 'この端末の現在状態をクラウドへ保存（他端末に同期）';
+      setGroupStatus('同期中', '#3a5520');
+    }
+  }
+  refreshModeUI();
+
+  // モード切替（ワンタッチ）
+  btnMode.addEventListener('click', () => {
+    const next = getGroupMode() === 'sync' ? 'draft' : 'sync';
+    setGroupMode(next);
+    refreshModeUI();
+  });
 
   btnPull.addEventListener('click', async () => {
     if (!await askConfirm('クラウド上の最新データでこの端末を上書きします。よろしいですか？\n（この端末の現在の編集内容は失われます）')) return;
@@ -1980,8 +2006,9 @@ function initCloudSync() {
       }
       applySharedPayload(r.data);
       lastCloudUpdatedAt = r.updated_at || '';
-      setGroupStatus(`取得完了 ${new Date().toLocaleTimeString()}`, '#3a5520');
       notify('クラウドから取得しました。');
+      refreshModeUI();
+      setGroupStatus(`取得完了 ${new Date().toLocaleTimeString()}`, '#3a5520');
     } catch (e) {
       setGroupStatus('取得失敗', '#c33');
       notify(`取得失敗: ${e.message}`);
@@ -1989,58 +2016,21 @@ function initCloudSync() {
   });
 
   btnPush.addEventListener('click', async () => {
+    // 試作モード中は確認ダイアログ
+    if (getGroupMode() === 'draft') {
+      const ok = await askConfirm('⚠️ 試作モード中です。\n試作中の内容をクラウド（本番）に反映してよろしいですか？');
+      if (!ok) return;
+    }
     setGroupStatus('保存中…', '#888');
     try {
       const r = await cloudPut(buildSharedPayload());
       lastCloudUpdatedAt = r.updated_at || '';
-      setGroupStatus(`保存完了 ${new Date().toLocaleTimeString()}`, '#3a5520');
       notify('クラウドに保存しました。');
+      refreshModeUI();
+      setGroupStatus(`保存完了 ${new Date().toLocaleTimeString()}`, '#3a5520');
     } catch (e) {
       setGroupStatus('保存失敗', '#c33');
       notify(`保存失敗: ${e.message}`);
-    }
-  });
-
-  // ライブ同期: 5秒ごとに cloudGet → updated_at が変わってたら apply
-  async function tickLiveSync() {
-    try {
-      const r = await cloudGet();
-      if (!r.ok) return;
-      if (r.updated_at && r.updated_at !== lastCloudUpdatedAt) {
-        // 他端末から更新が来た → ローカルを上書き
-        lastCloudUpdatedAt = r.updated_at;
-        if (r.data && Object.keys(r.data).length) {
-          applySharedPayload(r.data);
-          setGroupStatus(`同期受信 ${new Date().toLocaleTimeString()}`, '#3a5520');
-        }
-      }
-    } catch (e) {
-      setGroupStatus(`ライブ同期失敗: ${e.message}`, '#c33');
-    }
-  }
-  function startLive() {
-    if (window.__liveSyncTimer) clearInterval(window.__liveSyncTimer);
-    window.__liveSyncTimer = setInterval(tickLiveSync, 5000);
-    tickLiveSync();  // 即時1回
-    setGroupStatus('ライブ同期ON', '#3a5520');
-  }
-  function stopLive() {
-    if (window.__liveSyncTimer) {
-      clearInterval(window.__liveSyncTimer);
-      window.__liveSyncTimer = null;
-    }
-    setGroupStatus('ライブ同期OFF', '#888');
-  }
-
-  chkLive.checked = localStorage.getItem(LIVE_SYNC_KEY) === '1';
-  if (chkLive.checked) startLive();
-  chkLive.addEventListener('change', () => {
-    if (chkLive.checked) {
-      localStorage.setItem(LIVE_SYNC_KEY, '1');
-      startLive();
-    } else {
-      localStorage.removeItem(LIVE_SYNC_KEY);
-      stopLive();
     }
   });
 }
