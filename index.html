@@ -1857,7 +1857,8 @@ function initGroupLock() {
       ※ 全員が全員の所持・編成を編集可能。後勝ち（last-write-wins）方式。
     </div>
   `;
-  document.querySelector('aside.right').appendChild(groupPanel);
+  // フッターの直前に挿入（aside がないので body 直下）
+  document.body.insertBefore(groupPanel, footer);
 
   // クラウド同期ロジック（後でフックを呼ぶ）
   initCloudSync();
