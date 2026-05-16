@@ -1810,7 +1810,76 @@ function renderGlobalPriority() {
   renderRoster();
   renderFormation();
   renderSummary();
+
+  // === グループ機能ロック解錠 ===
+  initGroupLock();
 })();
+
+// =========================
+// グループ機能アクセス制御（パスワード解錠式）
+// =========================
+const GROUP_LOCK_KEY = 'sangoku_group_unlocked_v1';
+const GROUP_PASSPHRASE = 'sangoku2026';
+
+function isGroupUnlocked() {
+  return localStorage.getItem(GROUP_LOCK_KEY) === '1';
+}
+function setGroupUnlocked(on) {
+  if (on) localStorage.setItem(GROUP_LOCK_KEY, '1');
+  else localStorage.removeItem(GROUP_LOCK_KEY);
+}
+
+function initGroupLock() {
+  // フッター下端に控えめなボタンを設置
+  const footer = document.createElement('div');
+  footer.id = 'group-footer';
+  footer.style.cssText = 'margin-top:24px;padding:10px 4px;text-align:center;color:#bcae8a;font-size:11px;border-top:1px dotted var(--border);';
+  footer.innerHTML = `<button id="btn-group-toggle" title="グループ機能" style="background:transparent;color:#bcae8a;border:1px solid #d4c89c;padding:4px 10px;font-size:11px;border-radius:3px;">⚙️</button>`;
+  document.body.appendChild(footer);
+
+  const groupPanel = document.createElement('div');
+  groupPanel.id = 'group-panel';
+  groupPanel.style.cssText = 'display:none;margin:12px 0;padding:10px;background:#e8f0e0;border:1px solid #88a06a;';
+  groupPanel.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <strong style="color:#3a5520;">🔓 グループ機能（解錠済）</strong>
+      <button id="btn-group-lock" style="background:#999;color:#fff;border:none;padding:3px 8px;font-size:11px;cursor:pointer;">ロックに戻す</button>
+    </div>
+    <div style="font-size:13px;color:#555;">
+      ※ クラウド同期グループ機能は Firebase 設定後に有効化されます。<br>
+      現在は解錠状態（このデバイスの localStorage に保存）のみ実装済み。
+    </div>
+  `;
+  document.querySelector('aside.right').appendChild(groupPanel);
+
+  function refresh() {
+    groupPanel.style.display = isGroupUnlocked() ? '' : 'none';
+  }
+  refresh();
+
+  document.getElementById('btn-group-toggle').addEventListener('click', async () => {
+    if (isGroupUnlocked()) {
+      notify('グループ機能は既に解錠されています。');
+      return;
+    }
+    const code = await askText('アクセスコードを入力してください:');
+    if (code == null) return;
+    if (code === GROUP_PASSPHRASE) {
+      setGroupUnlocked(true);
+      refresh();
+      notify('✅ グループ機能を解錠しました。');
+    } else {
+      notify('❌ アクセスコードが違います。');
+    }
+  });
+
+  document.getElementById('btn-group-lock').addEventListener('click', async () => {
+    if (await askConfirm('グループ機能をロックします。よろしいですか？\n（再解錠にはアクセスコードが必要です）')) {
+      setGroupUnlocked(false);
+      refresh();
+    }
+  });
+}
 
 </script>
 </body>
