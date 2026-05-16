@@ -7261,15 +7261,15 @@ generals:
   name: 典韋
   yomi: null
   base_rarity: 橙
-  troop_type: 万能
+  troop_type: 弓兵
   slot_stat: 武力
   role_tags: []
   skills:
-  - name: 抵抗35%減（上限80%・共有）
-    type: debuff
-    scope: rally
+  - name: 討伐
+    type: buff
+    scope: self
     unlocked_at: 0
-    effect: 抵抗35%減（上限80%・共有）
+    effect: 今いる軍団の敵武将を捕虜にできる確率が44%アップ
     unit: percent
     value:
       by_breakthrough:
@@ -7277,13 +7277,60 @@ generals:
       - null
       - null
       - null
-      - -35.0
-      confidence: medium
+      - 44
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 逃亡
+    type: passive
+    scope: self
+    unlocked_at: 0
+    effect: 戦闘失敗時に捕虜にならない武将です
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 0
+      confidence: high
+    effect_attribute: その他
+    direction: null
+  - name: 奮起・連弩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 古の悪来
+    type: debuff
+    scope: legion
+    unlocked_at: 0
+    effect: 属する陣の戦闘時、敵方兵士の抵抗38.5%低下（集結時同じ陣の累加可、80%を超えない）。戦闘勝利時、22%の確率ですぐに敵方武将を処刑
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 38.5
+      confidence: high
     cap:
-      rule: rally_resist_down_80_shared
-      cap_value: -80.0
-      note: xlsx備考由来の固定%上限
-      shared: true
+      rule: no_cap
+      cap_value: 80
+      note: 抵抗低下累加80%上限
     effect_attribute: 抵抗
     direction: down
   seal_bonus:
@@ -7298,6 +7345,7 @@ generals:
     confidence: unknown
   sources:
   - xlsx:3_20251224.xlsx#武将!B110
+  - screenshot:典韋.PNG
   xlsx_remarks: 抵抗35%減（上限80%・共有）
 - id: 曹操
   name: 曹操
@@ -8973,3 +9021,2738 @@ generals:
     direction: up
   sources:
   - screenshot:鍾繇.PNG
+- id: かすが
+  name: かすが
+  yomi: null
+  base_rarity: 橙
+  troop_type: 騎兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 密儀 紅影
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の騎兵攻撃力10%アップ、特殊騎兵は追加で10%アップ（于禁、董卓突破スキル付加を受ける）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 密儀 月輪
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 所属部隊騎兵の攻撃力が基礎攻撃力×30%アップ（于禁、董卓の突破スキル付加を受ける）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 奮起・猛獣
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×24%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 24
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  sources:
+  - screenshot:かすが.PNG
+- id: 呉懿
+  name: 呉懿
+  yomi: null
+  base_rarity: 橙
+  troop_type: 騎兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 将才
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 統帥を担当時、自身の率兵数が基礎率兵数×34%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 34
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 掲盾
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の騎兵のシールドが基礎シールド×34%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 34
+      confidence: high
+    effect_attribute: シールド
+    direction: up
+  - name: 奮起・連弩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 動合自在
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 所属集結が属する陣の全騎兵の抵抗が基礎抵抗×10%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 抵抗
+    direction: up
+  sources:
+  - screenshot:呉懿.PNG
+- id: 夏侯淵
+  name: 夏侯淵
+  yomi: null
+  base_rarity: 橙
+  troop_type: 弓兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 強弓
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の弓兵の攻撃力25%
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 25
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 急襲
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の全武将武力の対兵士攻防付加がアップ。数値は元の50%
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 50
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 連射
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 所属集結が属する陣の全弓兵の攻撃力が（基礎攻撃力×30%）アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  sources:
+  - screenshot:夏侯淵.PNG
+- id: 孟獲
+  name: 孟獲
+  yomi: null
+  base_rarity: 橙
+  troop_type: 歩兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 援護
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる軍団の武将が捕虜になる確率-20%
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: その他
+    direction: down
+  - name: 七擒
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣内兵士の攻撃力が、当該軍団陣の討論スキル効果×10%にアップ。防御力は当該軍団の殿軍スキル効果×10%にアップ（スキル効果は、当該軍団当該陣の討論/殿軍スキルの総レベル/10。宝物スキルを含み、2種のスキル効果の上限は7）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 慧駁
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 探訪時に8%の確率で複数の武将を探訪できます
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 8
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:孟獲.PNG
+- id: 廖化
+  name: 廖化
+  yomi: null
+  base_rarity: 橙
+  troop_type: 歩兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 奮起・歩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の歩兵攻撃力を基礎攻撃力×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 強御・歩
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の歩兵の防御力が基礎防御力×10%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 鉄壁・盾槍
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の盾槍兵防御力を基礎防御力×21%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 21
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  sources:
+  - screenshot:廖化.PNG
+- id: 張任
+  name: 張任
+  yomi: null
+  base_rarity: 橙
+  troop_type: 弓兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 奮起・弓
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の弓兵攻撃力が基礎攻撃力×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 鉄壁・弓
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の弓兵防御力を基礎防御力×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 奮起・連弩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×21%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 21
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 隕鳳落星
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 所属集結が属する陣の全弓兵の軍紀が（基礎軍紀×8%）アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 8
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:張任.PNG
+- id: 張承
+  name: 張承
+  yomi: null
+  base_rarity: 橙
+  troop_type: 騎兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 眼識
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 所属部隊の騎兵の攻撃力が基礎攻撃力×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 威儀
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の騎兵の防御力が基礎防御力×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 軍容整然
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 所属集結が属する陣の全騎兵の軍紀が基礎軍紀×8%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 8
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:張承.PNG
+- id: 張春華
+  name: 張春華
+  yomi: null
+  base_rarity: 橙
+  troop_type: 歩兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 傷逝
+    type: debuff
+    scope: legion
+    unlocked_at: 0
+    effect: 属する陣の戦闘時、相手兵士の死亡率13.5%アップ（プレイヤーにのみ有効）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 13.5
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 鉄壁・歩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の歩兵防御力を基礎防御力×44%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 44
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 鉄壁・盾槍
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の盾槍兵防御力を基礎防御力×24%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 24
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 絶代芳華
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 戦闘終了後、軍団が属する陣の負傷兵を治癒。治癒数はスキル「傷逝」により追加で死んだ兵士数の110%（最大で負傷兵の80%を治癒）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 110
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: 80
+      note: 治癒上限80%
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:張春華.PNG
+- id: 張松
+  name: 張松
+  yomi: null
+  base_rarity: 橙
+  troop_type: 歩兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 奮起・歩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の歩兵攻撃力を基礎攻撃力×34%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 34
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 無双・歩
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の歩兵の攻撃力が基礎攻撃力×22%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 22
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 奮起・歩_2
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の歩兵攻撃力を基礎攻撃力×14%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 14
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 献図
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の歩兵の攻撃力が基礎攻撃力×（陣内の歩兵部隊数×15%）アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 15
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  sources:
+  - screenshot:張松.PNG
+- id: 徐庶
+  name: 徐庶
+  yomi: null
+  base_rarity: 橙
+  troop_type: 弓兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 智計・燎
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 焼討成功時に、効果が元の効果×60%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 60
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 無双・弓
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の弓兵攻撃力が基礎攻撃力×12%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 12
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 奮起・連弩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×21%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 21
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  sources:
+  - screenshot:徐庶.PNG
+- id: 文鴦
+  name: 文鴦
+  yomi: null
+  base_rarity: 橙
+  troop_type: 騎兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 奮起・騎
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の騎兵攻撃力を基礎攻撃力×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 無双・騎
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の騎兵攻撃力が基礎攻撃力×10%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 眼力
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 探宝所要時間を基礎時間×7%短縮
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 7
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:文鴦.PNG
+- id: 曹植
+  name: 曹植
+  yomi: null
+  base_rarity: 橙
+  troop_type: 歩兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 奮起・歩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の歩兵攻撃力を基礎攻撃力×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 強御・歩
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の歩兵の防御力が基礎防御力×10%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 慧眼
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 探訪時に8%の確率で複数の武将を探訪できます
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 8
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:曹植.PNG
+- id: 曹沖
+  name: 曹沖
+  yomi: null
+  base_rarity: 橙
+  troop_type: 弓兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 鉄壁・軍
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 所属部隊全兵士の防御力を20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 称象
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 属する陣の戦闘時、双方の平均基礎負荷を比較して、味方が敵方を上回る場合、味方の防御力がアップする。上回らない場合は味方の攻撃力がアップする（敵方プレイヤーとの戦闘時のみ有効。現在の数値5%、集結時に同じ陣で累加可能だが、50%を超えず、且つ100ptを超えない）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 5
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: 50
+      note: 攻防累加50%・100pt
+    effect_attribute: 防御
+    direction: up
+  - name: 兵心・弓
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 兵士訓練時に一度に訓練できる弓兵の数量を元の数量×40%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 40
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:曹沖.PNG
+- id: 沮授
+  name: 沮授
+  yomi: null
+  base_rarity: 橙
+  troop_type: 騎兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 疾駆
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: この武将を鉄鉱の略奪へ行かせた時、略奪できる鉄鉱が元の数値×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 奮起・騎
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の騎兵攻撃力を基礎攻撃力×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 奮起・猛獣
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×21%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 21
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 良謀大略
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の騎兵の防御力アップ。数値は自身の総攻撃力の10%
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  sources:
+  - screenshot:沮授.PNG
+- id: 玄姜維
+  name: 玄姜維
+  yomi: null
+  base_rarity: 玄
+  troop_type: 弓兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 迅射
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の特殊弓兵の攻撃力×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 結陣
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の特殊弓兵の防御力×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 奮起・連弩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×21%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 21
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 剣閣守険
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 集結が今いる部隊する陣内の全弓兵の貫通が（基礎貫通×10%）アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 貫通
+    direction: up
+  sources:
+  - screenshot:玄姜維.PNG
+- id: 玄田豊
+  name: 玄田豊
+  yomi: null
+  base_rarity: 玄
+  troop_type: 戦車
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 砥兵
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の兵士の攻撃力が基礎攻撃力×10%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 焚玉
+    type: debuff
+    scope: legion
+    unlocked_at: 0
+    effect: 属する陣の戦闘時、味方ダメージの無効率2%低下、同時に敵方のダメージ無効率8%低下（同じ陣の集結による累加で味方の低下は8%を超えず、敵方の低下は30%を超えない。他のダメージ無効率を低下させるスキルと作用させた場合、相手のダメージ無効率は下限の10%以下にはならない。プレイヤーとの戦闘でのみ有効）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 8
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: 30
+      note: 累加上限30%、下限10%
+    effect_attribute: その他
+    direction: down
+  - name: 攻城・車
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の戦車攻城値を基礎攻城値×14%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 14
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:玄田豊.PNG
+- id: 玄顔良
+  name: 玄顔良
+  yomi: null
+  base_rarity: 玄
+  troop_type: 歩兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 驍将
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の特殊歩兵の攻撃力30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 冠勇
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の特殊歩兵の防御力30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 奮起・連弩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 24
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 三軍戦慄
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 集結が属する陣内の全歩兵の連撃が（基礎連撃×10%）アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 連撃
+    direction: up
+  sources:
+  - screenshot:玄顔良.PNG
+- id: 甘寧
+  name: 甘寧
+  yomi: null
+  base_rarity: 橙
+  troop_type: 騎兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 遊侠
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 統帥を担当時、自身の率兵数が基礎率兵数×60%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 60
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 速攻
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の兵士の攻撃力が基礎攻撃力×（基礎速度×60/100%）アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 60
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 奮起・連弩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 24
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 衝陣
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 所属集結が属する陣の全騎兵の攻撃力が（基礎攻撃力×30%）アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  sources:
+  - screenshot:甘寧.PNG
+- id: 田豊
+  name: 田豊
+  yomi: null
+  base_rarity: 橙
+  troop_type: 歩兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 勇傑
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の歩兵の攻撃力28%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 28
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 応変
+    type: debuff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の死亡率28%低下
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 28
+      confidence: high
+    effect_attribute: その他
+    direction: down
+  - name: 奮起・歩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の歩兵攻撃力を基礎攻撃力×12%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 12
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 深溝高塁
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 所属部隊の武将の歩兵付加スキル効果および武将が装備中宝物の歩兵付加スキル効果がそれぞれ元の効果×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:田豊.PNG
+- id: 祝融
+  name: 祝融
+  yomi: null
+  base_rarity: 橙
+  troop_type: 歩兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 討伐
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる軍団の敵武将を捕虜にできる確率が20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 無双・弓
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の弓兵攻撃力が基礎攻撃力×10%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 人脈
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 探訪所要時間を基礎時間×7%短縮
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 7
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:祝融.PNG
+- id: 程昱
+  name: 程昱
+  yomi: null
+  base_rarity: 橙
+  troop_type: 戦車
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 智計・破
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 破城成功時に、効果が元の効果×120%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 120
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 無双・車
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の戦車の攻城値が基礎攻城値×12%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 12
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 精工
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 所属軍団の採掘効率が基礎採掘効率×16%アップ（スキルの累加上限は基礎採掘効率×200%を超えない）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 16
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: 200
+      note: 累加上限200%
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:程昱.PNG
+- id: 羊祜
+  name: 羊祜
+  yomi: null
+  base_rarity: 橙
+  troop_type: 歩兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 将才
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 統帥を担当時、自身の率兵数が基礎率兵数×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 強御・歩
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の歩兵の防御力が基礎防御力×10%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 兵心・歩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 兵士訓練時に一度に訓練できる歩兵の数量を元の数量×35%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 35
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:羊祜.PNG
+- id: 董卓
+  name: 董卓
+  yomi: null
+  base_rarity: 橙
+  troop_type: 騎兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 奮起・騎
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の騎兵攻撃力を基礎攻撃力×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 鉄壁・騎
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の騎兵防御力を基礎防御力×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 民
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 村落派遣時、村落の糧秣税収率×16%分、武将の政治付加値をアップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 16
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 酒池肉林
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 所属部隊の武将および宝物帯同武将の騎兵の付加スキル効果を30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:董卓.PNG
+- id: 董襲
+  name: 董襲
+  yomi: null
+  base_rarity: 橙
+  troop_type: 弓兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 奮起・弓
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の弓兵攻撃力が基礎攻撃力×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 強御・弓
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の弓兵の防御力が基礎防御力×10%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 奮起・連弩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 24
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  sources:
+  - screenshot:董襲.PNG
+- id: 蔡文姫
+  name: 蔡文姫
+  yomi: null
+  base_rarity: 橙
+  troop_type: 万能
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 人脈
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 探訪所要時間を基礎時間×12%短縮
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 12
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 慧眼
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 探訪時に12%の確率で複数の武将を探訪できます
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 12
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 兵心・弓
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 兵士訓練時に一度に訓練できる弓兵の数量を元の数量×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:蔡文姫.PNG
+- id: 許攸
+  name: 許攸
+  yomi: null
+  base_rarity: 橙
+  troop_type: 歩兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 鉄壁・歩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の歩兵防御力を基礎防御力×34%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 34
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 奮起・歩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の歩兵攻撃力を基礎攻撃力×34%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 34
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 鉄壁・盾槍
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の盾槍兵防御力を基礎防御力×21%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 21
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 烈火真金
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 集結が属する陣内の全歩兵の基礎攻撃力と基礎防御力がそれぞれ15%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 15
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  sources:
+  - screenshot:許攸.PNG
+- id: 許褚
+  name: 許褚
+  yomi: null
+  base_rarity: 橙
+  troop_type: 歩兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 築城
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 分城/要塞建造の派遣時に、建造に必要な時間-24%（最大50%まで）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 24
+      confidence: high
+    effect_attribute: その他
+    direction: down
+  - name: 討伐
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる軍団の敵武将を捕虜にできる確率が24%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 24
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 攻城・虎戦
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の虎戦車攻城値+24%
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 24
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:許褚.PNG
+- id: 諸葛恪
+  name: 諸葛恪
+  yomi: null
+  base_rarity: 橙
+  troop_type: 弓兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 奮起・弓
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の弓兵攻撃力が基礎攻撃力×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 強御・弓
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の弓兵の防御力が基礎防御力×10%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 民
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 村落派遣時、村落の糧秣税収率×16%分、武将の政治付加値をアップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 16
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:諸葛恪.PNG
+- id: 郝昭
+  name: 郝昭
+  yomi: null
+  base_rarity: 橙
+  troop_type: 歩兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 修繕
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 城防築造時、築造速度+30%
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 不移
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の歩兵の防御力が基礎防御力×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 座守堅城
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 集結が属する陣内の全歩兵の軍紀が基礎軍紀×8%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 8
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:郝昭.PNG
+- id: 郭淮
+  name: 郭淮
+  yomi: null
+  base_rarity: 橙
+  troop_type: 弓兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 将才
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 統帥を担当時、自身の率兵数が基礎率兵数×34%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 34
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 鉄壁・弓
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の弓兵防御力を基礎防御力×34%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 34
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 奮起・連弩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 27
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 垂問秦雍
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の弓兵の連撃30%アップ、シールド30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: シールド
+    direction: up
+  sources:
+  - screenshot:郭淮.PNG
+- id: 鍾会
+  name: 鍾会
+  yomi: null
+  base_rarity: 橙
+  troop_type: 騎兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 智計・乱
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 流言成功時に、効果が元の効果×50%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 50
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 強御・騎
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の騎兵の防御力が基礎防御力×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 阜財
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 村落派遣時、村落の金銭税収率×16%分、武将の政治付加値をアップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 16
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 奇策
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 集結が属する陣の全騎兵の防御力が（基礎防御力×30%）アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  sources:
+  - screenshot:鍾会.PNG
+- id: 陳宮
+  name: 陳宮
+  yomi: null
+  base_rarity: 橙
+  troop_type: 騎兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 鉄壁・騎
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の騎兵防御力を基礎防御力×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 強御・騎
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の騎兵の防御力が基礎防御力×10%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 重農
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 農地に派遣されると、内城農地生産量+16%
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 16
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:陳宮.PNG
+- id: 陳泰
+  name: 陳泰
+  yomi: null
+  base_rarity: 橙
+  troop_type: 歩兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 鉄壁・歩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の歩兵防御力を基礎防御力×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 応変
+    type: debuff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の死亡率15%低下
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 15
+      confidence: high
+    effect_attribute: その他
+    direction: down
+  - name: 兵心・歩
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 兵士訓練時に一度に訓練できる歩兵の数量を元の数量×35%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 35
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:陳泰.PNG
+- id: 陸抗
+  name: 陸抗
+  yomi: null
+  base_rarity: 橙
+  troop_type: 戦車
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 攻城・車
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の戦車攻城値を基礎攻城値×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 将才
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 統帥を担当時、自身の率兵数が基礎率兵数×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 蔵珠
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 探宝時に7%の確率で複数の宝物を発見
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 7
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 示形惑敵
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 所属集結が属する陣の全兵士の抵抗が基礎抵抗×15%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 15
+      confidence: high
+    effect_attribute: 抵抗
+    direction: up
+  sources:
+  - screenshot:陸抗.PNG
+- id: 韓遂
+  name: 韓遂
+  yomi: null
+  base_rarity: 橙
+  troop_type: 騎兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 鉄壁・騎
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の騎兵防御力を基礎防御力×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 将才
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 統帥を担当時、自身の率兵数が基礎率兵数×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 奮起・猛獣
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×21%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 21
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  sources:
+  - screenshot:韓遂.PNG
+- id: 馬雲騄
+  name: 馬雲騄
+  yomi: null
+  base_rarity: 橙
+  troop_type: 騎兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 鉄壁・騎
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の騎兵防御力を基礎防御力×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 強御・騎
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の騎兵の防御力が基礎防御力×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 眼力
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 探宝所要時間を基礎時間×8%短縮
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 8
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 流雲千転
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 集結が属する陣内の全騎兵のシールドが（基礎シールド×20%）アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: シールド
+    direction: up
+  sources:
+  - screenshot:馬雲騄.PNG
+- id: 高順
+  name: 高順
+  yomi: null
+  base_rarity: 橙
+  troop_type: 騎兵
+  role_tags: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  skills:
+  - name: 奮起・騎
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 今いる部隊の騎兵攻撃力を基礎攻撃力×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 御影
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 所属部隊の騎兵の防御力が基礎防御力×（陣内の騎兵部隊数×10%）アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 慧眼
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 探訪時に8%の確率で複数の武将を探訪できます
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 8
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  sources:
+  - screenshot:高順.PNG
