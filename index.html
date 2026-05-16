@@ -1841,16 +1841,26 @@ function initGroupLock() {
   groupPanel.id = 'group-panel';
   groupPanel.style.cssText = 'display:none;margin:12px 0;padding:10px;background:#e8f0e0;border:1px solid #88a06a;';
   groupPanel.innerHTML = `
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-      <strong style="color:#3a5520;">🔓 グループ機能（解錠済）</strong>
-      <button id="btn-group-lock" style="background:#999;color:#fff;border:none;padding:3px 8px;font-size:11px;cursor:pointer;">ロックに戻す</button>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+      <strong style="color:#3a5520;">🔓 グループ同期</strong>
+      <span id="group-status" style="font-size:11px;color:#666;">未接続</span>
+      <button id="btn-group-lock" style="background:#999;color:#fff;border:none;padding:3px 8px;font-size:11px;cursor:pointer;margin-left:auto;">ロックに戻す</button>
     </div>
-    <div style="font-size:13px;color:#555;">
-      ※ クラウド同期グループ機能は Firebase 設定後に有効化されます。<br>
-      現在は解錠状態（このデバイスの localStorage に保存）のみ実装済み。
+    <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:12px;">
+      <button id="btn-cloud-pull" title="クラウド上の最新データでこの端末を上書き">⬇️ クラウドから取得</button>
+      <button id="btn-cloud-push" title="この端末の現在状態をクラウドへ保存（他端末に同期）" style="background:var(--accent);color:#fff;">⬆️ クラウドへ保存</button>
+      <label style="display:inline-flex;align-items:center;gap:4px;font-size:12px;background:#fff;border:1px solid var(--border);padding:3px 8px;">
+        <input type="checkbox" id="chk-live-sync"> ライブ同期(5秒)
+      </label>
+    </div>
+    <div style="font-size:11px;color:#777;margin-top:6px;">
+      ※ 全員が全員の所持・編成を編集可能。後勝ち（last-write-wins）方式。
     </div>
   `;
   document.querySelector('aside.right').appendChild(groupPanel);
+
+  // クラウド同期ロジック（後でフックを呼ぶ）
+  initCloudSync();
 
   function refresh() {
     groupPanel.style.display = isGroupUnlocked() ? '' : 'none';
@@ -1877,6 +1887,157 @@ function initGroupLock() {
     if (await askConfirm('グループ機能をロックします。よろしいですか？\n（再解錠にはアクセスコードが必要です）')) {
       setGroupUnlocked(false);
       refresh();
+      // ライブ同期も停止
+      if (window.__liveSyncTimer) {
+        clearInterval(window.__liveSyncTimer);
+        window.__liveSyncTimer = null;
+      }
+    }
+  });
+}
+
+// =========================
+// クラウド同期（GAS Web App）
+// =========================
+const GROUP_API_URL = 'https://script.google.com/macros/s/AKfycbzHbJsj9mdyVqJvMl85_NkB5y4k4tbQ2hYXahT3gVNAPaQfCU4629xuvmnEtQJc6B26/exec';
+const LIVE_SYNC_KEY = 'sangoku_live_sync_v1';
+let lastCloudUpdatedAt = '';
+
+async function cloudGet() {
+  const res = await fetch(GROUP_API_URL, { method: 'GET' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return await res.json();
+}
+
+async function cloudPut(payload) {
+  // Content-Type: text/plain でプリフライト回避
+  const res = await fetch(GROUP_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const r = await res.json();
+  if (!r.ok) throw new Error(r.error || 'unknown');
+  return r;
+}
+
+function buildSharedPayload() {
+  return {
+    schema: 'sangoku_group_v1',
+    users: state.users,
+    ownerships: state.ownerships,
+    activeUserId: state.activeUserId,
+    formations: state.formations,
+    priority: state.priority,
+    aggMode: state.aggMode,
+  };
+}
+
+function applySharedPayload(d) {
+  if (!d || typeof d !== 'object') return false;
+  if (Array.isArray(d.users)) state.users = d.users;
+  if (d.ownerships && typeof d.ownerships === 'object') state.ownerships = d.ownerships;
+  if (typeof d.activeUserId === 'number' && state.users.find(u => u.id === d.activeUserId)) state.activeUserId = d.activeUserId;
+  if (Array.isArray(d.formations)) state.formations = d.formations;
+  if (d.priority && typeof d.priority === 'object') state.priority = d.priority;
+  if (d.aggMode) state.aggMode = d.aggMode;
+  saveState();
+  renderUserTabs();
+  renderGlobalPriority();
+  renderRoster();
+  renderFormation();
+  renderSummary();
+  return true;
+}
+
+function setGroupStatus(text, color) {
+  const el = document.getElementById('group-status');
+  if (!el) return;
+  el.textContent = text;
+  el.style.color = color || '#666';
+}
+
+function initCloudSync() {
+  const btnPull = document.getElementById('btn-cloud-pull');
+  const btnPush = document.getElementById('btn-cloud-push');
+  const chkLive = document.getElementById('chk-live-sync');
+  if (!btnPull) return;
+
+  btnPull.addEventListener('click', async () => {
+    if (!await askConfirm('クラウド上の最新データでこの端末を上書きします。よろしいですか？\n（この端末の現在の編集内容は失われます）')) return;
+    setGroupStatus('取得中…', '#888');
+    try {
+      const r = await cloudGet();
+      if (!r.ok) throw new Error('GET failed');
+      if (!r.data || !Object.keys(r.data).length) {
+        setGroupStatus('クラウドはまだ空です', '#888');
+        notify('クラウドにはまだデータがありません。\nまず「クラウドへ保存」で初期データをアップロードしてください。');
+        return;
+      }
+      applySharedPayload(r.data);
+      lastCloudUpdatedAt = r.updated_at || '';
+      setGroupStatus(`取得完了 ${new Date().toLocaleTimeString()}`, '#3a5520');
+      notify('クラウドから取得しました。');
+    } catch (e) {
+      setGroupStatus('取得失敗', '#c33');
+      notify(`取得失敗: ${e.message}`);
+    }
+  });
+
+  btnPush.addEventListener('click', async () => {
+    setGroupStatus('保存中…', '#888');
+    try {
+      const r = await cloudPut(buildSharedPayload());
+      lastCloudUpdatedAt = r.updated_at || '';
+      setGroupStatus(`保存完了 ${new Date().toLocaleTimeString()}`, '#3a5520');
+      notify('クラウドに保存しました。');
+    } catch (e) {
+      setGroupStatus('保存失敗', '#c33');
+      notify(`保存失敗: ${e.message}`);
+    }
+  });
+
+  // ライブ同期: 5秒ごとに cloudGet → updated_at が変わってたら apply
+  async function tickLiveSync() {
+    try {
+      const r = await cloudGet();
+      if (!r.ok) return;
+      if (r.updated_at && r.updated_at !== lastCloudUpdatedAt) {
+        // 他端末から更新が来た → ローカルを上書き
+        lastCloudUpdatedAt = r.updated_at;
+        if (r.data && Object.keys(r.data).length) {
+          applySharedPayload(r.data);
+          setGroupStatus(`同期受信 ${new Date().toLocaleTimeString()}`, '#3a5520');
+        }
+      }
+    } catch (e) {
+      setGroupStatus(`ライブ同期失敗: ${e.message}`, '#c33');
+    }
+  }
+  function startLive() {
+    if (window.__liveSyncTimer) clearInterval(window.__liveSyncTimer);
+    window.__liveSyncTimer = setInterval(tickLiveSync, 5000);
+    tickLiveSync();  // 即時1回
+    setGroupStatus('ライブ同期ON', '#3a5520');
+  }
+  function stopLive() {
+    if (window.__liveSyncTimer) {
+      clearInterval(window.__liveSyncTimer);
+      window.__liveSyncTimer = null;
+    }
+    setGroupStatus('ライブ同期OFF', '#888');
+  }
+
+  chkLive.checked = localStorage.getItem(LIVE_SYNC_KEY) === '1';
+  if (chkLive.checked) startLive();
+  chkLive.addEventListener('change', () => {
+    if (chkLive.checked) {
+      localStorage.setItem(LIVE_SYNC_KEY, '1');
+      startLive();
+    } else {
+      localStorage.removeItem(LIVE_SYNC_KEY);
+      stopLive();
     }
   });
 }
