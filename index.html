@@ -494,19 +494,46 @@ function loadData() {
 // スキル解決ロジック
 // ============================================================
 // 単一スキルの実効値を計算（突破段・装備段に応じる）
+// 戻り値: number | null （nullは未解放/未登録）
+// estimated フラグは別途 resolveSkillValueDetailed() で取得可
 function resolveSkillValue(skill, own) {
+  const r = resolveSkillValueDetailed(skill, own);
+  return r ? r.value : null;
+}
+
+// 詳細版: {value, estimated, source} を返す
+//   estimated=true: ユーザー段階に値が無く、別段階の値を代用している
+//   source: 'exact' | 'fallback-breakthrough' | 'fallback-equipment'
+function resolveSkillValueDetailed(skill, own) {
   // 突破段で未解放？
   if ((skill.unlocked_at ?? 0) > own.breakthrough) return null;
   // 装備段で未解放？
   if (skill.unlocked_at_equipment != null && skill.unlocked_at_equipment > own.equipment) return null;
 
   const v = skill.value || {};
-  const bt = (v.by_breakthrough || [])[own.breakthrough];
-  const eq = (v.by_equipment || [])[own.equipment];
-  if (bt == null) return null;  // 未登録段
+  const btArr = v.by_breakthrough || [];
+  const eqArr = v.by_equipment || [];
+
+  // 突破値の取得（current段にあればそれ、なければ最も近い高い段から探す）
+  let bt = btArr[own.breakthrough];
+  let estimated = false;
+  if (bt == null) {
+    // フォールバック: own.breakthrough → 4 → 3 → ... と高い段から探す
+    for (let lvl = btArr.length - 1; lvl >= 0; lvl--) {
+      if (btArr[lvl] != null) {
+        bt = btArr[lvl];
+        estimated = true;
+        break;
+      }
+    }
+  }
+  if (bt == null) return null;  // どこにも値がない
+
+  // 装備値（フォールバックなし: 装備値は持ってる装備段のみ加算）
+  let eq = eqArr[own.equipment];
   let total = bt;
   if (typeof eq === 'number') total += eq;
-  return total;
+  return { value: total, estimated, source: estimated ? 'fallback-breakthrough' : 'exact' };
 }
 
 // 編成内の (userId, genId) 配置エントリを返す
@@ -550,13 +577,15 @@ function aggregate() {
 
   for (const { g, own, userName } of targets) {
     for (const sk of g.skills) {
-      const eff = resolveSkillValue(sk, own);
+      const detail = resolveSkillValueDetailed(sk, own);
+      const eff = detail ? detail.value : null;
       const entry = {
         general: userName ? `${userName}・${g.name}` : g.name,
         skill: sk.name,
         scope: sk.scope,
         unit: sk.unit,
         value: eff,
+        estimated: !!(detail && detail.estimated),
         cap: sk.cap || null,
         stacking: sk.stacking || 'additive',
         confidence: (sk.value && sk.value.confidence) || 'unknown',
@@ -1521,7 +1550,8 @@ function renderAttributeMatrix(breakdown) {
         td.textContent = '—';
       } else {
         td.className = (c.sum > 0 ? 'up' : (c.sum < 0 ? 'down' : 'zero')) + ' has-detail';
-        const signed = (c.sum > 0 ? '+' : '') + fmtVal(c.sum, 'percent');
+        const hasEstimated = c.effective.some(i => i.estimated);
+        const signed = (c.sum > 0 ? '+' : '') + fmtVal(c.sum, 'percent') + (hasEstimated ? '🔶' : '');
         const detailLines = c.effective.map(i => {
           const capParts = [];
           if (i.cap && i.cap.cap_value != null) capParts.push(`上限${i.cap.cap_value}%`);
@@ -1529,7 +1559,8 @@ function renderAttributeMatrix(breakdown) {
           if (i.cap && i.cap.shared === true) capParts.push('共有');
           else if (i.cap && i.cap.shared === false) capParts.push('非共有');
           const capStr = capParts.length ? ` [${capParts.join('・')}]` : '';
-          return `${i.general}/${i.skill.slice(0,16)} (${fmtVal(i.value, 'percent')})${capStr}`;
+          const estMark = i.estimated ? ' <span style="color:#a86a00;" title="該当段階データ未登録のため別段階値で推定">🔶推定</span>' : '';
+          return `${i.general}/${i.skill.slice(0,16)} (${fmtVal(i.value, 'percent')})${estMark}${capStr}`;
         });
         td.innerHTML = `<strong>${signed}</strong>` +
           `<div class="attr-list">${detailLines.join('<br>')}</div>`;
