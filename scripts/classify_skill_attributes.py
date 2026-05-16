@@ -15,15 +15,32 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 YAML_PATH = ROOT / 'generals.yaml'
 
-# 検査順序が重要: 「貫通抵抗」は「貫通」「抵抗」より先に判定する
+# 非戦闘系（採取・生産・探訪など）→ 「その他」として早期リターン
+NON_COMBAT_KEYWORDS = [
+    '採掘', '採取', '生産', '探訪', '探宝', '助力',
+    '建造', '築造', '農地', '市場', '糧秣', '訓練',
+]
+
+# 検査順序が重要:
+#  1) 貫通抵抗を 貫通/抵抗 より先に
+#  2) 新カテゴリ(抑制/軍紀/率兵/兵士数) を既存より先に判定
+#  3) ダメージは最後(汎用的すぎるため、他の専用キーワードで拾えなかった残りを取る)
 ATTRIBUTE_PATTERNS = [
     ('貫通抵抗', re.compile(r'貫通抵抗')),
     ('シールド',  re.compile(r'シールド')),
+    # 新カテゴリ（A案で昇格、優先判定）
+    ('抑制',     re.compile(r'抑制')),
+    ('軍紀',     re.compile(r'軍紀')),
+    ('率兵',     re.compile(r'率兵')),
+    ('兵士数',   re.compile(r'殺害|撃破|負傷兵|複製|蘇生|治癒|死亡(?!率)|参戦兵|参戦可能')),
+    # 既存
     ('連撃',     re.compile(r'連撃')),
     ('貫通',     re.compile(r'貫通')),
     ('抵抗',     re.compile(r'抵抗')),
     ('防御',     re.compile(r'防御')),
     ('攻撃',     re.compile(r'攻撃')),
+    # ダメージは最後（他で拾えなかったダメ系をすくう）
+    ('ダメージ', re.compile(r'ダメ')),
 ]
 
 UP_KW = ['増', 'アップ', '+', 'UP', '上昇', 'up']
@@ -35,11 +52,15 @@ def classify(effect_text: str, value: float | None):
         text = ''
     else:
         text = effect_text
-    attr = 'その他'
-    for name, pat in ATTRIBUTE_PATTERNS:
-        if pat.search(text):
-            attr = name
-            break
+    # 非戦闘系（採掘・生産・探訪等）は早期にその他へ振り分ける
+    if any(kw in text for kw in NON_COMBAT_KEYWORDS):
+        attr = 'その他'
+    else:
+        attr = 'その他'
+        for name, pat in ATTRIBUTE_PATTERNS:
+            if pat.search(text):
+                attr = name
+                break
 
     # direction はテキストから判定（複数該当時は both）
     has_up = any(kw in text for kw in UP_KW)

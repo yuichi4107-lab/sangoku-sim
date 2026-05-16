@@ -181,7 +181,7 @@ generals:
       cap_value: 80
     sources:
     - https://sangoku-haou.gamer-wiki.com/character/tyouryou
-    effect_attribute: その他
+    effect_attribute: 抑制
     direction: both
   - name: 突撃
     type: buff
@@ -404,7 +404,7 @@ generals:
       rule: no_cap
       cap_value: 10
       note: 殺害上限10%（最小値採用）
-    effect_attribute: その他
+    effect_attribute: 兵士数
     direction: up
   - name: 万軍奪首
     type: buff
@@ -750,7 +750,7 @@ generals:
       rule: no_cap
       cap_value: 30
       note: xlsx備考では上限30%と記載。wikiでは上限記載なし。要再確認
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   - name: 盾防
     type: buff
@@ -971,7 +971,7 @@ generals:
       rule: no_cap
       cap_value: 5
       note: アップ/低下それぞれ最大5%
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: both
   seal_bonus:
     by_seal:
@@ -1097,7 +1097,7 @@ generals:
       rule: no_cap
       cap_value: 30.0
       note: xlsx備考由来の固定%上限
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: down
   seal_bonus:
     by_seal:
@@ -1134,7 +1134,7 @@ generals:
       - null
       - 30
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 屠険
     type: buff
@@ -1186,7 +1186,7 @@ generals:
       rule: no_cap
       cap_value: 25
       note: 追加ダメ25%上限
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   seal_bonus:
     by_seal:
@@ -1244,7 +1244,7 @@ generals:
       rule: no_cap
       cap_value: 80
       note: 抑制係数アップ80%上限
-    effect_attribute: その他
+    effect_attribute: 抑制
     direction: up
   - name: 鉄壁・盾槍
     type: buff
@@ -1318,7 +1318,7 @@ generals:
       rule: no_cap
       cap_value: -80.0
       note: xlsx備考由来の固定%上限
-    effect_attribute: その他
+    effect_attribute: 抑制
     direction: down
   - name: 貫通20%減（上限50%）
     type: debuff
@@ -1469,7 +1469,7 @@ generals:
       rule: no_cap
       cap_value: 15.0
       note: xlsx備考由来の固定%上限
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   seal_bonus:
     by_seal:
@@ -1507,7 +1507,7 @@ generals:
       - -15.0
       confidence: medium
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: down
   - name: 最終抵抗1%高×0.5減（上限25%・上限累加可、1スキル上
     type: debuff
@@ -1603,7 +1603,7 @@ generals:
       - -15.0
       confidence: medium
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: down
   seal_bonus:
     by_seal:
@@ -1661,7 +1661,7 @@ generals:
       - null
       - 30
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 攻城・車
     type: buff
@@ -1694,7 +1694,7 @@ generals:
       - 19.8
       confidence: high
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: down
   - name: 製機持変
     type: buff
@@ -1754,7 +1754,7 @@ generals:
       - null
       - 50
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 厳威
     type: buff
@@ -1775,7 +1775,7 @@ generals:
       rule: no_cap
       cap_value: 80
       note: 抑制率増減80%
-    effect_attribute: その他
+    effect_attribute: 抑制
     direction: both
   - name: 鉄壁・盾備
     type: buff
@@ -1869,7 +1869,7 @@ generals:
       - null
       - 15
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: up
   - name: 追討
     type: debuff
@@ -1889,7 +1889,7 @@ generals:
       rule: no_cap
       cap_value: 15
       note: 低下軍紀15%まで
-    effect_attribute: 攻撃
+    effect_attribute: 軍紀
     direction: down
   - name: 鉄壁・盾備
     type: buff
@@ -1942,7 +1942,7 @@ generals:
       - 5
       confidence: high
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: down
   seal_bonus:
     by_seal:
@@ -1982,7 +1982,7 @@ generals:
       - 8
       confidence: high
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: up
   - name: 替将
     type: buff
@@ -2305,7 +2305,7 @@ generals:
       rule: no_cap
       cap_value: 6
       note: ダメ低下上限6%
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: down
   seal_bonus:
     by_seal:
@@ -2388,7 +2388,7 @@ generals:
       rule: no_cap
       cap_value: -80.0
       note: xlsx備考由来の固定%上限
-    effect_attribute: その他
+    effect_attribute: 抑制
     direction: down
   seal_bonus:
     by_seal:
@@ -2498,7 +2498,7 @@ generals:
       rule: no_cap
       cap_value: 25
       note: 累加上限25%、連撃8%上限
-    effect_attribute: 連撃
+    effect_attribute: 率兵
     direction: up
   seal_bonus:
     by_seal:
@@ -2536,7 +2536,7 @@ generals:
       - null
       - 30
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 威盛
     type: buff
@@ -2553,7 +2553,7 @@ generals:
       - 20
       confidence: high
     stacking: non_stackable
-    effect_attribute: 攻撃
+    effect_attribute: 兵士数
     direction: up
   - name: 鉄壁・車
     type: buff
@@ -2589,7 +2589,7 @@ generals:
       rule: no_cap
       cap_value: 25
       note: アップ上限25%、低下上限10%
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: both
   - name: 臨戒応変
     type: buff
@@ -2606,7 +2606,7 @@ generals:
       - 5
       confidence: high
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   seal_bonus:
     by_seal:
@@ -2686,7 +2686,7 @@ generals:
       - null
       - 60.0
       confidence: medium
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   seal_bonus:
     by_seal:
@@ -2910,7 +2910,7 @@ generals:
       rule: no_cap
       cap_value: 40
       note: 実ダメ低下累加40%
-    effect_attribute: その他
+    effect_attribute: 兵士数
     direction: down
   seal_bonus:
     by_seal:
@@ -3010,7 +3010,7 @@ generals:
       - 10.0
       confidence: medium
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   seal_bonus:
     by_seal:
@@ -3047,7 +3047,7 @@ generals:
       - null
       - 50
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 突陣
     type: buff
@@ -3100,7 +3100,7 @@ generals:
       - 20
       confidence: high
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   seal_bonus:
     by_seal:
@@ -3139,7 +3139,7 @@ generals:
       - null
       - 50
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 伐執
     type: buff
@@ -3155,7 +3155,7 @@ generals:
       - null
       - 15
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: up
   - name: 奮起・猛獣
     type: buff
@@ -3384,7 +3384,7 @@ generals:
       - 20.0
       confidence: medium
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: 抑制
     direction: up
   - name: シールド5%増（上限10%）
     type: buff
@@ -3441,7 +3441,7 @@ generals:
       - null
       - 15
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: up
   - name: 寵摯
     type: debuff
@@ -3494,7 +3494,7 @@ generals:
       rule: no_cap
       cap_value: 30
       note: 累加上限30%
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: down
   - name: 制敵攻略
     type: debuff
@@ -3612,7 +3612,7 @@ generals:
       rule: no_cap
       cap_value: -80.0
       note: xlsx備考由来の固定%上限
-    effect_attribute: その他
+    effect_attribute: 抑制
     direction: down
   seal_bonus:
     by_seal:
@@ -3746,7 +3746,7 @@ generals:
       rule: no_cap
       cap_value: 20
       note: ダメ増20%上限
-    effect_attribute: その他
+    effect_attribute: 兵士数
     direction: up
   - name: 周到戦略
     type: debuff
@@ -3763,7 +3763,7 @@ generals:
       - 5
       confidence: high
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: down
   seal_bonus:
     by_seal:
@@ -3801,7 +3801,7 @@ generals:
       - null
       - 50
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 焚営
     type: buff
@@ -3854,7 +3854,7 @@ generals:
       - 10
       confidence: high
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: down
   seal_bonus:
     by_seal:
@@ -3897,7 +3897,7 @@ generals:
       rule: no_cap
       cap_value: 10.0
       note: xlsx備考由来の固定%上限
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   seal_bonus:
     by_seal:
@@ -3980,7 +3980,7 @@ generals:
       rule: no_cap
       cap_value: -20.0
       note: xlsx備考由来の固定%上限
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: down
   seal_bonus:
     by_seal:
@@ -4034,7 +4034,7 @@ generals:
       - 11
       confidence: high
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: 兵士数
     direction: up
   - name: 奮起・連弩
     type: buff
@@ -4088,7 +4088,7 @@ generals:
       - 20
       confidence: high
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   seal_bonus:
     by_seal:
@@ -4292,7 +4292,7 @@ generals:
       - 5
       confidence: high
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: up
   seal_bonus:
     by_seal:
@@ -4498,7 +4498,7 @@ generals:
       rule: no_cap
       cap_value: 80
       note: 抑制係数合計80%上限
-    effect_attribute: その他
+    effect_attribute: 抑制
     direction: down
   - name: 鹵舟
     type: buff
@@ -4550,7 +4550,7 @@ generals:
       rule: no_cap
       cap_value: 25
       note: 累加上限25%
-    effect_attribute: 防御
+    effect_attribute: 軍紀
     direction: up
   - name: 燎原弓詠
     type: debuff
@@ -4621,7 +4621,7 @@ generals:
       - null
       - 15
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: up
   - name: 奮起・連弩
     type: buff
@@ -4657,7 +4657,7 @@ generals:
       rule: no_cap
       cap_value: 20
       note: 累加上限20%
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   - name: 賞罰の勇
     type: buff
@@ -4929,7 +4929,7 @@ generals:
       - null
       - 50
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 拓士
     type: buff
@@ -4982,7 +4982,7 @@ generals:
       rule: no_cap
       cap_value: 40
       note: 累加上限40%、下限20%
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: both
   - name: 辺境防衛
     type: buff
@@ -5173,7 +5173,7 @@ generals:
       rule: no_cap
       cap_value: 40.0
       note: xlsx備考由来の固定%上限
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   seal_bonus:
     by_seal:
@@ -5211,7 +5211,7 @@ generals:
       - 8
       confidence: high
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: up
   - name: 替将
     type: buff
@@ -5340,7 +5340,7 @@ generals:
       rule: no_cap
       cap_value: 25
       note: 追加兵士25%上限
-    effect_attribute: その他
+    effect_attribute: 兵士数
     direction: up
   - name: 攻城
     type: buff
@@ -5377,7 +5377,7 @@ generals:
       rule: no_cap
       cap_value: 30
       note: 累加上限30%
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   - name: 忠勇堅固
     type: buff
@@ -5393,7 +5393,7 @@ generals:
       - null
       - 20
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: up
   seal_bonus:
     by_seal:
@@ -5431,7 +5431,7 @@ generals:
       - null
       - 15
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: up
   - name: 養勢
     type: debuff
@@ -5452,7 +5452,7 @@ generals:
       rule: no_cap
       cap_value: 10
       note: 撃破上限10%
-    effect_attribute: その他
+    effect_attribute: 兵士数
     direction: up
   - name: 鉄壁・車
     type: buff
@@ -5550,7 +5550,7 @@ generals:
       rule: no_cap
       cap_value: -30.0
       note: xlsx備考由来の固定%上限
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: down
   seal_bonus:
     by_seal:
@@ -5607,7 +5607,7 @@ generals:
       - null
       - -10.0
       confidence: medium
-    effect_attribute: その他
+    effect_attribute: 抑制
     direction: down
   - name: ダメ5%減・5%増（累加不可）
     type: buff
@@ -5624,7 +5624,7 @@ generals:
       - -5.0
       confidence: medium
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: both
   seal_bonus:
     by_seal:
@@ -5661,7 +5661,7 @@ generals:
       - null
       - -10.0
       confidence: medium
-    effect_attribute: その他
+    effect_attribute: 抑制
     direction: down
   seal_bonus:
     by_seal:
@@ -5702,7 +5702,7 @@ generals:
       rule: no_cap
       cap_value: 30
       note: 累加上限30%
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: down
   - name: 撤撃
     type: buff
@@ -5833,7 +5833,7 @@ generals:
       - null
       - 40
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 陥鋭
     type: buff
@@ -5853,7 +5853,7 @@ generals:
       rule: no_cap
       cap_value: 50
       note: 攻撃累加50%上限
-    effect_attribute: 攻撃
+    effect_attribute: 兵士数
     direction: up
   - name: 奮起・連弩
     type: buff
@@ -5927,7 +5927,7 @@ generals:
       - null
       - 30
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 威声
     type: buff
@@ -6037,7 +6037,7 @@ generals:
       - null
       - 30
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 兵士数
     direction: up
   - name: 鉄壁・盾備
     type: buff
@@ -6243,7 +6243,7 @@ generals:
       - 10.0
       confidence: medium
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   seal_bonus:
     by_seal:
@@ -6281,7 +6281,7 @@ generals:
       - 15.0
       confidence: medium
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   seal_bonus:
     by_seal:
@@ -6396,7 +6396,7 @@ generals:
       rule: no_cap
       cap_value: 50
       note: 罠累加上限50%
-    effect_attribute: その他
+    effect_attribute: 兵士数
     direction: up
   - name: 奮起・連弩
     type: buff
@@ -6496,7 +6496,7 @@ generals:
       rule: no_cap
       cap_value: -10.0
       note: xlsx備考由来の固定%上限
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: both
   seal_bonus:
     by_seal:
@@ -6576,7 +6576,7 @@ generals:
       - 10
       confidence: high
     stacking: non_stackable
-    effect_attribute: 抵抗
+    effect_attribute: 兵士数
     direction: up
   - name: 知命
     type: buff
@@ -6666,7 +6666,7 @@ generals:
       - null
       - 20.0
       confidence: medium
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   - name: 弓比率×20%減（上限25%）
     type: debuff
@@ -6724,7 +6724,7 @@ generals:
       - 10
       confidence: high
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   - name: 銀威
     type: buff
@@ -6740,7 +6740,7 @@ generals:
       - null
       - 10
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: up
   - name: 奮起・連弩
     type: buff
@@ -6793,7 +6793,7 @@ generals:
       - null
       - 10
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: up
   seal_bonus:
     by_seal:
@@ -6831,7 +6831,7 @@ generals:
       - null
       - 40
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 虚実
     type: buff
@@ -6884,7 +6884,7 @@ generals:
       rule: no_cap
       cap_value: 25
       note: 軍紀アップ累加上限25%
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: both
   - name: 絶遁演棄
     type: buff
@@ -6940,7 +6940,7 @@ generals:
       - null
       - 0.3
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 格虎
     type: buff
@@ -6993,7 +6993,7 @@ generals:
       rule: no_cap
       cap_value: 25
       note: アップ/低下それぞれ25%
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: both
   - name: 財虎御許
     type: debuff
@@ -7053,7 +7053,7 @@ generals:
       - 5
       confidence: high
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: down
   - name: 偽佐
     type: buff
@@ -7070,7 +7070,7 @@ generals:
       - 10
       confidence: high
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: 兵士数
     direction: up
   - name: 奮起・連弩
     type: buff
@@ -7106,7 +7106,7 @@ generals:
       rule: no_cap
       cap_value: 20
       note: 累加上限20%
-    effect_attribute: その他
+    effect_attribute: 兵士数
     direction: up
   - name: 副将
     type: passive
@@ -7184,7 +7184,7 @@ generals:
       rule: no_cap
       cap_value: -10.0
       note: xlsx備考由来の固定%上限
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: down
   seal_bonus:
     by_seal:
@@ -7371,7 +7371,7 @@ generals:
       - null
       - 44
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 無双・騎
     type: buff
@@ -7419,7 +7419,7 @@ generals:
       - null
       - 110
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 副将
     type: passive
@@ -7527,7 +7527,7 @@ generals:
       - 5
       confidence: high
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   seal_bonus:
     by_seal:
@@ -7626,7 +7626,7 @@ generals:
       rule: no_cap
       cap_value: 16
       note: 実ダメ低下上限16%
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: down
   - name: 護宝守帝
     type: buff
@@ -7642,7 +7642,7 @@ generals:
       - null
       - 8
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: up
   sources:
   - screenshot:IMG_0702.PNG
@@ -7678,7 +7678,7 @@ generals:
       - null
       - 40
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 射虎
     type: buff
@@ -7731,7 +7731,7 @@ generals:
       rule: no_cap
       cap_value: 12
       note: 撃破上限12%
-    effect_attribute: その他
+    effect_attribute: 兵士数
     direction: up
   sources:
   - screenshot:IMG_0705.PNG
@@ -7834,7 +7834,7 @@ generals:
       - null
       - 40
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 怒撃
     type: debuff
@@ -7891,7 +7891,7 @@ generals:
       rule: no_cap
       cap_value: 25
       note: 上限25%
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: up
   - name: 副将
     type: passive
@@ -7964,7 +7964,7 @@ generals:
       - 5
       confidence: high
     stacking: non_stackable
-    effect_attribute: その他
+    effect_attribute: 兵士数
     direction: up
   - name: 鉄壁・盾備
     type: buff
@@ -8037,7 +8037,7 @@ generals:
       - null
       - 8
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: down
   - name: 温恵
     type: buff
@@ -8140,7 +8140,7 @@ generals:
       rule: no_cap
       cap_value: 20
       note: 援軍上限20%
-    effect_attribute: その他
+    effect_attribute: 抑制
     direction: up
   - name: 奮起・連弩
     type: buff
@@ -8357,7 +8357,7 @@ generals:
       - null
       - 50
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 武烈
     type: buff
@@ -8377,7 +8377,7 @@ generals:
       rule: no_cap
       cap_value: 20
       note: ダメ累加上限20%
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: up
   - name: 鉄壁・盾槍
     type: buff
@@ -8536,7 +8536,7 @@ generals:
       - null
       - 50
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 横矛
     type: buff
@@ -8706,7 +8706,7 @@ generals:
       - null
       - 78
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 鉄壁・弓
     type: buff
@@ -9119,7 +9119,7 @@ generals:
       - null
       - 34
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 掲盾
     type: buff
@@ -9451,7 +9451,7 @@ generals:
       - null
       - 8
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: up
   sources:
   - screenshot:張任.PNG
@@ -9518,7 +9518,7 @@ generals:
       - null
       - 8
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: up
   sources:
   - screenshot:張承.PNG
@@ -9605,7 +9605,7 @@ generals:
       rule: no_cap
       cap_value: 80
       note: 治癒上限80%
-    effect_attribute: その他
+    effect_attribute: 兵士数
     direction: up
   sources:
   - screenshot:張春華.PNG
@@ -10181,7 +10181,7 @@ generals:
       rule: no_cap
       cap_value: 30
       note: 累加上限30%、下限10%
-    effect_attribute: その他
+    effect_attribute: ダメージ
     direction: down
   - name: 攻城・車
     type: buff
@@ -10315,7 +10315,7 @@ generals:
       - null
       - 60
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 速攻
     type: buff
@@ -10619,7 +10619,7 @@ generals:
       - null
       - 20
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 強御・歩
     type: buff
@@ -11152,7 +11152,7 @@ generals:
       - null
       - 8
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 軍紀
     direction: up
   sources:
   - screenshot:郝昭.PNG
@@ -11187,7 +11187,7 @@ generals:
       - null
       - 34
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 鉄壁・弓
     type: buff
@@ -11503,7 +11503,7 @@ generals:
       - null
       - 30
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 蔵珠
     type: buff
@@ -11586,7 +11586,7 @@ generals:
       - null
       - 20
       confidence: high
-    effect_attribute: その他
+    effect_attribute: 率兵
     direction: up
   - name: 奮起・猛獣
     type: buff
