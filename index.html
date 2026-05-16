@@ -145,6 +145,7 @@
       <button id="btn-add-user-json" title="register.html で作成された個人JSONをプレイヤーとして追加（複数可）" style="background:#5a7a5a;color:#fff;">ユーザーをインポート</button>
       <input id="file-add-user-json" type="file" accept="application/json,.json" multiple style="display:none;">
       <a href="register.html" target="_blank" style="font-size:12px;color:var(--accent);margin-left:8px;">▶ 友人配布用登録ツール</a>
+      <button id="btn-show-qr" title="登録ツールURLのQRコードを表示" style="font-size:12px;padding:2px 8px;">📱 QR</button>
     </div>
     <div class="filters" style="border-top:1px dotted var(--border);padding-top:6px;">
       <span style="font-size:12px;color:var(--muted);">一括（表示中の武将に適用）:</span>
@@ -738,6 +739,40 @@ function renderFilters() {
     renderRoster();
     renderFormation();
     renderSummary();
+  });
+
+  // QRコード表示: register.html のURLをQR化（api.qrserver.com 利用）
+  document.getElementById('btn-show-qr').addEventListener('click', () => {
+    const url = new URL('register.html', window.location.href).toString();
+    const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=10&data=${encodeURIComponent(url)}`;
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:var(--paper);border:1px solid var(--border);padding:16px;max-width:340px;text-align:center;';
+    box.innerHTML = `
+      <div style="font-weight:600;margin-bottom:8px;">友人配布用 登録ツール</div>
+      <img src="${qrSrc}" alt="QR" style="display:block;margin:0 auto 8px;background:#fff;padding:6px;border:1px solid var(--border);max-width:100%;" onerror="this.alt='QR読み込み失敗';this.style.border='1px solid red';">
+      <div style="font-size:11px;color:var(--muted);word-break:break-all;margin-bottom:8px;">${url}</div>
+      <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+        <button id="btn-qr-copy">URLをコピー</button>
+        <button id="btn-qr-open">開く</button>
+        <button id="btn-qr-close" style="background:#888;">閉じる</button>
+      </div>
+    `;
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    const cleanup = () => document.body.removeChild(overlay);
+    box.querySelector('#btn-qr-close').onclick = cleanup;
+    overlay.addEventListener('click', e => { if (e.target === overlay) cleanup(); });
+    box.querySelector('#btn-qr-open').onclick = () => window.open(url, '_blank');
+    box.querySelector('#btn-qr-copy').onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+        notify('URLをコピーしました');
+      } catch (e) {
+        notify(`コピー失敗: ${e.message}\nURL: ${url}`);
+      }
+    };
   });
 
   // ユーザーをエクスポート: プレイヤー選択モーダル → 選んだ各人をJSONダウンロード
