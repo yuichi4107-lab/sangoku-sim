@@ -144,6 +144,9 @@
       <button id="btn-export-state" title="所持・編成・プレイヤー設定をJSONファイルとして保存">エクスポート</button>
       <button id="btn-import-state" title="JSONファイルから読み込み（現在の状態は上書きされます）">インポート</button>
       <input id="file-import-state" type="file" accept="application/json,.json" style="display:none;">
+      <button id="btn-add-user-json" title="register.html で作成された個人JSONをプレイヤーとして追加" style="background:#5a7a5a;color:#fff;">＋友人JSON追加</button>
+      <input id="file-add-user-json" type="file" accept="application/json,.json" multiple style="display:none;">
+      <a href="register.html" target="_blank" style="font-size:12px;color:var(--accent);margin-left:8px;">▶ 友人配布用登録ツール</a>
     </div>
     <div class="filters" style="border-top:1px dotted var(--border);padding-top:6px;">
       <span style="font-size:12px;color:var(--muted);">一括（表示中の武将に適用）:</span>
@@ -795,6 +798,49 @@ function renderFilters() {
       console.error(e);
       notify(`読み込みに失敗しました\n${e.message || e}`);
     }
+  });
+
+  // 友人 JSON 追加: register.html 形式の sangoku_user_v1 を読んでプレイヤーとして追加（複数ファイル可）
+  const addUserInput = document.getElementById('file-add-user-json');
+  document.getElementById('btn-add-user-json').addEventListener('click', () => {
+    addUserInput.value = '';
+    addUserInput.click();
+  });
+  addUserInput.addEventListener('change', async () => {
+    const files = Array.from(addUserInput.files || []);
+    if (!files.length) return;
+    const added = [];
+    const skipped = [];
+    for (const f of files) {
+      try {
+        const text = await f.text();
+        const obj = JSON.parse(text);
+        if (obj.schema !== 'sangoku_user_v1') {
+          skipped.push(`${f.name}: 未対応形式 (schema=${obj.schema || 'なし'})`);
+          continue;
+        }
+        const name = (obj.user_name || f.name.replace(/\.json$/i, '')).trim() || '名無し';
+        // 既存ユーザー名と衝突したら -2, -3 を付与
+        let finalName = name;
+        let suffix = 2;
+        const existingNames = new Set(state.users.map(u => u.name));
+        while (existingNames.has(finalName)) finalName = `${name}-${suffix++}`;
+        const newId = Math.max(0, ...state.users.map(u => u.id)) + 1;
+        state.users.push({ id: newId, name: finalName });
+        state.ownerships[newId] = obj.ownerships || {};
+        added.push(finalName);
+      } catch (e) {
+        skipped.push(`${f.name}: ${e.message}`);
+      }
+    }
+    saveState();
+    renderUserTabs();
+    renderRoster();
+    renderFormation();
+    renderSummary();
+    let msg = `追加: ${added.length}名` + (added.length ? `\n  ・${added.join(', ')}` : '');
+    if (skipped.length) msg += `\nスキップ: ${skipped.length}件\n  ・${skipped.join('\n  ・')}`;
+    notify(msg);
   });
 
   // 集計モード切替
