@@ -2021,6 +2021,34 @@ function initCloudSync() {
       const ok = await askConfirm('⚠️ 試作モード中です。\n試作中の内容をクラウド（本番）に反映してよろしいですか？');
       if (!ok) return;
     }
+
+    // 衝突確認: クラウドの updated_at を取得して比較
+    setGroupStatus('衝突確認中…', '#888');
+    let cloudCheck = null;
+    try {
+      cloudCheck = await cloudGet();
+    } catch (e) {
+      const ok = await askConfirm(`⚠️ 衝突確認の通信に失敗しました（${e.message}）。\nそれでも保存しますか？`);
+      if (!ok) { setGroupStatus('キャンセル', '#888'); return; }
+    }
+
+    // 他者の更新が入っている場合は3択ダイアログ
+    if (cloudCheck && cloudCheck.updated_at && cloudCheck.updated_at !== lastCloudUpdatedAt && lastCloudUpdatedAt) {
+      const choice = await askConflictChoice(cloudCheck.updated_at);
+      if (choice === 'cancel') { setGroupStatus('キャンセル', '#888'); return; }
+      if (choice === 'pull') {
+        if (cloudCheck.data && Object.keys(cloudCheck.data).length) {
+          applySharedPayload(cloudCheck.data);
+          lastCloudUpdatedAt = cloudCheck.updated_at;
+          notify('クラウドから取得しました。\nあなたの未保存の編集は破棄されました。');
+          refreshModeUI();
+          setGroupStatus(`取得完了 ${new Date().toLocaleTimeString()}`, '#3a5520');
+        }
+        return;
+      }
+      // choice === 'overwrite' → 続行して保存
+    }
+
     setGroupStatus('保存中…', '#888');
     try {
       const r = await cloudPut(buildSharedPayload());
@@ -2032,6 +2060,53 @@ function initCloudSync() {
       setGroupStatus('保存失敗', '#c33');
       notify(`保存失敗: ${e.message}`);
     }
+  });
+}
+
+// 3択モーダル: 他人更新検出時 - 'overwrite' | 'pull' | 'cancel'
+function askConflictChoice(remoteUpdatedAt) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#fff;padding:18px 20px;border-radius:6px;max-width:420px;box-shadow:0 4px 16px rgba(0,0,0,0.25);font-family:inherit;';
+    const timeStr = (() => {
+      try {
+        const d = new Date(remoteUpdatedAt);
+        const diff = Math.round((Date.now() - d.getTime()) / 1000);
+        let when;
+        if (diff < 60) when = `${diff}秒前`;
+        else if (diff < 3600) when = `${Math.floor(diff/60)}分前`;
+        else when = `${Math.floor(diff/3600)}時間前`;
+        return `${d.toLocaleTimeString()}（${when}）`;
+      } catch { return remoteUpdatedAt; }
+    })();
+    box.innerHTML = `
+      <div style="font-weight:600;font-size:14px;color:#c33;margin-bottom:8px;">⚠️ 他の人が更新しています</div>
+      <div style="font-size:12px;line-height:1.6;margin-bottom:12px;">
+        クラウドの最終更新: <strong>${timeStr}</strong><br>
+        あなたが取得した状態より新しい変更がクラウドにあります。<br>
+        どうしますか？
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <button data-act="overwrite" style="padding:8px 12px;background:#c33;color:#fff;border:none;border-radius:4px;cursor:pointer;text-align:left;">
+          <strong>上書き保存</strong><br><span style="font-size:11px;opacity:0.85;">他の人の更新を捨てて自分の編集で上書き</span>
+        </button>
+        <button data-act="pull" style="padding:8px 12px;background:#3a5520;color:#fff;border:none;border-radius:4px;cursor:pointer;text-align:left;">
+          <strong>クラウドから取得</strong><br><span style="font-size:11px;opacity:0.85;">自分の編集を破棄して最新を取得</span>
+        </button>
+        <button data-act="cancel" style="padding:8px 12px;background:#888;color:#fff;border:none;border-radius:4px;cursor:pointer;text-align:left;">
+          <strong>キャンセル</strong><br><span style="font-size:11px;opacity:0.85;">何もせず閉じる（自分の編集はローカルに残る）</span>
+        </button>
+      </div>
+    `;
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    const close = (v) => { document.body.removeChild(overlay); resolve(v); };
+    box.querySelectorAll('button').forEach(b => {
+      b.addEventListener('click', () => close(b.dataset.act));
+    });
+    overlay.addEventListener('click', e => { if (e.target === overlay) close('cancel'); });
   });
 }
 
