@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>三国覇王戦記 編成シミュレーター 取扱説明書</title>
+<style>
+  /* ============ 印刷向けCSS ============ */
+  @page {
+    size: A4;
+    margin: 18mm 16mm;
+    @bottom-center {
+      content: "三国覇王戦記 編成シミュレーター 取扱説明書 — " counter(page) " / " counter(pages);
+      font-size: 9pt;
+      color: #888;
+    }
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    color: #222;
+    font-family: "Yu Gothic", "Hiragino Sans", "Meiryo", "Noto Sans JP", sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.65;
+  }
+  body {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  @media print {
+    body { max-width: 100%; padding: 0; }
+    .no-print { display: none !important; }
+    .page-break { page-break-before: always; }
+    .avoid-break { page-break-inside: avoid; }
+    a { color: inherit; text-decoration: none; }
+  }
+  /* スクリーン表示時のヘルプ */
+  .no-print {
+    background: #fff3cd;
+    border: 2px solid #d4ac0d;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    font-size: 11pt;
+  }
+  .no-print h3 { margin: 0 0 6px 0; }
+  .no-print ol { margin: 6px 0 0 24px; padding: 0; }
+
+  /* 表紙 */
+  .cover {
+    text-align: center;
+    padding: 100px 0 40px;
+    page-break-after: always;
+  }
+  .cover h1 {
+    font-size: 26pt;
+    margin: 0 0 16px 0;
+    border: none;
+    color: #2b1d0e;
+  }
+  .cover .subtitle {
+    font-size: 14pt;
+    color: #8a5a2b;
+    margin-bottom: 80px;
+  }
+  .cover .version-info {
+    margin-top: 200px;
+    font-size: 10pt;
+    color: #666;
+    line-height: 2;
+  }
+
+  /* 目次 */
+  .toc {
+    page-break-after: always;
+  }
+  .toc h2 {
+    font-size: 16pt;
+    border-bottom: 2px solid #8a5a2b;
+    padding-bottom: 4px;
+    margin-bottom: 16px;
+  }
+  .toc ol { padding-left: 24px; }
+  .toc li { margin-bottom: 4px; }
+  .toc ol ol { padding-left: 20px; font-size: 0.95em; color: #555; }
+
+  /* 本文 */
+  h1.section {
+    font-size: 18pt;
+    color: #2b1d0e;
+    border-bottom: 3px solid #8a5a2b;
+    padding-bottom: 4px;
+    margin: 40px 0 16px;
+    page-break-before: always;
+  }
+  h1.section:first-of-type { page-break-before: auto; }
+  h2 {
+    font-size: 14pt;
+    color: #4a3010;
+    border-left: 4px solid #8a5a2b;
+    padding-left: 8px;
+    margin: 24px 0 10px;
+  }
+  h3 {
+    font-size: 11.5pt;
+    color: #4a3010;
+    margin: 16px 0 6px;
+  }
+  p { margin: 6px 0; }
+  ul, ol { margin: 6px 0; padding-left: 24px; }
+  li { margin-bottom: 3px; }
+  code {
+    background: #f0e8d8;
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 9.5pt;
+  }
+  pre {
+    background: #f5efe2;
+    border: 1px solid #c8b88e;
+    padding: 8px 12px;
+    border-radius: 3px;
+    font-size: 9.5pt;
+    overflow-x: auto;
+    line-height: 1.4;
+  }
+  pre code { background: none; padding: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: 9.5pt;
+    page-break-inside: avoid;
+  }
+  th {
+    background: #4472c4;
+    color: #fff;
+    padding: 5px 8px;
+    text-align: left;
+    border: 1px solid #888;
+  }
+  td {
+    border: 1px solid #888;
+    padding: 4px 8px;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #f8f6f0; }
+  .callout {
+    background: #fff8e8;
+    border-left: 4px solid #d4ae5a;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-size: 10pt;
+  }
+  .callout.warning {
+    background: #ffe5e5;
+    border-left-color: #c33;
+  }
+  .callout.info {
+    background: #e5f0ff;
+    border-left-color: #4472c4;
+  }
+  .badge {
+    display: inline-block;
+    padding: 1px 6px;
+    background: #ede7d9;
+    border-radius: 8px;
+    font-size: 9pt;
+    margin: 0 2px;
+  }
+  .badge.green { background: #6a8f4a; color: #fff; }
+  .badge.red { background: #c33; color: #fff; }
+  .badge.blue { background: #4472c4; color: #fff; }
+
+  hr {
+    border: none;
+    border-top: 1px dotted #aaa;
+    margin: 12px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- スクリーン用ヘルプ -->
+<div class="no-print">
+  <h3>📄 PDFとして保存する手順</h3>
+  <ol>
+    <li>キーボードで <code>Ctrl + P</code>（Mac は <code>Cmd + P</code>）を押す</li>
+    <li>送信先で「<strong>PDF に保存</strong>」を選択</li>
+    <li>レイアウトは「縦」、用紙サイズ「A4」、余白「デフォルト」</li>
+    <li>「保存」をクリック</li>
+  </ol>
+  <p style="margin-top:8px;font-size:10pt;color:#555;">この黄色のボックスは印刷時には出力されません。</p>
+</div>
+
+<!-- ============ 表紙 ============ -->
+<section class="cover">
+  <h1>三国覇王戦記<br>編成シミュレーター</h1>
+  <div class="subtitle">取扱説明書</div>
+  <div class="version-info">
+    対象: 三国覇王戦記プレイヤー<br>
+    バージョン: data v0.5<br>
+    対応武将数: 157体<br>
+    公開URL: yuichi4107-lab.github.io/sangoku-sim/<br>
+    最終更新: 2026年5月
+  </div>
+</section>
+
+<!-- ============ 目次 ============ -->
+<section class="toc">
+  <h2>目次</h2>
+  <ol>
+    <li><a href="#sec1">はじめに</a>
+      <ol>
+        <li>このアプリでできること</li>
+        <li>利用者の想定</li>
+        <li>動作環境</li>
+      </ol>
+    </li>
+    <li><a href="#sec2">起動・基本画面</a>
+      <ol>
+        <li>アクセス方法</li>
+        <li>画面構成の全体像</li>
+      </ol>
+    </li>
+    <li><a href="#sec3">武将所持データの登録</a>
+      <ol>
+        <li>所持チェック</li>
+        <li>育成段階の入力</li>
+        <li>一括操作</li>
+        <li>フィルタ・検索</li>
+      </ol>
+    </li>
+    <li><a href="#sec4">編成の組み方</a>
+      <ol>
+        <li>プレイヤータブ</li>
+        <li>軍団の構成</li>
+        <li>優先属性の設定</li>
+        <li>自動編成（クイック選別）</li>
+      </ol>
+    </li>
+    <li><a href="#sec5">集計結果の見方</a>
+      <ol>
+        <li>属性マトリクス</li>
+        <li>上限プール状況</li>
+        <li>スキル詳細</li>
+      </ol>
+    </li>
+    <li><a href="#sec6">友人配布用ツール（register.html）</a>
+      <ol>
+        <li>友人へのお願い手順</li>
+        <li>QRコードによる配布</li>
+        <li>友人側の操作</li>
+      </ol>
+    </li>
+    <li><a href="#sec7">ユーザーデータの管理</a>
+      <ol>
+        <li>ユーザーをエクスポート</li>
+        <li>ユーザーをインポート</li>
+      </ol>
+    </li>
+    <li><a href="#sec8">グループ同期機能</a>
+      <ol>
+        <li>解錠</li>
+        <li>クラウドへの保存／取得</li>
+        <li>同期モードと試作モード</li>
+        <li>運用パターン</li>
+      </ol>
+    </li>
+    <li><a href="#sec9">トラブルシューティング</a></li>
+    <li><a href="#sec10">付録</a>
+      <ol>
+        <li>優先属性 一覧（24択）</li>
+        <li>武将一覧（簡易）</li>
+        <li>URL一覧</li>
+      </ol>
+    </li>
+  </ol>
+</section>
+
+<!-- ============ 1. はじめに ============ -->
+<h1 class="section" id="sec1">1. はじめに</h1>
+
+<h2>1.1 このアプリでできること</h2>
+<p>三国覇王戦記の <strong>4プレイヤー × 8軍団</strong> 編成を画面上で組み立てて、スキル効果の合計を可視化するツールです。所持武将を登録し、適切な兵種と配置を選ぶことで、集結戦に向けた最適な編成を検討できます。</p>
+
+<ul>
+  <li>武将所持データの管理（突破段階・装備・将印）</li>
+  <li>編成の構築（クイック自動編成サポート）</li>
+  <li>属性マトリクスでスキル効果合計を一目で確認</li>
+  <li>上限プール状況の表示（バフ重複時の余裕量）</li>
+  <li>友人とのデータ共有（個別JSON or リアルタイム同期）</li>
+</ul>
+
+<h2>1.2 利用者の想定</h2>
+<ul>
+  <li>三国覇王戦記をプレイ中で、集結戦を意識した編成検討をしたい人</li>
+  <li>仲間内で所持武将を共有・連携して編成を組みたい人</li>
+  <li>ゲーム内のスキル効果（とくに上限・共有プール）を整理して把握したい人</li>
+</ul>
+
+<h2>1.3 動作環境</h2>
+<table>
+  <tr><th>環境</th><th>対応</th></tr>
+  <tr><td>PC ブラウザ</td><td>Chrome / Edge / Firefox / Safari の最新版</td></tr>
+  <tr><td>スマートフォン</td><td>iOS Safari / Android Chrome 最新版</td></tr>
+  <tr><td>インターネット接続</td><td>必須（初回読み込み時）。以降はオフラインでも動作可能</td></tr>
+  <tr><td>アカウント登録</td><td>不要</td></tr>
+  <tr><td>データ保存場所</td><td>ブラウザの localStorage（端末別に独立）</td></tr>
+</table>
+
+<!-- ============ 2. 起動・基本画面 ============ -->
+<h1 class="section" id="sec2">2. 起動・基本画面</h1>
+
+<h2>2.1 アクセス方法</h2>
+<p>ブラウザで以下のURLを開くだけで利用開始できます。</p>
+<pre><code>https://yuichi4107-lab.github.io/sangoku-sim/</code></pre>
+<p>ブックマーク登録を推奨します。スマホの場合は「ホーム画面に追加」しておくとアプリのように起動可能です。</p>
+
+<h2>2.2 画面構成の全体像</h2>
+<p>画面は大きく3つのエリアで構成されます。</p>
+<table>
+  <tr><th>エリア</th><th>機能</th></tr>
+  <tr><td><strong>上部ヘッダー</strong></td><td>プレイヤータブ／エクスポート・インポート／QRコード／使い方リンク</td></tr>
+  <tr><td><strong>左：武将一覧</strong></td><td>所持武将の登録、フィルタ、一括操作</td></tr>
+  <tr><td><strong>中央：編成エリア</strong></td><td>4プレイヤー×8軍団の配置、クイック選別ボタン</td></tr>
+  <tr><td><strong>下部：集計結果</strong></td><td>属性マトリクス、上限プール、スキル詳細</td></tr>
+  <tr><td><strong>フッター</strong></td><td>⚙️ グループ機能解錠ボタン（控えめ表示）</td></tr>
+</table>
+
+<!-- ============ 3. 武将所持データの登録 ============ -->
+<h1 class="section" id="sec3">3. 武将所持データの登録</h1>
+
+<h2>3.1 所持チェック</h2>
+<p>武将一覧の各行の左端にある所持チェックボックスをONにすると、その武将を所持済みと記録します。</p>
+
+<h2>3.2 育成段階の入力</h2>
+<table>
+  <tr><th>項目</th><th>選択肢</th><th>説明</th></tr>
+  <tr><td>3突</td><td>チェック</td><td>突破3段階（4突との排他、両OFFで0）</td></tr>
+  <tr><td>4突</td><td>チェック</td><td>突破4段階</td></tr>
+  <tr><td>4装</td><td>チェック</td><td>装備完成済み</td></tr>
+  <tr><td>印</td><td>0〜5</td><td>将印枚数</td></tr>
+</table>
+
+<div class="callout info">
+ゲーム内では中間段階（1突/2突/装1〜3）もありますが、スキル発動値に影響するのはほぼ4段階のみのため、UI簡略化のため2値（0 or 4）にしています。
+</div>
+
+<h2>3.3 一括操作</h2>
+<p>武将一覧の上部に「一括（表示中の武将に適用）」のチェックボックスがあります。フィルタで対象を絞った状態で「所持」「3突」「4突」「4装」のいずれかをチェックすると、表示中の全武将に一括適用されます。</p>
+<p class="callout">例: 「兵種=騎兵」「レア=橙」でフィルタ → 「所持」一括チェック → 騎兵橙全員が所持済みに。</p>
+
+<h2>3.4 フィルタ・検索</h2>
+<ul>
+  <li><strong>兵種</strong>: 歩兵 / 騎兵 / 弓兵 / 戦車 / 万能</li>
+  <li><strong>レア度</strong>: 橙 / 玄</li>
+  <li><strong>検索</strong>: 武将名 or 読み（部分一致）</li>
+  <li><strong>所持のみ</strong>: 所持済み武将だけ表示</li>
+</ul>
+
+<!-- ============ 4. 編成の組み方 ============ -->
+<h1 class="section" id="sec4">4. 編成の組み方</h1>
+
+<h2>4.1 プレイヤータブ</h2>
+<p>本アプリでは最大 <strong>4プレイヤー × 各2軍団 = 8軍団</strong>（集結戦の同じ陣）を構築できます。上部のプレイヤータブで対象プレイヤーを切り替えて、それぞれの所持状況・編成を編集します。</p>
+<ul>
+  <li>プレイヤーは追加・名前変更・削除可能</li>
+  <li>所持データはプレイヤーごとに独立して保存</li>
+  <li>編成は全プレイヤー共通で1セット表示</li>
+</ul>
+
+<h2>4.2 軍団の構成</h2>
+<p>各軍団は以下の構造になっています。</p>
+<table>
+  <tr><th>枠</th><th>役割</th></tr>
+  <tr><td>主将（統率）</td><td>軍団の率兵数を決定、統率系スキルが発動</td></tr>
+  <tr><td>副将×4枠</td><td>武力/知性/副将枠など、効果を提供する補助武将</td></tr>
+  <tr><td>角陣</td><td>陣形効果スキルが発動する独立枠</td></tr>
+</table>
+<p>各枠で武将名を選ぶと、その武将のスキルが集計に反映されます。</p>
+
+<h2>4.3 優先属性の設定</h2>
+<p>編成上部「集結共通の優先属性」で <strong>第一優先 / 第二優先</strong> を選びます。これはクイック選別（自動編成）が候補武将を選ぶ際の優先順位として使われます。</p>
+<p>選択肢は <strong>12カテゴリ × up/down = 24択</strong>（詳細は付録10.1）。</p>
+
+<h2>4.4 自動編成（クイック選別）</h2>
+<p>各軍団に「クイック選別」ボタンがあり、押すと以下のロジックで自動配置します。</p>
+<ol>
+  <li>対象プレイヤーの所持武将から、軍団兵種に置ける候補を抽出</li>
+  <li>戦闘系スキルを持たない武将は除外</li>
+  <li>優先属性スキルを持つ武将を高く評価</li>
+  <li>cap プールを考慮し、上限超過した場合は他属性の武将に切替</li>
+  <li>主将→副将の順に最適候補を選定</li>
+</ol>
+
+<!-- ============ 5. 集計結果の見方 ============ -->
+<h1 class="section" id="sec5">5. 集計結果の見方</h1>
+
+<h2>5.1 属性マトリクス</h2>
+<p>編成下部に表示される表で、12のスキルカテゴリ × 4スコープの合計値を一覧できます。</p>
+<table>
+  <tr><th>列</th><th>意味</th></tr>
+  <tr><td>集結</td><td>集結戦（rally）スコープのスキル合計</td></tr>
+  <tr><td>軍団</td><td>軍団内（legion）スコープ</td></tr>
+  <tr><td>角陣</td><td>角陣（array）スコープ</td></tr>
+  <tr><td>自部隊</td><td>自部隊（self）スコープ</td></tr>
+</table>
+<ul>
+  <li>セル内の値は <strong>符号付き合計</strong>（例: +54%、-80%）</li>
+  <li>緑＝アップ、赤＝ダウン、グレー＝ゼロ</li>
+  <li>セルをクリックすると詳細武将名・スキル名・上限値が展開</li>
+  <li>全スコープでゼロの属性行は非表示</li>
+</ul>
+
+<h2>5.2 上限プール状況</h2>
+<p>各 cap_rule ごとの充足率を視覚化します。バフ重複時にどこまで余裕があるか・どの武将を入れれば埋められるかを示します。</p>
+<table>
+  <tr><th>表示要素</th><th>意味</th></tr>
+  <tr><td>プログレスバー</td><td>合計 / 上限 の充足率</td></tr>
+  <tr><td>余裕 N%</td><td>上限まで残り何%か</td></tr>
+  <tr><td>上限到達</td><td>上限ピッタリ or 溢れている</td></tr>
+  <tr><td>構成スキル</td><td>既に入っている武将/スキルの内訳</td></tr>
+  <tr><td>候補武将</td><td>編成外で同じ cap.rule を持つ武将提示</td></tr>
+</table>
+
+<h2>5.3 スキル詳細</h2>
+<p>武将ごとの解像度の高いブレイクダウン表示。各スキルの実効値・スコープ・cap情報・累加可否などを確認できます。</p>
+
+<!-- ============ 6. 友人配布用ツール ============ -->
+<h1 class="section" id="sec6">6. 友人配布用ツール（register.html）</h1>
+
+<h2>6.1 友人へのお願い手順</h2>
+<p>所持武将データを多人数から集めたい場合、メインシミュレータとは別の <strong>所持登録専用ツール</strong> を友人に使ってもらえます。</p>
+<pre><code>https://yuichi4107-lab.github.io/sangoku-sim/register.html</code></pre>
+<p>友人への案内テンプレート例:</p>
+<pre><code>お疲れさまです。三国覇王戦記の武将所持状況を集計したく、ご協力ください。
+
+下記URLをスマホ/PCで開いて入力をお願いします。
+👉 https://yuichi4107-lab.github.io/sangoku-sim/register.html
+
+【手順】
+1. 名前を入力
+2. 所持している武将にチェック+段階入力（3突/4突/4装/印）
+3. 「📤 JSONエクスポート」ボタンを押す
+4. ダウンロードされたファイルを私に送ってください
+
+入力途中で閉じても自動保存されるので、何度に分けてもOKです。</code></pre>
+
+<h2>6.2 QRコードによる配布</h2>
+<p>メインシミュレータ上部の「📱 QR」ボタンを押すと、register.html のURLのQRコードが表示されます。画面共有や紙印刷、Discordへの貼付けなどに利用できます。</p>
+
+<h2>6.3 友人側の操作</h2>
+<ol>
+  <li>URLを開いて名前を入力</li>
+  <li>武将カードの所持チェック＋段階入力（スマホ最適化UI）</li>
+  <li>「📤 JSONエクスポート」をタップ → ファイルダウンロード</li>
+  <li>そのファイルを LINE / メール等で依頼者に送信</li>
+</ol>
+<p>入力途中の状態は端末ブラウザに自動保存されるため、中断・再開が自由です。</p>
+
+<!-- ============ 7. ユーザーデータの管理 ============ -->
+<h1 class="section" id="sec7">7. ユーザーデータの管理</h1>
+
+<h2>7.1 ユーザーをエクスポート</h2>
+<p>メインシミュレータ上部の「ユーザーをエクスポート」をクリックすると、登録済みのプレイヤー一覧から複数選択してJSONダウンロードできます。</p>
+<ul>
+  <li>初期状態で全プレイヤーが選択済み</li>
+  <li>「全選択」「全解除」ボタンあり</li>
+  <li>ファイル名: <code>sangoku_user_{名前}_{日付}.json</code></li>
+</ul>
+
+<h2>7.2 ユーザーをインポート</h2>
+<p>「ユーザーをインポート」ボタンで、友人からもらった JSON（または自身のバックアップ）を取り込めます。複数ファイル同時選択可能。</p>
+<table>
+  <tr><th>状況</th><th>動作</th></tr>
+  <tr><td>新規プレイヤー名</td><td>新しく追加</td></tr>
+  <tr><td>同名プレイヤーが既存</td><td>上書き確認ダイアログ表示。OK=上書き、キャンセル=スキップ</td></tr>
+  <tr><td>不正な形式</td><td>スキップしてエラー表示</td></tr>
+</table>
+
+<!-- ============ 8. グループ同期機能 ============ -->
+<h1 class="section" id="sec8">8. グループ同期機能</h1>
+
+<h2>8.1 解錠</h2>
+<p>グループ同期は隠し機能として実装されており、初回はアクセスコード入力で解錠が必要です。</p>
+<ol>
+  <li>ページ下端の <strong>⚙️ ボタン</strong> をクリック</li>
+  <li>アクセスコードを入力（管理者から個別に伝達）</li>
+  <li>解錠完了。以降はそのブラウザで常時表示</li>
+</ol>
+<div class="callout warning">
+解錠状態はブラウザの localStorage に保存されます。共有PC等でロックに戻したい場合は「ロックに戻す」ボタンを使用してください。
+</div>
+
+<h2>8.2 クラウドへの保存／取得</h2>
+<p>解錠後に表示される「🔓 グループ」パネルで以下を操作します。</p>
+<table>
+  <tr><th>ボタン</th><th>動作</th></tr>
+  <tr><td>⬇️ クラウドから取得</td><td>クラウド最新データでこの端末を上書き</td></tr>
+  <tr><td>⬆️ クラウドへ保存</td><td>現在のローカル状態をクラウドに送信（他端末・他メンバーに伝播）</td></tr>
+</table>
+<div class="callout info">
+自動同期機能はありません。すべて手動操作です。
+</div>
+
+<h2>8.3 同期モードと試作モード</h2>
+<p>パネル上部のモード切替ボタンで、グループ同期中の状態を制御できます。</p>
+<table>
+  <tr><th>モード</th><th>動作</th></tr>
+  <tr><td><span class="badge green">🔗 同期モード</span></td><td>通常運用。⬆️保存ボタンはそのまま実行</td></tr>
+  <tr><td><span class="badge red">🧪 試作モード</span></td><td>⬆️保存ボタンが赤色になり、押すと「本番に反映しますか？」と確認</td></tr>
+</table>
+<p>モード切替自体はデータ操作を伴わない、ワンタッチで即切替できます。</p>
+
+<h2>8.4 運用パターン</h2>
+<table>
+  <tr><th>場面</th><th>推奨操作</th></tr>
+  <tr><td>1人で複数端末を使い分け</td><td>編集後 ⬆️保存 → 別端末で ⬇️取得</td></tr>
+  <tr><td>通話しながら共同編集</td><td>同期モードのまま、編集→ ⬆️保存 を順番に</td></tr>
+  <tr><td>共同編集中に自分だけ試したい</td><td>🧪 試作モードに切替、自由に編集</td></tr>
+  <tr><td>試作内容を本番反映</td><td>試作モードのまま⬆️保存 → 確認OK</td></tr>
+  <tr><td>試作内容を破棄</td><td>🔗 同期モードに戻す → ⬇️取得で最新を復元</td></tr>
+</table>
+<div class="callout warning">
+<strong>last-write-wins 方式</strong>: 同時刻に複数人が保存すると後勝ち。複数人での同時編集は時間帯を分けるか、宣言してから行うのが安全です。
+</div>
+
+<!-- ============ 9. トラブルシューティング ============ -->
+<h1 class="section" id="sec9">9. トラブルシューティング</h1>
+
+<table>
+  <tr><th>症状</th><th>対処</th></tr>
+  <tr><td>「データロードエラー」表示</td><td>ハードリロード（Ctrl+Shift+R）、それでも駄目ならブラウザキャッシュ削除</td></tr>
+  <tr><td>⚙️ ボタン押しても反応なし</td><td>F12 開発者ツール → Console でエラー確認</td></tr>
+  <tr><td>グループ同期で「取得失敗」</td><td>サーバ側エラー。数秒後リトライ、頻発するなら管理者連絡</td></tr>
+  <tr><td>友人JSON取込でエラー</td><td>スキーマが <code>sangoku_user_v1</code> か確認、JSON破損確認</td></tr>
+  <tr><td>編成が壊れた</td><td>過去のエクスポートJSONからインポートで復旧</td></tr>
+  <tr><td>武将データが古い</td><td>generals.yaml の更新時に GitHub Actions が自動再ビルド。1〜2分待ってリロード</td></tr>
+  <tr><td>クラウドデータが消えた</td><td>管理者のGoogleスプレッドシート変更履歴から復旧可能</td></tr>
+  <tr><td>同期中に自分の編集が消えた</td><td>他メンバーの保存に上書きされた可能性。スプレッドシート履歴から復旧</td></tr>
+</table>
+
+<!-- ============ 10. 付録 ============ -->
+<h1 class="section" id="sec10">10. 付録</h1>
+
+<h2 id="appendix-attrs">10.1 優先属性 一覧（24択）</h2>
+<table>
+  <tr><th>#</th><th>属性</th><th>方向</th><th>説明</th></tr>
+  <tr><td>1-2</td><td>攻撃</td><td>up/down</td><td>攻撃力</td></tr>
+  <tr><td>3-4</td><td>防御</td><td>up/down</td><td>防御力</td></tr>
+  <tr><td>5-6</td><td>連撃</td><td>up/down</td><td>連撃確率</td></tr>
+  <tr><td>7-8</td><td>貫通</td><td>up/down</td><td>防御貫通</td></tr>
+  <tr><td>9-10</td><td>抵抗</td><td>up/down</td><td>連撃抵抗</td></tr>
+  <tr><td>11-12</td><td>シールド</td><td>up/down</td><td>シールド値</td></tr>
+  <tr><td>13-14</td><td>貫通抵抗</td><td>up/down</td><td>貫通の抵抗</td></tr>
+  <tr><td>15-16</td><td>ダメージ</td><td>up/down</td><td>与/受けダメージ調整</td></tr>
+  <tr><td>17-18</td><td>軍紀</td><td>up/down</td><td>軍紀値</td></tr>
+  <tr><td>19-20</td><td>率兵</td><td>up/down</td><td>主将の率兵数</td></tr>
+  <tr><td>21-22</td><td>兵士数</td><td>up/down</td><td>殺害/撃破/複製等</td></tr>
+  <tr><td>23-24</td><td>抑制</td><td>up/down</td><td>兵種間抑制係数</td></tr>
+</table>
+
+<h2 id="appendix-stats">10.2 武将一覧（簡易統計）</h2>
+<table>
+  <tr><th>区分</th><th>件数</th></tr>
+  <tr><td>総武将数</td><td><strong>157体</strong></td></tr>
+  <tr><td>橙武将</td><td>102体</td></tr>
+  <tr><td>玄武将</td><td>55体</td></tr>
+  <tr><td>歩兵</td><td>40体</td></tr>
+  <tr><td>騎兵</td><td>39体</td></tr>
+  <tr><td>弓兵</td><td>41体</td></tr>
+  <tr><td>戦車</td><td>13体</td></tr>
+  <tr><td>万能</td><td>24体</td></tr>
+</table>
+<p>武将名の完全リストは <code>docs/data_overview.xlsx</code> または <code>docs/data_overview.md</code> を参照してください。</p>
+
+<h2 id="appendix-urls">10.3 URL一覧</h2>
+<table>
+  <tr><th>用途</th><th>URL</th></tr>
+  <tr><td>メインシミュレータ</td><td>https://yuichi4107-lab.github.io/sangoku-sim/</td></tr>
+  <tr><td>友人配布用登録ツール</td><td>https://yuichi4107-lab.github.io/sangoku-sim/register.html</td></tr>
+  <tr><td>ソースコード（GitHub）</td><td>https://github.com/yuichi4107-lab/sangoku-sim</td></tr>
+  <tr><td>使い方ガイド（Markdown）</td><td>https://github.com/yuichi4107-lab/sangoku-sim/blob/main/docs/usage.md</td></tr>
+  <tr><td>グループ同期 詳細ガイド</td><td>https://github.com/yuichi4107-lab/sangoku-sim/blob/main/docs/group_sync.md</td></tr>
+  <tr><td>武将データ一覧（Excel）</td><td>https://github.com/yuichi4107-lab/sangoku-sim/raw/main/docs/data_overview.xlsx</td></tr>
+</table>
+
+<hr>
+<p style="text-align:center;font-size:9pt;color:#888;margin-top:30px;">
+  以上が、三国覇王戦記 編成シミュレーターの取扱説明書です。<br>
+  不明点・改善要望は GitHub Issues または管理者まで。
+</p>
+
+</body>
+</html>
