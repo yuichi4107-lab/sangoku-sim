@@ -11,85 +11,114 @@
     --ink: #2b1d0e;
     --border: #c8b88e;
     --muted: #807058;
-    --ok: #1d6e2a;
+    --ok: #2e8b3a;
     --accent: #8a5a2b;
   }
-  body { background: var(--bg); color: var(--ink); font-family: "Hiragino Mincho ProN","Yu Mincho",serif; margin: 0; padding: 10px; }
-  h1 { font-size: 18px; margin: 0 0 6px 0; border-bottom: 2px solid var(--border); padding-bottom: 4px; }
-  .lead { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
-  .topbar { background: var(--paper); border: 1px solid var(--border); padding: 8px; margin-bottom: 8px; position: sticky; top: 0; z-index: 10; }
-  .topbar label { font-size: 13px; margin-right: 8px; }
-  .topbar input[type="text"] { padding: 3px 6px; border: 1px solid var(--border); background: #fff; font-family: inherit; }
-  .topbar button { padding: 4px 10px; background: var(--accent); color: #fff; border: none; cursor: pointer; font-family: inherit; }
-  .topbar button:hover { opacity: 0.88; }
-  .filters { padding: 4px 0; font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
-  .filters select, .filters input { font-size: 12px; padding: 2px 4px; border: 1px solid var(--border); background: #fff; }
-  table { width: 100%; border-collapse: collapse; background: var(--paper); font-size: 12px; }
-  th, td { border: 1px solid var(--border); padding: 3px 4px; text-align: left; vertical-align: middle; }
-  th { background: #ede7d9; position: sticky; top: 0; }
-  td.attr { font-size: 11px; color: var(--muted); }
-  .prog { white-space: nowrap; }
-  .prog label { margin-right: 4px; font-size: 11px; }
-  .prog input[type="checkbox"] { transform: scale(0.95); }
-  .prog input[type="number"] { width: 36px; padding: 1px 2px; font-size: 11px; }
-  .counter { font-size: 12px; color: var(--muted); margin-left: 8px; }
-  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 100; }
+  * { box-sizing: border-box; }
+  html, body { -webkit-text-size-adjust: 100%; }
+  body { background: var(--bg); color: var(--ink); font-family: "Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif; margin: 0; padding: 8px; }
+  h1 { font-size: 17px; margin: 0 0 4px 0; border-bottom: 2px solid var(--border); padding-bottom: 4px; }
+  .lead { font-size: 12px; color: var(--muted); margin-bottom: 6px; line-height: 1.5; }
+  .topbar { background: var(--paper); border: 1px solid var(--border); padding: 8px; margin-bottom: 8px; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
+  .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 6px; }
+  .row:last-child { margin-bottom: 0; }
+  label.field { font-size: 13px; display: inline-flex; align-items: center; gap: 4px; }
+  input[type="text"] { padding: 6px 8px; border: 1px solid var(--border); background: #fff; font-family: inherit; font-size: 14px; }
+  select { padding: 6px; border: 1px solid var(--border); background: #fff; font-size: 14px; }
+  button { padding: 8px 12px; background: var(--accent); color: #fff; border: none; cursor: pointer; font-family: inherit; font-size: 14px; border-radius: 4px; }
+  button.green { background: #5a7a5a; }
+  button.red { background: #a66; }
+  button:active { opacity: 0.7; }
+  .counter { font-size: 12px; color: var(--muted); }
+  .counter strong { color: var(--ok); font-size: 14px; }
+
+  /* カード型レイアウト */
+  #roster-list { display: flex; flex-direction: column; gap: 6px; }
+  .gcard { background: var(--paper); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; display: grid; grid-template-columns: 40px 1fr; gap: 10px; align-items: center; }
+  .gcard.owned { background: #fff8e8; border-color: #d4ae5a; border-width: 2px; }
+  .gcard .owned-check { display: flex; align-items: center; justify-content: center; }
+  .gcard .owned-check input[type="checkbox"] { width: 26px; height: 26px; cursor: pointer; accent-color: var(--ok); }
+  .gcard .info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .gcard .name-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+  .gcard .name { font-size: 16px; font-weight: 600; }
+  .gcard .badges { font-size: 11px; color: var(--muted); display: inline-flex; gap: 4px; flex-wrap: wrap; }
+  .gcard .badge { display: inline-block; padding: 1px 6px; background: #ede7d9; border-radius: 8px; }
+  .gcard .badge.gen { background: #c8b070; color: #fff; }
+  .gcard .badge.troop-騎兵 { background: #b3d4f0; }
+  .gcard .badge.troop-歩兵 { background: #d4e0b3; }
+  .gcard .badge.troop-弓兵 { background: #e8d0a8; }
+  .gcard .badge.troop-戦車 { background: #c8b8d0; }
+  .gcard .badge.troop-万能 { background: #d8c890; }
+  .gcard .prog { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 2px; }
+  .gcard .prog label { font-size: 13px; padding: 6px 10px; border: 1px solid var(--border); background: #fff; cursor: pointer; user-select: none; border-radius: 4px; min-height: 36px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  .gcard .prog label.on { background: var(--ok); color: #fff; border-color: var(--ok); font-weight: 600; }
+  .gcard .prog label input { display: none; }
+  .gcard .prog .seal-wrap { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; padding: 2px 8px; border: 1px solid var(--border); background: #fff; border-radius: 4px; min-height: 36px; }
+  .gcard .prog .seal-wrap input { width: 40px; padding: 4px; font-size: 14px; text-align: center; border: 1px solid var(--border); }
+  .gcard:not(.owned) .prog { display: none; }
+
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
   .modal.active { display: flex; }
-  .modal-content { background: var(--paper); padding: 16px; max-width: 90%; border: 1px solid var(--border); }
-  .modal-content textarea { width: 100%; box-sizing: border-box; }
+  .modal-content { background: var(--paper); padding: 16px; max-width: 90%; border: 1px solid var(--border); border-radius: 4px; }
   .modal-content button { margin-top: 8px; }
+
+  /* PC（広い画面）でも見やすく */
+  @media (min-width: 700px) {
+    body { padding: 12px; max-width: 800px; margin: 0 auto; }
+    .gcard .name { font-size: 17px; }
+  }
 </style>
 </head>
 <body>
 
-<h1>三国覇王戦記 武将所持登録ツール</h1>
+<h1>三国覇王戦記 武将所持登録</h1>
 <div class="lead">
-  このツールでは、あなたが所持している武将の情報を入力します。
-  入力後、右下の「JSONエクスポート」を押してファイルをダウンロードし、依頼者にお送りください。<br>
-  入力中のデータはこの端末のブラウザに自動保存されます。途中で閉じても続きから入力できます。
+  所持している武将にチェック、突破/装備の段階を入力してください。<br>
+  完了したら下の「📤 JSONエクスポート」を押してファイルを依頼者に送ってください。<br>
+  入力内容はこの端末に自動保存されます。
 </div>
 
 <div class="topbar">
-  <div>
-    <label>あなたの名前: <input type="text" id="user-name" placeholder="例: 田中" style="width:200px;"></label>
+  <div class="row">
+    <label class="field" style="flex:1;min-width:180px;">
+      👤 名前
+      <input type="text" id="user-name" placeholder="例: 田中" style="flex:1;min-width:120px;">
+    </label>
     <span class="counter">所持: <strong id="owned-count">0</strong> / <span id="total-count">0</span></span>
   </div>
-  <div class="filters">
-    <label>兵種:
-      <select id="filter-troop">
-        <option value="">全て</option>
-        <option>歩兵</option><option>騎兵</option><option>弓兵</option><option>戦車</option><option>万能</option>
-      </select>
-    </label>
-    <label>レア:
-      <select id="filter-rarity">
-        <option value="">全て</option>
-        <option>橙</option><option>玄</option>
-      </select>
-    </label>
-    <label>検索: <input type="text" id="filter-search" placeholder="武将名" style="width:120px;"></label>
-    <label><input type="checkbox" id="filter-owned-only">所持のみ</label>
-    <span class="counter">一括: <input type="checkbox" id="bulk-owned"> 所持 / <input type="checkbox" id="bulk-bt3">3突 / <input type="checkbox" id="bulk-bt4">4突 / <input type="checkbox" id="bulk-equipment">4装</span>
+  <div class="row">
+    <select id="filter-troop">
+      <option value="">兵種：全て</option>
+      <option>歩兵</option><option>騎兵</option><option>弓兵</option><option>戦車</option><option>万能</option>
+    </select>
+    <select id="filter-rarity">
+      <option value="">レア：全て</option>
+      <option>橙</option><option>玄</option>
+    </select>
+    <input type="text" id="filter-search" placeholder="🔍 武将名" style="flex:1;min-width:100px;">
+    <label class="field"><input type="checkbox" id="filter-owned-only">所持のみ</label>
   </div>
-  <div style="margin-top:6px;">
-    <button id="btn-export">JSONエクスポート（依頼者に送る）</button>
-    <button id="btn-import" style="background:#5a7a5a;">既存JSONを読込（編集再開）</button>
-    <button id="btn-clear" style="background:#a66;">全クリア</button>
+  <div class="row" style="font-size:12px;color:var(--muted);">
+    一括（表示中に適用）:
+    <label class="field"><input type="checkbox" id="bulk-owned">所持</label>
+    <label class="field"><input type="checkbox" id="bulk-bt3">3突</label>
+    <label class="field"><input type="checkbox" id="bulk-bt4">4突</label>
+    <label class="field"><input type="checkbox" id="bulk-equipment">4装</label>
+  </div>
+  <div class="row">
+    <button id="btn-export">📤 JSONエクスポート</button>
+    <button id="btn-import" class="green">📥 既存JSONを読込</button>
+    <button id="btn-clear" class="red">🗑️ 全クリア</button>
   </div>
 </div>
 
-<table id="roster">
-  <thead>
-    <tr><th>所持</th><th>武将</th><th>属性</th><th>育成段階</th></tr>
-  </thead>
-  <tbody></tbody>
-</table>
+<div id="roster-list"></div>
 
 <input type="file" id="file-import" accept="application/json" style="display:none;">
 
 <div class="modal" id="modal">
   <div class="modal-content">
-    <div id="modal-msg" style="white-space:pre-line; margin-bottom:8px;"></div>
+    <div id="modal-msg" style="white-space:pre-line; margin-bottom:8px; font-size:14px;"></div>
     <div style="text-align:right;">
       <button id="modal-ok">OK</button>
     </div>
@@ -98,21 +127,20 @@
 
 <script>
 // =========================
-// データロード（inline_data_to_html.py で window.GENERALS_DATA に注入）
+// データ・状態
 // =========================
 const STORAGE_KEY = 'sangoku_register_v1';
 
 const state = {
   data: null,
   userName: '',
-  ownerships: {},  // { [genId]: {owned, breakthrough, equipment, seal} }
+  ownerships: {},
   filters: { troop: '', rarity: '', search: '', ownedOnly: false },
 };
 
 function defaultOwn() {
   return { owned: false, breakthrough: 0, equipment: 0, seal: 0 };
 }
-
 function getOwn(genId) {
   if (!state.ownerships[genId]) state.ownerships[genId] = defaultOwn();
   return state.ownerships[genId];
@@ -120,7 +148,7 @@ function getOwn(genId) {
 
 function loadData() {
   if (!window.GENERALS_DATA) {
-    document.body.innerHTML = '<h1 style="color:red;">データロードエラー: window.GENERALS_DATA が未注入です</h1>';
+    document.body.innerHTML = '<h1 style="color:red;">データロードエラー: ページを再読み込みしてください。</h1>';
     throw new Error('GENERALS_DATA missing');
   }
   state.data = window.GENERALS_DATA;
@@ -132,7 +160,6 @@ function saveLocal() {
     ownerships: state.ownerships,
   }));
 }
-
 function loadLocal() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -167,43 +194,59 @@ function updateOwnedCount() {
 }
 
 function renderRoster() {
-  const tbody = document.querySelector('#roster tbody');
-  tbody.innerHTML = '';
+  const container = document.getElementById('roster-list');
+  container.innerHTML = '';
   const list = filteredGenerals();
   for (const g of list) {
     const own = getOwn(g.id);
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><input type="checkbox" ${own.owned ? 'checked' : ''} data-id="${g.id}" data-axis="owned"></td>
-      <td><strong>${g.name}</strong><br><span style="font-size:10px;color:var(--muted);">${g.base_rarity}/${g.troop_type}</span></td>
-      <td class="attr">${(g.role_tags||[]).join(',')||'-'}</td>
-      <td class="prog">
-        <label>3突<input type="checkbox" ${own.breakthrough === 3 ? 'checked' : ''} data-id="${g.id}" data-axis="bt3"></label>
-        <label>4突<input type="checkbox" ${own.breakthrough === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="bt4"></label>
-        <label>4装<input type="checkbox" ${own.equipment === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="equipment"></label>
-        <label>印<input type="number" min="0" max="5" value="${own.seal}" data-id="${g.id}" data-axis="seal"></label>
-      </td>
+    const card = document.createElement('div');
+    card.className = 'gcard' + (own.owned ? ' owned' : '');
+    card.innerHTML = `
+      <div class="owned-check">
+        <input type="checkbox" ${own.owned ? 'checked' : ''} data-id="${g.id}" data-axis="owned">
+      </div>
+      <div class="info">
+        <div class="name-row">
+          <span class="name">${g.name}</span>
+          <span class="badges">
+            <span class="badge ${g.base_rarity === '玄' ? 'gen' : ''}">${g.base_rarity}</span>
+            <span class="badge troop-${g.troop_type}">${g.troop_type || '?'}</span>
+          </span>
+        </div>
+        <div class="prog">
+          <label class="${own.breakthrough === 3 ? 'on' : ''}"><input type="checkbox" ${own.breakthrough === 3 ? 'checked' : ''} data-id="${g.id}" data-axis="bt3">3突</label>
+          <label class="${own.breakthrough === 4 ? 'on' : ''}"><input type="checkbox" ${own.breakthrough === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="bt4">4突</label>
+          <label class="${own.equipment === 4 ? 'on' : ''}"><input type="checkbox" ${own.equipment === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="equipment">4装</label>
+          <span class="seal-wrap">印<input type="number" min="0" max="5" value="${own.seal}" data-id="${g.id}" data-axis="seal"></span>
+        </div>
+      </div>
     `;
-    tbody.appendChild(tr);
+    container.appendChild(card);
   }
   // bind
-  tbody.querySelectorAll('input[data-axis]').forEach(inp => {
+  container.querySelectorAll('input[data-axis]').forEach(inp => {
     inp.addEventListener('change', () => {
       const id = inp.dataset.id;
       const axis = inp.dataset.axis;
       const own = getOwn(id);
-      if (axis === 'owned') own.owned = inp.checked;
+      let needFullRerender = false;
+      if (axis === 'owned') { own.owned = inp.checked; needFullRerender = true; }
       else if (axis === 'bt3') {
         if (inp.checked) own.breakthrough = 3;
         else if (own.breakthrough === 3) own.breakthrough = 0;
+        needFullRerender = true;
       } else if (axis === 'bt4') {
         if (inp.checked) own.breakthrough = 4;
         else if (own.breakthrough === 4) own.breakthrough = 0;
-      } else if (axis === 'equipment') own.equipment = inp.checked ? 4 : 0;
+        needFullRerender = true;
+      } else if (axis === 'equipment') {
+        own.equipment = inp.checked ? 4 : 0;
+        needFullRerender = true;
+      }
       else if (axis === 'seal') own.seal = Math.max(0, Math.min(5, parseInt(inp.value, 10) || 0));
       saveLocal();
       updateOwnedCount();
-      if (axis === 'bt3' || axis === 'bt4') renderRoster();
+      if (needFullRerender) renderRoster();
     });
   });
   updateOwnedCount();
@@ -231,15 +274,13 @@ document.getElementById('user-name').addEventListener('input', e => {
 ['filter-troop', 'filter-rarity', 'filter-search', 'filter-owned-only'].forEach(id => {
   const el = document.getElementById(id);
   el.addEventListener('input', () => {
-    const k = id.replace('filter-', '').replace('-only', 'Only').replace('-', '');
-    const map = { 'troop': 'troop', 'rarity': 'rarity', 'search': 'search', 'ownedOnly': 'ownedOnly' };
-    const key = map[k] || k;
+    const map = { 'filter-troop': 'troop', 'filter-rarity': 'rarity', 'filter-search': 'search', 'filter-owned-only': 'ownedOnly' };
+    const key = map[id];
     state.filters[key] = el.type === 'checkbox' ? el.checked : el.value;
     renderRoster();
   });
 });
 
-// 一括
 ['bulk-owned', 'bulk-bt3', 'bulk-bt4', 'bulk-equipment'].forEach(id => {
   document.getElementById(id).addEventListener('change', e => {
     const on = e.target.checked;
@@ -252,14 +293,14 @@ document.getElementById('user-name').addEventListener('input', e => {
     }
     saveLocal();
     renderRoster();
+    e.target.checked = false;  // 一括チェック自体は OFF に戻す（UX）
   });
 });
 
-// エクスポート
 document.getElementById('btn-export').addEventListener('click', () => {
   const name = (state.userName || '').trim();
   if (!name) {
-    notify('「あなたの名前」を入力してください。\n（依頼者がデータを識別するために必須です）');
+    notify('「名前」を入力してください。\n（依頼者がデータを識別するために必須です）');
     document.getElementById('user-name').focus();
     return;
   }
@@ -280,10 +321,9 @@ document.getElementById('btn-export').addEventListener('click', () => {
   a.href = url; a.download = fname;
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
-  notify(`エクスポートしました: ${fname}\n依頼者にこのファイルをお送りください。`);
+  notify(`エクスポート完了\nファイル: ${fname}\n\nこのファイルを依頼者にお送りください。`);
 });
 
-// インポート（既存JSONで編集再開）
 document.getElementById('btn-import').addEventListener('click', () => {
   document.getElementById('file-import').click();
 });
@@ -308,7 +348,6 @@ document.getElementById('file-import').addEventListener('change', async e => {
   }
 });
 
-// 全クリア
 document.getElementById('btn-clear').addEventListener('click', () => {
   if (!confirm('入力した所持データを全てクリアします。よろしいですか？')) return;
   state.ownerships = {};
