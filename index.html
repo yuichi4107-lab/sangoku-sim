@@ -141,10 +141,8 @@
       <label>検索<input id="filter-search" type="text" placeholder="武将名" style="width:120px;"></label>
       <label><input type="checkbox" id="filter-owned-only">所持のみ</label>
       <button id="btn-clear-state">状態リセット</button>
-      <button id="btn-export-state" title="所持・編成・プレイヤー設定をJSONファイルとして保存">エクスポート</button>
-      <button id="btn-import-state" title="JSONファイルから読み込み（現在の状態は上書きされます）">インポート</button>
-      <input id="file-import-state" type="file" accept="application/json,.json" style="display:none;">
-      <button id="btn-add-user-json" title="register.html で作成された個人JSONをプレイヤーとして追加" style="background:#5a7a5a;color:#fff;">＋友人JSON追加</button>
+      <button id="btn-export-user" title="プレイヤーを選んでJSONエクスポート">ユーザーをエクスポート</button>
+      <button id="btn-add-user-json" title="register.html で作成された個人JSONをプレイヤーとして追加（複数可）" style="background:#5a7a5a;color:#fff;">ユーザーをインポート</button>
       <input id="file-add-user-json" type="file" accept="application/json,.json" multiple style="display:none;">
       <a href="register.html" target="_blank" style="font-size:12px;color:var(--accent);margin-left:8px;">▶ 友人配布用登録ツール</a>
     </div>
@@ -742,65 +740,69 @@ function renderFilters() {
     renderSummary();
   });
 
-  // エクスポート: 現在の状態を JSON ファイルとしてダウンロード
-  document.getElementById('btn-export-state').addEventListener('click', () => {
-    const payload = {
-      schema: 'sangoku_sim_v06',
-      exported_at: new Date().toISOString(),
-      users: state.users,
-      ownerships: state.ownerships,
-      activeUserId: state.activeUserId,
-      filters: state.filters,
-      formations: state.formations,
-      priority: state.priority,
-      aggMode: state.aggMode,
-    };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const ts = new Date();
-    const pad = n => String(n).padStart(2, '0');
-    const fname = `sangoku_sim_${ts.getFullYear()}${pad(ts.getMonth()+1)}${pad(ts.getDate())}_${pad(ts.getHours())}${pad(ts.getMinutes())}.json`;
-    const a = document.createElement('a');
-    a.href = url; a.download = fname;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  });
-
-  // インポート: ファイル選択 → JSON 読込 → loadState で復元 → 再描画
-  const fileInput = document.getElementById('file-import-state');
-  document.getElementById('btn-import-state').addEventListener('click', async () => {
-    if (!await askConfirm('JSONファイルから読み込みます。\n現在の所持・編成・プレイヤー設定は上書きされます。よろしいですか？')) return;
-    fileInput.value = '';
-    fileInput.click();
-  });
-  fileInput.addEventListener('change', async () => {
-    const f = fileInput.files && fileInput.files[0];
-    if (!f) return;
-    try {
-      const text = await f.text();
-      const obj = JSON.parse(text);
-      // 既存の loadState ロジックを再利用するため localStorage に書いてから読み直す
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
-      // state を初期化してから loadState
-      state.users = defaultUsers();
-      state.ownerships = {};
-      state.activeUserId = 1;
-      state.formations = defaultFormations();
-      state.priority = { pri1: '', pri2: '' };
-      loadState();
-      renderUserTabs();
-      renderGlobalPriority();
-      renderRoster();
-      renderFormation();
-      renderSummary();
-      notify(`読み込み完了: プレイヤー${state.users.length}名 / 軍団${state.formations.length}件`);
-    } catch (e) {
-      console.error(e);
-      notify(`読み込みに失敗しました\n${e.message || e}`);
+  // ユーザーをエクスポート: プレイヤー選択モーダル → 選んだ各人をJSONダウンロード
+  document.getElementById('btn-export-user').addEventListener('click', async () => {
+    if (!state.users.length) {
+      notify('登録されているプレイヤーがいません。');
+      return;
     }
+    // 選択モーダルを動的に組み立て
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:200;';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:var(--paper);border:1px solid var(--border);padding:14px;min-width:280px;max-width:90%;max-height:80%;overflow:auto;';
+    box.innerHTML = '<div style="font-weight:600;margin-bottom:8px;">エクスポートするプレイヤーを選択</div>';
+    const listDiv = document.createElement('div');
+    listDiv.style.cssText = 'display:flex;flex-direction:column;gap:4px;margin-bottom:8px;';
+    state.users.forEach(u => {
+      const lbl = document.createElement('label');
+      lbl.style.cssText = 'display:flex;gap:6px;align-items:center;padding:4px 6px;border:1px solid var(--border);cursor:pointer;';
+      lbl.innerHTML = `<input type="checkbox" data-uid="${u.id}" checked> <span>${u.name}</span>`;
+      listDiv.appendChild(lbl);
+    });
+    box.appendChild(listDiv);
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:6px;justify-content:flex-end;';
+    btnRow.innerHTML = '<button id="btn-export-all">全選択</button><button id="btn-export-none">全解除</button><button id="btn-export-ok" style="background:var(--accent);color:#fff;">エクスポート</button><button id="btn-export-cancel">キャンセル</button>';
+    box.appendChild(btnRow);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    const cleanup = () => document.body.removeChild(overlay);
+    box.querySelector('#btn-export-all').onclick = () => listDiv.querySelectorAll('input').forEach(i => i.checked = true);
+    box.querySelector('#btn-export-none').onclick = () => listDiv.querySelectorAll('input').forEach(i => i.checked = false);
+    box.querySelector('#btn-export-cancel').onclick = cleanup;
+    box.querySelector('#btn-export-ok').onclick = () => {
+      const selectedIds = Array.from(listDiv.querySelectorAll('input:checked')).map(i => parseInt(i.dataset.uid, 10));
+      if (!selectedIds.length) { notify('1名以上選択してください。'); return; }
+      const ts = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      const dateStr = `${ts.getFullYear()}${pad(ts.getMonth()+1)}${pad(ts.getDate())}`;
+      for (const uid of selectedIds) {
+        const user = state.users.find(u => u.id === uid);
+        if (!user) continue;
+        const payload = {
+          schema: 'sangoku_user_v1',
+          exported_at: new Date().toISOString(),
+          user_name: user.name,
+          data_version: state.data.meta.data_version,
+          ownerships: state.ownerships[uid] || {},
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const safeName = user.name.replace(/[^\p{L}\p{N}_-]/gu, '_');
+        const fname = `sangoku_user_${safeName}_${dateStr}.json`;
+        const a = document.createElement('a');
+        a.href = url; a.download = fname;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+      cleanup();
+      notify(`${selectedIds.length}名分をエクスポートしました。`);
+    };
   });
 
-  // 友人 JSON 追加: register.html 形式の sangoku_user_v1 を読んでプレイヤーとして追加（複数ファイル可）
+  // ユーザーをインポート: sangoku_user_v1 を読んでプレイヤー追加（複数ファイル可、同名上書き確認）
   const addUserInput = document.getElementById('file-add-user-json');
   document.getElementById('btn-add-user-json').addEventListener('click', () => {
     addUserInput.value = '';
@@ -810,6 +812,7 @@ function renderFilters() {
     const files = Array.from(addUserInput.files || []);
     if (!files.length) return;
     const added = [];
+    const overwritten = [];
     const skipped = [];
     for (const f of files) {
       try {
@@ -820,15 +823,19 @@ function renderFilters() {
           continue;
         }
         const name = (obj.user_name || f.name.replace(/\.json$/i, '')).trim() || '名無し';
-        // 既存ユーザー名と衝突したら -2, -3 を付与
-        let finalName = name;
-        let suffix = 2;
-        const existingNames = new Set(state.users.map(u => u.name));
-        while (existingNames.has(finalName)) finalName = `${name}-${suffix++}`;
-        const newId = Math.max(0, ...state.users.map(u => u.id)) + 1;
-        state.users.push({ id: newId, name: finalName });
-        state.ownerships[newId] = obj.ownerships || {};
-        added.push(finalName);
+        // 同名ユーザーがいたら上書き確認
+        const existing = state.users.find(u => u.name === name);
+        if (existing) {
+          const ok = await askConfirm(`「${name}」は既に登録済みです。\n所持データを上書きしますか？\n\n[OK]=上書き / [キャンセル]=スキップ`);
+          if (!ok) { skipped.push(`${name}: 上書きキャンセル`); continue; }
+          state.ownerships[existing.id] = obj.ownerships || {};
+          overwritten.push(name);
+        } else {
+          const newId = Math.max(0, ...state.users.map(u => u.id)) + 1;
+          state.users.push({ id: newId, name });
+          state.ownerships[newId] = obj.ownerships || {};
+          added.push(name);
+        }
       } catch (e) {
         skipped.push(`${f.name}: ${e.message}`);
       }
@@ -838,9 +845,11 @@ function renderFilters() {
     renderRoster();
     renderFormation();
     renderSummary();
-    let msg = `追加: ${added.length}名` + (added.length ? `\n  ・${added.join(', ')}` : '');
-    if (skipped.length) msg += `\nスキップ: ${skipped.length}件\n  ・${skipped.join('\n  ・')}`;
-    notify(msg);
+    const lines = [];
+    if (added.length) lines.push(`新規追加: ${added.length}名 (${added.join(', ')})`);
+    if (overwritten.length) lines.push(`上書き: ${overwritten.length}名 (${overwritten.join(', ')})`);
+    if (skipped.length) lines.push(`スキップ: ${skipped.length}件\n  ・${skipped.join('\n  ・')}`);
+    notify(lines.length ? lines.join('\n') : '処理対象なし');
   });
 
   // 集計モード切替
