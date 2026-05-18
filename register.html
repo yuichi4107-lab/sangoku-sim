@@ -75,8 +75,7 @@
 <div class="lead">
   所持している武将にチェック、突破/装備の段階を入力してください。<br>
   完了したら下の「📤 送信（オンライン）」を押すと、依頼者に直接データが届きます。<br>
-  通信できない場合は「💾 JSONダウンロード」でファイル化して個別送信もできます。<br>
-  入力内容はこの端末に自動保存されます。
+  入力内容はこの端末に自動保存されるので、途中で閉じても続きから入力できます。
 </div>
 
 <div class="topbar">
@@ -108,15 +107,12 @@
   </div>
   <div class="row">
     <button id="btn-submit" style="background:#2e8b3a;font-weight:600;">📤 送信（オンライン）</button>
-    <button id="btn-export">💾 JSONダウンロード</button>
-    <button id="btn-import" class="green">📥 既存JSONを読込</button>
     <button id="btn-clear" class="red">🗑️ 全クリア</button>
   </div>
 </div>
 
 <div id="roster-list"></div>
 
-<input type="file" id="file-import" accept="application/json" style="display:none;">
 
 <div class="modal" id="modal">
   <div class="modal-content">
@@ -441,57 +437,6 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
   } finally {
     btn.textContent = orig;
     btn.disabled = false;
-  }
-});
-
-document.getElementById('btn-export').addEventListener('click', () => {
-  const name = (state.userName || '').trim();
-  if (!name) {
-    notify('「名前」を入力してください。\n（依頼者がデータを識別するために必須です）');
-    document.getElementById('user-name').focus();
-    return;
-  }
-  const payload = {
-    schema: 'sangoku_user_v1',
-    exported_at: new Date().toISOString(),
-    user_name: name,
-    data_version: state.data.meta.data_version,
-    ownerships: state.ownerships,
-  };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const ts = new Date();
-  const pad = n => String(n).padStart(2, '0');
-  const safeName = name.replace(/[^\p{L}\p{N}_-]/gu, '_');
-  const fname = `sangoku_user_${safeName}_${ts.getFullYear()}${pad(ts.getMonth()+1)}${pad(ts.getDate())}.json`;
-  const a = document.createElement('a');
-  a.href = url; a.download = fname;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-  notify(`エクスポート完了\nファイル: ${fname}\n\nこのファイルを依頼者にお送りください。`);
-});
-
-document.getElementById('btn-import').addEventListener('click', () => {
-  document.getElementById('file-import').click();
-});
-document.getElementById('file-import').addEventListener('change', async e => {
-  const f = e.target.files[0];
-  if (!f) return;
-  try {
-    const text = await f.text();
-    const obj = JSON.parse(text);
-    if (obj.schema !== 'sangoku_user_v1') {
-      notify('対応していない形式です。\nschema: sangoku_user_v1 のファイルを選んでください。');
-      return;
-    }
-    state.userName = obj.user_name || '';
-    state.ownerships = obj.ownerships || {};
-    document.getElementById('user-name').value = state.userName;
-    saveLocal();
-    renderRoster();
-    notify(`読み込み完了: ${state.userName}`);
-  } catch (err) {
-    notify(`読み込み失敗: ${err.message}`);
   }
 });
 
