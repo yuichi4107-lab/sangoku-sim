@@ -306,6 +306,66 @@ document.getElementById('user-name').addEventListener('input', e => {
 // オンライン送信先（メインシミュ index.html と同じGAS endpoint）
 const SUBMIT_API_URL = 'https://script.google.com/macros/s/AKfycbzHbJsj9mdyVqJvMl85_NkB5y4k4tbQ2hYXahT3gVNAPaQfCU4629xuvmnEtQJc6B26/exec';
 
+// File→base64 ヘルパー
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const r = reader.result;
+      const idx = r.indexOf(',');
+      resolve(idx >= 0 ? r.slice(idx + 1) : r);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// 画像添付モーダル → 添付なしでは送信不可
+function showImageAttachModal() {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:var(--paper);padding:16px;border:1px solid var(--border);border-radius:4px;max-width:380px;width:100%;';
+    box.innerHTML = `
+      <div style="font-weight:600;font-size:15px;margin-bottom:6px;">📸 兵士属性スクショの添付（必須）</div>
+      <div style="font-size:12px;color:#555;margin-bottom:10px;line-height:1.5;">
+        ゲーム内「詳細情報」画面の「兵士属性」スクショを添付してください（複数選択可）。<br>
+        例: 兵種ごとの攻撃/防御ボーナス、敵への減益値が見えるスクショ。<br>
+        <span style="color:#c33;">※ 添付しないと送信できません。</span>
+      </div>
+      <input type="file" id="img-input" accept="image/*" multiple style="display:block;margin-bottom:8px;width:100%;">
+      <div id="img-preview" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;max-height:200px;overflow:auto;"></div>
+      <div style="display:flex;gap:6px;justify-content:flex-end;">
+        <button id="btn-img-cancel" style="background:#888;">キャンセル</button>
+        <button id="btn-img-ok" style="background:var(--ok);" disabled>📤 送信</button>
+      </div>
+    `;
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    const fileInput = box.querySelector('#img-input');
+    const preview = box.querySelector('#img-preview');
+    const btnOk = box.querySelector('#btn-img-ok');
+    let files = [];
+    fileInput.addEventListener('change', () => {
+      files = Array.from(fileInput.files || []);
+      preview.innerHTML = '';
+      for (const f of files) {
+        const url = URL.createObjectURL(f);
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'border:1px solid var(--border);padding:2px;background:#fff;';
+        wrap.innerHTML = `<img src="${url}" style="display:block;width:80px;height:80px;object-fit:cover;"><div style="font-size:10px;text-align:center;width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${f.name}</div>`;
+        preview.appendChild(wrap);
+      }
+      btnOk.disabled = files.length === 0;
+      btnOk.style.opacity = files.length === 0 ? '0.4' : '1';
+    });
+    box.querySelector('#btn-img-cancel').onclick = () => { document.body.removeChild(overlay); resolve(null); };
+    btnOk.onclick = () => { document.body.removeChild(overlay); resolve(files); };
+  });
+}
+
 document.getElementById('btn-submit').addEventListener('click', async () => {
   const name = (state.userName || '').trim();
   if (!name) {
@@ -313,15 +373,28 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
     document.getElementById('user-name').focus();
     return;
   }
+
+  // 画像添付モーダル
+  const files = await showImageAttachModal();
+  if (!files) return;  // キャンセル
+  if (!files.length) { notify('画像が必要です。'); return; }
+
   const btn = document.getElementById('btn-submit');
   const orig = btn.textContent;
   btn.textContent = '送信中…';
   btn.disabled = true;
   try {
+    // 画像を base64 化
+    const images = [];
+    for (const f of files) {
+      const b64 = await fileToBase64(f);
+      images.push({ name: f.name, mimeType: f.type || 'image/png', base64: b64 });
+    }
     const payload = {
       action: 'submit_user',
       user_name: name,
       ownerships: state.ownerships,
+      images: images,
     };
     const res = await fetch(SUBMIT_API_URL, {
       method: 'POST',
@@ -331,7 +404,7 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const r = await res.json();
     if (!r.ok) throw new Error(r.error || 'unknown');
-    notify(`✅ 送信完了\n\n名前: ${name}\n登録した武将数: ${Object.values(state.ownerships).filter(o => o.owned).length}\n\nデータは依頼者に届きました。\nご協力ありがとうございました！`);
+    notify(`✅ 送信完了\n\n名前: ${name}\n登録した武将数: ${Object.values(state.ownerships).filter(o => o.owned).length}\n添付画像: ${r.image_count || images.length}枚\n\nデータは依頼者に届きました。\nご協力ありがとうございました！`);
   } catch (err) {
     notify(`❌ 送信失敗: ${err.message}\n\nお手数ですが「💾 JSONダウンロード」でファイル保存後、依頼者に直接お送りください。`);
   } finally {

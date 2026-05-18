@@ -316,6 +316,7 @@ const state = {
   data: null,
   users: defaultUsers(),
   ownerships: { 1: {}, 2: {}, 3: {}, 4: {} },  // userId -> { genId -> ownEntry }（動的に増減）
+  playerStats: {},  // userId -> player_stats (兵士属性)
   activeUserId: 1,
   filters: { troop: '', rarity: '', search: '', ownedOnly: false },
   formations: defaultFormations(),
@@ -406,6 +407,15 @@ function loadState() {
       state.formations[0] = normFormation(s.formation, 1);
     }
 
+    // 兵士属性（プレイヤーステータス）
+    state.playerStats = {};
+    if (s.playerStats && typeof s.playerStats === 'object') {
+      for (const u of state.users) {
+        const v = s.playerStats[u.id] || s.playerStats[String(u.id)];
+        if (v) state.playerStats[u.id] = v;
+      }
+    }
+
     // 第一/第二優先は集結全体で1セットに変更（v06後期）
     // 既存データが無い場合は、各軍団の f.auto から最初の非空ペアを採用
     if (s.priority && typeof s.priority === 'object') {
@@ -427,6 +437,7 @@ function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       users: state.users,
       ownerships: state.ownerships,
+      playerStats: state.playerStats,
       activeUserId: state.activeUserId,
       filters: state.filters,
       formations: state.formations,
@@ -1883,6 +1894,7 @@ function initGroupLock() {
       <button id="btn-cloud-pull" title="クラウド上の最新データでこの端末を上書き">⬇️ クラウドから取得</button>
       <button id="btn-cloud-push" title="この端末の現在状態をクラウドへ保存（他端末に同期）" style="background:var(--accent);color:#fff;">⬆️ クラウドへ保存</button>
       <button id="btn-inbox" title="register.html から送信された友人データを取得" style="background:#5a7a5a;color:#fff;">📥 受信箱を取得</button>
+      <button id="btn-compare-stats" title="プレイヤー兵士属性を横並びで比較" style="background:#4a6a8c;color:#fff;">📊 ステ比較</button>
     </div>
     <div style="font-size:11px;color:#777;margin-top:6px;">
       ※ 後勝ち（last-write-wins）方式。試作モード中は保存ボタンが警告色になります。
@@ -1962,6 +1974,7 @@ function buildSharedPayload() {
     schema: 'sangoku_group_v1',
     users: state.users,
     ownerships: state.ownerships,
+    playerStats: state.playerStats,
     activeUserId: state.activeUserId,
     formations: state.formations,
     priority: state.priority,
@@ -1973,6 +1986,7 @@ function applySharedPayload(d) {
   if (!d || typeof d !== 'object') return false;
   if (Array.isArray(d.users)) state.users = d.users;
   if (d.ownerships && typeof d.ownerships === 'object') state.ownerships = d.ownerships;
+  if (d.playerStats && typeof d.playerStats === 'object') state.playerStats = d.playerStats;
   if (typeof d.activeUserId === 'number' && state.users.find(u => u.id === d.activeUserId)) state.activeUserId = d.activeUserId;
   if (Array.isArray(d.formations)) state.formations = d.formations;
   if (d.priority && typeof d.priority === 'object') state.priority = d.priority;
@@ -2006,6 +2020,9 @@ function initCloudSync() {
   const btnInbox = document.getElementById('btn-inbox');
   if (!btnPull) return;
 
+  const btnCompare = document.getElementById('btn-compare-stats');
+  if (btnCompare) btnCompare.addEventListener('click', () => showStatsCompareModal());
+
   // 受信箱を取得 → モーダルで選択 → ユーザー追加/上書き
   if (btnInbox) btnInbox.addEventListener('click', async () => {
     setGroupStatus('受信箱を取得中…', '#888');
@@ -2033,22 +2050,33 @@ function initCloudSync() {
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;';
     const box = document.createElement('div');
-    box.style.cssText = 'background:#fff;padding:16px 18px;border-radius:6px;max-width:520px;max-height:80vh;overflow:auto;box-shadow:0 4px 16px rgba(0,0,0,0.25);font-family:inherit;';
+    box.style.cssText = 'background:#fff;padding:16px 18px;border-radius:6px;max-width:620px;max-height:85vh;overflow:auto;box-shadow:0 4px 16px rgba(0,0,0,0.25);font-family:inherit;';
     let html = `<div style="font-weight:600;font-size:14px;margin-bottom:8px;">📥 受信箱 (${inbox.length}名)</div>
-      <div style="font-size:11px;color:#666;margin-bottom:10px;">取り込みたいユーザーを選択してください。同名は上書き確認します。</div>
-      <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px;">`;
+      <div style="font-size:11px;color:#666;margin-bottom:10px;">取り込みたいユーザーを選択 → 取込で追加/上書き。「📋 ステ編集」で兵士属性を貼付け登録。</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">`;
     inbox.sort((a, b) => (b.updated_at || '').localeCompare(a.updated_at || ''));
     inbox.forEach((row, idx) => {
       const ownedCount = Object.values(row.ownerships || {}).filter(o => o && o.owned).length;
       const exists = existingNames.has(row.user_name);
       const ts = row.updated_at ? new Date(row.updated_at).toLocaleString() : '';
-      html += `<label style="display:flex;gap:6px;align-items:center;padding:6px 8px;border:1px solid #ccc;border-radius:3px;background:${exists ? '#fff8e8' : '#fff'};cursor:pointer;">
-        <input type="checkbox" data-idx="${idx}" checked>
-        <div style="flex:1;">
-          <div><strong>${row.user_name}</strong> ${exists ? '<span style="color:#a86a00;font-size:11px;">（既存・上書き）</span>' : '<span style="color:#3a5520;font-size:11px;">（新規）</span>'}</div>
-          <div style="font-size:11px;color:#666;">所持 ${ownedCount}件 / 受信 ${ts}</div>
+      const imgs = (row.image_refs || []).filter(r => r && r.url);
+      const hasStats = !!row.player_stats && Object.keys(row.player_stats).length > 0;
+      const imgLinks = imgs.length
+        ? imgs.map((r, i) => `<a href="${r.url}" target="_blank" style="font-size:10px;color:#4472c4;text-decoration:underline;margin-right:6px;">📸${i+1}</a>`).join('')
+        : '<span style="font-size:10px;color:#aaa;">画像なし</span>';
+      html += `<div style="border:1px solid #ccc;border-radius:3px;background:${exists ? '#fff8e8' : '#fff'};padding:6px 8px;">
+        <label style="display:flex;gap:6px;align-items:center;cursor:pointer;">
+          <input type="checkbox" data-idx="${idx}" checked>
+          <div style="flex:1;">
+            <div><strong>${row.user_name}</strong> ${exists ? '<span style="color:#a86a00;font-size:11px;">（既存・上書き）</span>' : '<span style="color:#3a5520;font-size:11px;">（新規）</span>'} ${hasStats ? '<span style="color:#3a5520;font-size:11px;">✓ステ登録済</span>' : '<span style="color:#a86a00;font-size:11px;">✗ステ未登録</span>'}</div>
+            <div style="font-size:11px;color:#666;">所持 ${ownedCount}件 / 受信 ${ts}</div>
+          </div>
+        </label>
+        <div style="margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          ${imgLinks}
+          <button class="btn-edit-stats" data-name="${row.user_name}" style="font-size:11px;padding:2px 8px;margin-left:auto;background:#5a7a5a;color:#fff;border:none;border-radius:3px;cursor:pointer;">📋 ステ編集</button>
         </div>
-      </label>`;
+      </div>`;
     });
     html += `</div>
       <div style="display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;">
@@ -2064,6 +2092,17 @@ function initCloudSync() {
     box.querySelector('#btn-inbox-cancel').onclick = cleanup;
     box.querySelector('#btn-inbox-all').onclick = () => box.querySelectorAll('input[type=checkbox]').forEach(i => i.checked = true);
     box.querySelector('#btn-inbox-none').onclick = () => box.querySelectorAll('input[type=checkbox]').forEach(i => i.checked = false);
+    // ステ編集ボタン
+    box.querySelectorAll('.btn-edit-stats').forEach(b => {
+      b.addEventListener('click', async () => {
+        const name = b.dataset.name;
+        const row = inbox.find(r => r.user_name === name);
+        await showStatsEditModal(name, row && row.player_stats);
+        // 編集後は受信箱再読込
+        cleanup();
+        document.getElementById('btn-inbox').click();
+      });
+    });
     box.querySelector('#btn-inbox-ok').onclick = async () => {
       const selected = Array.from(box.querySelectorAll('input[type=checkbox]:checked')).map(i => inbox[parseInt(i.dataset.idx, 10)]);
       if (!selected.length) { notify('1名以上選択してください。'); return; }
@@ -2077,11 +2116,19 @@ function initCloudSync() {
           const ok = await askConfirm(`「${row.user_name}」は既存です。\n所持データを上書きしますか？\n[OK]=上書き / [キャンセル]=スキップ`);
           if (!ok) { skipped.push(row.user_name); continue; }
           state.ownerships[existing.id] = row.ownerships || {};
+          if (row.player_stats) {
+            if (!state.playerStats) state.playerStats = {};
+            state.playerStats[existing.id] = row.player_stats;
+          }
           overwritten.push(row.user_name);
         } else {
           const newId = Math.max(0, ...state.users.map(u => u.id)) + 1;
           state.users.push({ id: newId, name: row.user_name });
           state.ownerships[newId] = row.ownerships || {};
+          if (row.player_stats) {
+            if (!state.playerStats) state.playerStats = {};
+            state.playerStats[newId] = row.player_stats;
+          }
           added.push(row.user_name);
         }
       }
@@ -2241,6 +2288,306 @@ function askConflictChoice(remoteUpdatedAt) {
     overlay.addEventListener('click', e => { if (e.target === overlay) close('cancel'); });
   });
 }
+
+// =========================
+// プレイヤー兵士属性スキーマ & パーサー
+// =========================
+const STATS_TROOPS = ['歩兵', '騎兵', '弓兵', '戦車'];
+const STATS_TROOP_ATTRS = [
+  ['attack', '攻撃ボーナス'],
+  ['defense', '防御ボーナス'],
+  ['speed', '速度ボーナス'],
+  ['siege', '攻城ボーナス'],
+  ['load', '荷重ボーナス'],
+  ['shield', 'シールド付加'],
+  ['pierce', '貫通付加'],
+  ['rensa', '連撃付加'],
+  ['resist', '抵抗付加'],
+  ['pierce_resist', '貫通抵抗付加'],
+  ['discipline', '軍紀付加'],
+];
+const STATS_DEBUFF = [
+  ['attack', '攻撃'],
+  ['defense', '防御'],
+  ['shield', 'シールド'],
+  ['pierce', '貫通'],
+  ['rensa', '連撃'],
+  ['resist', '抵抗'],
+  ['pierce_resist', '貫通抵抗'],
+  ['discipline', '軍紀'],
+];
+
+function emptyPlayerStats() {
+  const ps = { general: { march_count: null, max_legions: null }, by_troop: {}, tank_support: null, debuff_enemy: {} };
+  for (const t of STATS_TROOPS) {
+    ps.by_troop[t] = {};
+    for (const [k] of STATS_TROOP_ATTRS) ps.by_troop[t][k] = null;
+  }
+  for (const [k] of STATS_DEBUFF) ps.debuff_enemy[k] = null;
+  return ps;
+}
+
+// テキスト（OCR/手入力）から兵士属性を抽出
+function parsePlayerStatsText(text) {
+  const ps = emptyPlayerStats();
+  const lines = text.split(/\r?\n/);
+  function matchLine(line) {
+    const m = line.match(/^[\s\-・\*]*(.+?)[:：\s]+(-?[\d,]+(?:\.\d+)?)\s*[%％]?\s*$/);
+    if (!m) return null;
+    const key = m[1].trim().replace(/\s+/g, '');
+    const val = parseFloat(m[2].replace(/,/g, ''));
+    return { key, val };
+  }
+  for (const raw of lines) {
+    const m = matchLine(raw);
+    if (!m) continue;
+    const { key, val } = m;
+    // 一般
+    if (key === '行軍部隊総数') { ps.general.march_count = val; continue; }
+    if (key === '出征可軍団上限') { ps.general.max_legions = val; continue; }
+    if (key === '戦車支援付加') { ps.tank_support = val; continue; }
+    // 敵方への減益
+    const debuffMatch = key.match(/^敵方の(.+?)に対する減益$/);
+    if (debuffMatch) {
+      const name = debuffMatch[1];
+      const found = STATS_DEBUFF.find(([, jp]) => jp === name);
+      if (found) ps.debuff_enemy[found[0]] = val;
+      continue;
+    }
+    // 兵種別属性
+    let matched = false;
+    for (const troop of STATS_TROOPS) {
+      if (!key.startsWith(troop)) continue;
+      const rest = key.slice(troop.length);
+      const found = STATS_TROOP_ATTRS.find(([, jp]) => jp === rest);
+      if (found) {
+        ps.by_troop[troop][found[0]] = val;
+        matched = true;
+        break;
+      }
+    }
+  }
+  return ps;
+}
+
+function countFilledStats(ps) {
+  if (!ps) return 0;
+  let n = 0;
+  if (ps.general) {
+    if (ps.general.march_count != null) n++;
+    if (ps.general.max_legions != null) n++;
+  }
+  if (ps.by_troop) {
+    for (const t of STATS_TROOPS) {
+      const r = ps.by_troop[t] || {};
+      for (const [k] of STATS_TROOP_ATTRS) if (r[k] != null) n++;
+    }
+  }
+  if (ps.tank_support != null) n++;
+  if (ps.debuff_enemy) {
+    for (const [k] of STATS_DEBUFF) if (ps.debuff_enemy[k] != null) n++;
+  }
+  return n;
+}
+
+// 兵士属性編集モーダル（テキスト貼付パース or 手動入力）
+async function showStatsEditModal(userName, currentStats) {
+  return new Promise(resolve => {
+    let ps = currentStats ? JSON.parse(JSON.stringify(currentStats)) : emptyPlayerStats();
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#fff;padding:14px 16px;border-radius:6px;max-width:700px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 4px 16px rgba(0,0,0,0.3);';
+    function buildTroopGrid() {
+      let h = '<table style="border-collapse:collapse;font-size:11px;width:100%;margin-bottom:8px;"><thead><tr><th style="border:1px solid #999;background:#ede7d9;padding:3px;">属性</th>';
+      for (const t of STATS_TROOPS) h += `<th style="border:1px solid #999;background:#ede7d9;padding:3px;">${t}</th>`;
+      h += '</tr></thead><tbody>';
+      for (const [k, label] of STATS_TROOP_ATTRS) {
+        h += `<tr><td style="border:1px solid #999;padding:3px;font-weight:600;background:#f7f3e8;">${label}</td>`;
+        for (const t of STATS_TROOPS) {
+          const v = ps.by_troop[t][k];
+          h += `<td style="border:1px solid #999;padding:1px;"><input type="number" step="0.1" data-troop="${t}" data-attr="${k}" value="${v ?? ''}" style="width:100%;border:none;padding:3px;font-size:11px;text-align:right;background:transparent;"></td>`;
+        }
+        h += '</tr>';
+      }
+      h += '</tbody></table>';
+      return h;
+    }
+    function buildDebuff() {
+      let h = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px;margin-bottom:8px;">';
+      for (const [k, label] of STATS_DEBUFF) {
+        const v = ps.debuff_enemy[k];
+        h += `<label style="display:flex;align-items:center;gap:4px;font-size:11px;"><span style="flex:1;">敵${label}減益</span><input type="number" step="0.1" data-debuff="${k}" value="${v ?? ''}" style="width:60px;text-align:right;font-size:11px;padding:2px;border:1px solid #ccc;"></label>`;
+      }
+      h += '</div>';
+      return h;
+    }
+    function buildGeneral() {
+      return `<div style="display:flex;gap:8px;margin-bottom:8px;">
+        <label style="font-size:11px;display:flex;align-items:center;gap:4px;">行軍部隊総数<input type="number" step="1" data-general="march_count" value="${ps.general.march_count ?? ''}" style="width:50px;font-size:11px;padding:2px;border:1px solid #ccc;text-align:right;"></label>
+        <label style="font-size:11px;display:flex;align-items:center;gap:4px;">出征可軍団上限<input type="number" step="1" data-general="max_legions" value="${ps.general.max_legions ?? ''}" style="width:50px;font-size:11px;padding:2px;border:1px solid #ccc;text-align:right;"></label>
+        <label style="font-size:11px;display:flex;align-items:center;gap:4px;">戦車支援付加<input type="number" step="0.1" data-tank-support="1" value="${ps.tank_support ?? ''}" style="width:60px;font-size:11px;padding:2px;border:1px solid #ccc;text-align:right;">%</label>
+      </div>`;
+    }
+    function rebuild() {
+      const filled = countFilledStats(ps);
+      box.innerHTML = `<div style="font-weight:600;font-size:14px;margin-bottom:6px;">📋 兵士属性編集 — ${userName} <span style="font-size:11px;color:#666;font-weight:normal;">(入力済: ${filled}/55)</span></div>
+        <details style="margin-bottom:8px;font-size:12px;"><summary style="cursor:pointer;color:#4472c4;">📥 テキスト貼付けで一括入力（Geminiの出力など）</summary>
+          <textarea id="paste-area" placeholder="例:&#10;行軍部隊総数: 5&#10;出征可軍団上限: 10&#10;歩兵攻撃ボーナス: 3032.9%&#10;..." style="width:100%;height:90px;font-family:monospace;font-size:11px;padding:4px;margin-top:4px;box-sizing:border-box;"></textarea>
+          <button id="btn-parse" style="margin-top:4px;padding:4px 10px;background:#4472c4;color:#fff;border:none;border-radius:3px;cursor:pointer;font-size:12px;">パースして反映</button>
+        </details>
+        ${buildGeneral()}
+        <div style="font-weight:600;font-size:12px;margin-bottom:4px;">兵種別属性</div>
+        ${buildTroopGrid()}
+        <div style="font-weight:600;font-size:12px;margin-bottom:4px;">敵方への減益</div>
+        ${buildDebuff()}
+        <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:8px;">
+          <button id="btn-stats-clear" style="background:#a66;color:#fff;">全クリア</button>
+          <button id="btn-stats-cancel" style="background:#888;color:#fff;">キャンセル</button>
+          <button id="btn-stats-save" style="background:var(--ok);color:#fff;">クラウドに保存</button>
+        </div>
+        <div id="stats-msg" style="font-size:11px;color:#666;margin-top:6px;"></div>`;
+      bind();
+    }
+    function bind() {
+      box.querySelectorAll('input[data-troop]').forEach(inp => inp.addEventListener('input', () => {
+        const t = inp.dataset.troop, a = inp.dataset.attr;
+        ps.by_troop[t][a] = inp.value === '' ? null : parseFloat(inp.value);
+      }));
+      box.querySelectorAll('input[data-debuff]').forEach(inp => inp.addEventListener('input', () => {
+        ps.debuff_enemy[inp.dataset.debuff] = inp.value === '' ? null : parseFloat(inp.value);
+      }));
+      box.querySelectorAll('input[data-general]').forEach(inp => inp.addEventListener('input', () => {
+        ps.general[inp.dataset.general] = inp.value === '' ? null : parseFloat(inp.value);
+      }));
+      const tsInp = box.querySelector('input[data-tank-support]');
+      if (tsInp) tsInp.addEventListener('input', () => ps.tank_support = tsInp.value === '' ? null : parseFloat(tsInp.value));
+      box.querySelector('#btn-parse').onclick = () => {
+        const txt = box.querySelector('#paste-area').value;
+        const parsed = parsePlayerStatsText(txt);
+        // merge (non-null から優先)
+        function mergeIn(target, source) {
+          for (const k of Object.keys(source)) {
+            if (source[k] && typeof source[k] === 'object' && !Array.isArray(source[k])) {
+              if (!target[k]) target[k] = {};
+              mergeIn(target[k], source[k]);
+            } else if (source[k] != null) {
+              target[k] = source[k];
+            }
+          }
+        }
+        mergeIn(ps, parsed);
+        rebuild();
+        box.querySelector('#stats-msg').textContent = `✅ パース反映完了。${countFilledStats(parsed)}項目を更新。`;
+      };
+      box.querySelector('#btn-stats-clear').onclick = () => {
+        if (confirm('全項目をクリアします。よろしいですか？')) { ps = emptyPlayerStats(); rebuild(); }
+      };
+      box.querySelector('#btn-stats-cancel').onclick = () => { document.body.removeChild(overlay); resolve(null); };
+      box.querySelector('#btn-stats-save').onclick = async () => {
+        const msg = box.querySelector('#stats-msg');
+        msg.textContent = '保存中…';
+        try {
+          const res = await fetch(GROUP_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'update_stats', user_name: userName, player_stats: ps }),
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const r = await res.json();
+          if (!r.ok) throw new Error(r.error || 'unknown');
+          msg.textContent = '✅ クラウドに保存しました';
+          // ローカル state にも反映
+          const existing = state.users.find(u => u.name === userName);
+          if (existing) {
+            if (!state.playerStats) state.playerStats = {};
+            state.playerStats[existing.id] = ps;
+            saveState();
+          }
+          setTimeout(() => { document.body.removeChild(overlay); resolve(ps); }, 800);
+        } catch (e) {
+          msg.textContent = `❌ 保存失敗: ${e.message}`;
+        }
+      };
+    }
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    rebuild();
+  });
+}
+
+// 兵士属性比較ビュー（4名選択）
+function showStatsCompareModal() {
+  const users = state.users.filter(u => state.playerStats && state.playerStats[u.id]);
+  if (!users.length) { notify('プレイヤーステータスが未登録です。\n受信箱の「📋 ステ編集」で登録してください。'); return; }
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#fff;padding:14px 16px;border-radius:6px;max-width:800px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 4px 16px rgba(0,0,0,0.3);';
+  let selectedIds = [];
+  function rebuild() {
+    let h = `<div style="font-weight:600;font-size:14px;margin-bottom:8px;">📊 兵士属性 横並び比較</div>
+      <div style="font-size:11px;color:#666;margin-bottom:8px;">4名まで選択。各列に各プレイヤーの値を表示します。</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">`;
+    for (const u of users) {
+      const checked = selectedIds.includes(u.id) ? 'checked' : '';
+      h += `<label style="display:inline-flex;align-items:center;gap:4px;border:1px solid #ccc;padding:4px 8px;border-radius:3px;cursor:pointer;background:${selectedIds.includes(u.id) ? '#e8f0e0' : '#fff'};"><input type="checkbox" data-uid="${u.id}" ${checked}>${u.name}</label>`;
+    }
+    h += '</div>';
+    if (selectedIds.length > 0) {
+      const cols = selectedIds.map(id => ({ user: state.users.find(u => u.id === id), ps: state.playerStats[id] }));
+      h += '<table style="border-collapse:collapse;font-size:11px;width:100%;">';
+      h += '<thead><tr><th style="border:1px solid #999;background:#ede7d9;padding:4px;text-align:left;">項目</th>';
+      for (const c of cols) h += `<th style="border:1px solid #999;background:#ede7d9;padding:4px;">${c.user.name}</th>`;
+      h += '</tr></thead><tbody>';
+      function row(label, fn) {
+        h += `<tr><td style="border:1px solid #999;padding:3px;background:#f7f3e8;">${label}</td>`;
+        for (const c of cols) {
+          const v = fn(c.ps);
+          h += `<td style="border:1px solid #999;padding:3px;text-align:right;${v == null ? 'color:#bbb;' : ''}">${v == null ? '—' : v}</td>`;
+        }
+        h += '</tr>';
+      }
+      row('行軍部隊総数', ps => ps.general ? ps.general.march_count : null);
+      row('出征可軍団上限', ps => ps.general ? ps.general.max_legions : null);
+      for (const t of STATS_TROOPS) {
+        h += `<tr><td colspan="${cols.length+1}" style="border:1px solid #999;padding:3px;background:#ddd;font-weight:600;">${t}</td></tr>`;
+        for (const [k, label] of STATS_TROOP_ATTRS) {
+          row(`　${label}`, ps => {
+            const v = ps.by_troop && ps.by_troop[t] ? ps.by_troop[t][k] : null;
+            return v != null ? v + '%' : null;
+          });
+        }
+      }
+      row('戦車支援付加', ps => ps.tank_support != null ? ps.tank_support + '%' : null);
+      h += `<tr><td colspan="${cols.length+1}" style="border:1px solid #999;padding:3px;background:#ddd;font-weight:600;">敵方への減益</td></tr>`;
+      for (const [k, label] of STATS_DEBUFF) {
+        row(`　${label}`, ps => {
+          const v = ps.debuff_enemy ? ps.debuff_enemy[k] : null;
+          return v != null ? v + '%' : null;
+        });
+      }
+      h += '</tbody></table>';
+    }
+    h += '<div style="display:flex;gap:6px;justify-content:flex-end;margin-top:10px;"><button id="btn-cmp-close" style="background:#888;color:#fff;">閉じる</button></div>';
+    box.innerHTML = h;
+    box.querySelectorAll('input[data-uid]').forEach(inp => inp.addEventListener('change', () => {
+      const id = parseInt(inp.dataset.uid, 10);
+      if (inp.checked) {
+        if (selectedIds.length >= 4) { inp.checked = false; notify('最大4名まで選択できます。'); return; }
+        selectedIds.push(id);
+      } else {
+        selectedIds = selectedIds.filter(x => x !== id);
+      }
+      rebuild();
+    }));
+    box.querySelector('#btn-cmp-close').onclick = () => document.body.removeChild(overlay);
+  }
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  rebuild();
+}
+window.showStatsCompareModal = showStatsCompareModal;
 
 </script>
 </body>
