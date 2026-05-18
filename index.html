@@ -802,7 +802,7 @@ function renderFilters() {
     `;
     overlay.appendChild(box);
     document.body.appendChild(overlay);
-    const cleanup = () => if (overlay.parentNode) overlay.remove();
+    const cleanup = () => { if (overlay.parentNode) overlay.remove(); };
     box.querySelector('#btn-qr-close').onclick = cleanup;
     overlay.addEventListener('click', e => { if (e.target === overlay) cleanup(); });
     box.querySelector('#btn-qr-open').onclick = () => window.open(url, '_blank');
@@ -844,7 +844,7 @@ function renderFilters() {
     overlay.appendChild(box);
     document.body.appendChild(overlay);
 
-    const cleanup = () => if (overlay.parentNode) overlay.remove();
+    const cleanup = () => { if (overlay.parentNode) overlay.remove(); };
     box.querySelector('#btn-export-all').onclick = () => listDiv.querySelectorAll('input').forEach(i => i.checked = true);
     box.querySelector('#btn-export-none').onclick = () => listDiv.querySelectorAll('input').forEach(i => i.checked = false);
     box.querySelector('#btn-export-cancel').onclick = cleanup;
@@ -2088,7 +2088,7 @@ function initCloudSync() {
     box.innerHTML = html;
     overlay.appendChild(box);
     document.body.appendChild(overlay);
-    const cleanup = () => if (overlay.parentNode) overlay.remove();
+    const cleanup = () => { if (overlay.parentNode) overlay.remove(); };
     box.querySelector('#btn-inbox-cancel').onclick = cleanup;
     box.querySelector('#btn-inbox-all').onclick = () => box.querySelectorAll('input[type=checkbox]').forEach(i => i.checked = true);
     box.querySelector('#btn-inbox-none').onclick = () => box.querySelectorAll('input[type=checkbox]').forEach(i => i.checked = false);
@@ -2581,7 +2581,7 @@ function showStatsCompareModal() {
       }
       rebuild();
     }));
-    box.querySelector('#btn-cmp-close').onclick = () => if (overlay.parentNode) overlay.remove();
+    box.querySelector('#btn-cmp-close').onclick = () => { if (overlay.parentNode) overlay.remove(); };
   }
   overlay.appendChild(box);
   document.body.appendChild(overlay);
