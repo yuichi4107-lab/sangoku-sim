@@ -1882,6 +1882,7 @@ function initGroupLock() {
     <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:12px;">
       <button id="btn-cloud-pull" title="クラウド上の最新データでこの端末を上書き">⬇️ クラウドから取得</button>
       <button id="btn-cloud-push" title="この端末の現在状態をクラウドへ保存（他端末に同期）" style="background:var(--accent);color:#fff;">⬆️ クラウドへ保存</button>
+      <button id="btn-inbox" title="register.html から送信された友人データを取得" style="background:#5a7a5a;color:#fff;">📥 受信箱を取得</button>
     </div>
     <div style="font-size:11px;color:#777;margin-top:6px;">
       ※ 後勝ち（last-write-wins）方式。試作モード中は保存ボタンが警告色になります。
@@ -1992,11 +1993,111 @@ function setGroupStatus(text, color) {
   el.style.color = color || '#666';
 }
 
+async function cloudGetInbox() {
+  const res = await fetch(GROUP_API_URL + '?action=get_inbox', { method: 'GET' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return await res.json();
+}
+
 function initCloudSync() {
   const btnPull = document.getElementById('btn-cloud-pull');
   const btnPush = document.getElementById('btn-cloud-push');
   const btnMode = document.getElementById('btn-mode-toggle');
+  const btnInbox = document.getElementById('btn-inbox');
   if (!btnPull) return;
+
+  // 受信箱を取得 → モーダルで選択 → ユーザー追加/上書き
+  if (btnInbox) btnInbox.addEventListener('click', async () => {
+    setGroupStatus('受信箱を取得中…', '#888');
+    let r;
+    try {
+      r = await cloudGetInbox();
+      if (!r.ok) throw new Error(r.error || 'unknown');
+    } catch (e) {
+      setGroupStatus('受信箱取得失敗', '#c33');
+      notify(`受信箱取得失敗: ${e.message}`);
+      return;
+    }
+    const inbox = r.inbox || [];
+    if (!inbox.length) {
+      setGroupStatus('受信箱は空', '#888');
+      notify('受信箱に新着はありません。');
+      return;
+    }
+    refreshModeUI();
+    showInboxModal(inbox);
+  });
+
+  function showInboxModal(inbox) {
+    const existingNames = new Set(state.users.map(u => u.name));
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#fff;padding:16px 18px;border-radius:6px;max-width:520px;max-height:80vh;overflow:auto;box-shadow:0 4px 16px rgba(0,0,0,0.25);font-family:inherit;';
+    let html = `<div style="font-weight:600;font-size:14px;margin-bottom:8px;">📥 受信箱 (${inbox.length}名)</div>
+      <div style="font-size:11px;color:#666;margin-bottom:10px;">取り込みたいユーザーを選択してください。同名は上書き確認します。</div>
+      <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px;">`;
+    inbox.sort((a, b) => (b.updated_at || '').localeCompare(a.updated_at || ''));
+    inbox.forEach((row, idx) => {
+      const ownedCount = Object.values(row.ownerships || {}).filter(o => o && o.owned).length;
+      const exists = existingNames.has(row.user_name);
+      const ts = row.updated_at ? new Date(row.updated_at).toLocaleString() : '';
+      html += `<label style="display:flex;gap:6px;align-items:center;padding:6px 8px;border:1px solid #ccc;border-radius:3px;background:${exists ? '#fff8e8' : '#fff'};cursor:pointer;">
+        <input type="checkbox" data-idx="${idx}" checked>
+        <div style="flex:1;">
+          <div><strong>${row.user_name}</strong> ${exists ? '<span style="color:#a86a00;font-size:11px;">（既存・上書き）</span>' : '<span style="color:#3a5520;font-size:11px;">（新規）</span>'}</div>
+          <div style="font-size:11px;color:#666;">所持 ${ownedCount}件 / 受信 ${ts}</div>
+        </div>
+      </label>`;
+    });
+    html += `</div>
+      <div style="display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;">
+        <button id="btn-inbox-all">全選択</button>
+        <button id="btn-inbox-none">全解除</button>
+        <button id="btn-inbox-ok" style="background:var(--accent);color:#fff;">選択を取込</button>
+        <button id="btn-inbox-cancel" style="background:#888;color:#fff;">閉じる</button>
+      </div>`;
+    box.innerHTML = html;
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    const cleanup = () => document.body.removeChild(overlay);
+    box.querySelector('#btn-inbox-cancel').onclick = cleanup;
+    box.querySelector('#btn-inbox-all').onclick = () => box.querySelectorAll('input[type=checkbox]').forEach(i => i.checked = true);
+    box.querySelector('#btn-inbox-none').onclick = () => box.querySelectorAll('input[type=checkbox]').forEach(i => i.checked = false);
+    box.querySelector('#btn-inbox-ok').onclick = async () => {
+      const selected = Array.from(box.querySelectorAll('input[type=checkbox]:checked')).map(i => inbox[parseInt(i.dataset.idx, 10)]);
+      if (!selected.length) { notify('1名以上選択してください。'); return; }
+      cleanup();
+      const added = [];
+      const overwritten = [];
+      const skipped = [];
+      for (const row of selected) {
+        const existing = state.users.find(u => u.name === row.user_name);
+        if (existing) {
+          const ok = await askConfirm(`「${row.user_name}」は既存です。\n所持データを上書きしますか？\n[OK]=上書き / [キャンセル]=スキップ`);
+          if (!ok) { skipped.push(row.user_name); continue; }
+          state.ownerships[existing.id] = row.ownerships || {};
+          overwritten.push(row.user_name);
+        } else {
+          const newId = Math.max(0, ...state.users.map(u => u.id)) + 1;
+          state.users.push({ id: newId, name: row.user_name });
+          state.ownerships[newId] = row.ownerships || {};
+          added.push(row.user_name);
+        }
+      }
+      saveState();
+      renderUserTabs();
+      renderRoster();
+      renderFormation();
+      renderSummary();
+      const lines = [];
+      if (added.length) lines.push(`新規追加: ${added.length}名 (${added.join(', ')})`);
+      if (overwritten.length) lines.push(`上書き: ${overwritten.length}名 (${overwritten.join(', ')})`);
+      if (skipped.length) lines.push(`スキップ: ${skipped.length}名 (${skipped.join(', ')})`);
+      notify(lines.length ? lines.join('\n') : '処理対象なし');
+    };
+    overlay.addEventListener('click', e => { if (e.target === overlay) cleanup(); });
+  }
 
   // モード表示の更新
   function refreshModeUI() {

@@ -74,7 +74,8 @@
 <h1>三国覇王戦記 武将所持登録</h1>
 <div class="lead">
   所持している武将にチェック、突破/装備の段階を入力してください。<br>
-  完了したら下の「📤 JSONエクスポート」を押してファイルを依頼者に送ってください。<br>
+  完了したら下の「📤 送信（オンライン）」を押すと、依頼者に直接データが届きます。<br>
+  通信できない場合は「💾 JSONダウンロード」でファイル化して個別送信もできます。<br>
   入力内容はこの端末に自動保存されます。
 </div>
 
@@ -106,7 +107,8 @@
     <label class="field"><input type="checkbox" id="bulk-equipment">4装</label>
   </div>
   <div class="row">
-    <button id="btn-export">📤 JSONエクスポート</button>
+    <button id="btn-submit" style="background:#2e8b3a;font-weight:600;">📤 送信（オンライン）</button>
+    <button id="btn-export">💾 JSONダウンロード</button>
     <button id="btn-import" class="green">📥 既存JSONを読込</button>
     <button id="btn-clear" class="red">🗑️ 全クリア</button>
   </div>
@@ -299,6 +301,43 @@ document.getElementById('user-name').addEventListener('input', e => {
     renderRoster();
     e.target.checked = false;  // 一括チェック自体は OFF に戻す（UX）
   });
+});
+
+// オンライン送信先（メインシミュ index.html と同じGAS endpoint）
+const SUBMIT_API_URL = 'https://script.google.com/macros/s/AKfycbzHbJsj9mdyVqJvMl85_NkB5y4k4tbQ2hYXahT3gVNAPaQfCU4629xuvmnEtQJc6B26/exec';
+
+document.getElementById('btn-submit').addEventListener('click', async () => {
+  const name = (state.userName || '').trim();
+  if (!name) {
+    notify('「名前」を入力してください。\n（依頼者がデータを識別するために必須です）');
+    document.getElementById('user-name').focus();
+    return;
+  }
+  const btn = document.getElementById('btn-submit');
+  const orig = btn.textContent;
+  btn.textContent = '送信中…';
+  btn.disabled = true;
+  try {
+    const payload = {
+      action: 'submit_user',
+      user_name: name,
+      ownerships: state.ownerships,
+    };
+    const res = await fetch(SUBMIT_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const r = await res.json();
+    if (!r.ok) throw new Error(r.error || 'unknown');
+    notify(`✅ 送信完了\n\n名前: ${name}\n登録した武将数: ${Object.values(state.ownerships).filter(o => o.owned).length}\n\nデータは依頼者に届きました。\nご協力ありがとうございました！`);
+  } catch (err) {
+    notify(`❌ 送信失敗: ${err.message}\n\nお手数ですが「💾 JSONダウンロード」でファイル保存後、依頼者に直接お送りください。`);
+  } finally {
+    btn.textContent = orig;
+    btn.disabled = false;
+  }
 });
 
 document.getElementById('btn-export').addEventListener('click', () => {
