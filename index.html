@@ -1957,12 +1957,13 @@ async function cloudGet() {
 }
 
 async function cloudPut(payload) {
-  // Content-Type ヘッダーを明示しない（GAS への CORS 問題回避）
-  // ブラウザは body の型から text/plain として送信 → simple request 扱いでプリフライト不要
+  // GAS Web App との CORS 互換のため URLSearchParams (form-urlencoded) で送信
+  // → simple request 扱いで preflight 不要、リダイレクトでも Body 保持される
+  const form = new URLSearchParams();
+  form.append('payload', JSON.stringify(payload));
   const res = await fetch(GROUP_API_URL, {
     method: 'POST',
-    body: JSON.stringify(payload),
-    redirect: 'follow',
+    body: form,
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const r = await res.json();
@@ -2489,10 +2490,11 @@ async function showStatsEditModal(userName, currentStats) {
         const msg = box.querySelector('#stats-msg');
         msg.textContent = '保存中…';
         try {
+          const form = new URLSearchParams();
+          form.append('payload', JSON.stringify({ action: 'update_stats', user_name: userName, player_stats: ps }));
           const res = await fetch(GROUP_API_URL, {
             method: 'POST',
-            body: JSON.stringify({ action: 'update_stats', user_name: userName, player_stats: ps }),
-            redirect: 'follow',
+            body: form,
           });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const r = await res.json();
