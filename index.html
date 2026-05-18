@@ -1957,11 +1957,12 @@ async function cloudGet() {
 }
 
 async function cloudPut(payload) {
-  // Content-Type: text/plain でプリフライト回避
+  // Content-Type ヘッダーを明示しない（GAS への CORS 問題回避）
+  // ブラウザは body の型から text/plain として送信 → simple request 扱いでプリフライト不要
   const res = await fetch(GROUP_API_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify(payload),
+    redirect: 'follow',
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const r = await res.json();
@@ -2490,8 +2491,8 @@ async function showStatsEditModal(userName, currentStats) {
         try {
           const res = await fetch(GROUP_API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: 'update_stats', user_name: userName, player_stats: ps }),
+            redirect: 'follow',
           });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const r = await res.json();

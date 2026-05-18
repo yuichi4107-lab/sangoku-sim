@@ -425,8 +425,8 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
     };
     const res = await fetch(SUBMIT_API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload),
+      redirect: 'follow',
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const r = await res.json();
