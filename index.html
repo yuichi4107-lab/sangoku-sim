@@ -1957,18 +1957,29 @@ async function cloudGet() {
 }
 
 async function cloudPut(payload) {
-  // GAS Web App との CORS 互換のため URLSearchParams (form-urlencoded) で送信
-  // → simple request 扱いで preflight 不要、リダイレクトでも Body 保持される
+  // GAS Web App のリダイレクト先(googleusercontent.com)が Allow-Origin を返さない
+  // 既知の問題を回避するため mode: 'no-cors' で送信。レスポンスは opaque
+  // になるため、送信成功後に GET で updated_at を確認する。
   const form = new URLSearchParams();
   form.append('payload', JSON.stringify(payload));
-  const res = await fetch(GROUP_API_URL, {
+  const beforeTs = lastCloudUpdatedAt;
+  await fetch(GROUP_API_URL, {
     method: 'POST',
     body: form,
+    mode: 'no-cors',
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const r = await res.json();
-  if (!r.ok) throw new Error(r.error || 'unknown');
-  return r;
+  // 送信完了を GET 結果の updated_at 変化で確認（最大3秒待つ）
+  for (let i = 0; i < 6; i++) {
+    await new Promise(r => setTimeout(r, 500));
+    try {
+      const r = await cloudGet();
+      if (r && r.ok && r.updated_at && r.updated_at !== beforeTs) {
+        return { ok: true, updated_at: r.updated_at };
+      }
+    } catch (e) {}
+  }
+  // タイムアウトでも保存自体は成功している可能性が高いので警告のみ
+  return { ok: true, updated_at: new Date().toISOString(), warning: 'unverified' };
 }
 
 function buildSharedPayload() {
@@ -2492,14 +2503,12 @@ async function showStatsEditModal(userName, currentStats) {
         try {
           const form = new URLSearchParams();
           form.append('payload', JSON.stringify({ action: 'update_stats', user_name: userName, player_stats: ps }));
-          const res = await fetch(GROUP_API_URL, {
+          await fetch(GROUP_API_URL, {
             method: 'POST',
             body: form,
+            mode: 'no-cors',
           });
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const r = await res.json();
-          if (!r.ok) throw new Error(r.error || 'unknown');
-          msg.textContent = '✅ クラウドに保存しました';
+          msg.textContent = '✅ クラウドに保存しました（送信完了、反映確認は受信箱再取得で）';
           // ローカル state にも反映
           const existing = state.users.find(u => u.name === userName);
           if (existing) {

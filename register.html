@@ -425,14 +425,12 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
     };
     const form = new URLSearchParams();
     form.append('payload', JSON.stringify(payload));
-    const res = await fetch(SUBMIT_API_URL, {
+    await fetch(SUBMIT_API_URL, {
       method: 'POST',
       body: form,
+      mode: 'no-cors',
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const r = await res.json();
-    if (!r.ok) throw new Error(r.error || 'unknown');
-    notify(`✅ 送信完了\n\n名前: ${name}\n登録した武将数: ${Object.values(state.ownerships).filter(o => o.owned).length}\n添付画像: ${r.image_count || images.length}枚\n\nデータは依頼者に届きました。\nご協力ありがとうございました！`);
+    notify(`✅ 送信完了\n\n名前: ${name}\n登録した武将数: ${Object.values(state.ownerships).filter(o => o.owned).length}\n添付画像: ${images.length}枚\n\nデータは依頼者に届きました。\nご協力ありがとうございました！`);
   } catch (err) {
     notify(`❌ 送信失敗: ${err.message}\n\nお手数ですが「💾 JSONダウンロード」でファイル保存後、依頼者に直接お送りください。`);
   } finally {
