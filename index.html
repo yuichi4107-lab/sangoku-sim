@@ -257,7 +257,7 @@ function openModal({ message, defaultValue, withInput, okLabel, cancelLabel, ale
     box.appendChild(row);
     overlay.appendChild(box);
     document.body.appendChild(overlay);
-    const close = (v) => { document.body.removeChild(overlay); resolve(v); };
+    const close = (v) => { if (overlay.parentNode) overlay.remove(); resolve(v); };
     cancel.addEventListener('click', () => close(withInput ? null : false));
     ok.addEventListener('click', () => close(withInput ? (input.value ?? '') : true));
     overlay.addEventListener('click', e => { if (e.target === overlay) close(withInput ? null : false); });
@@ -802,7 +802,7 @@ function renderFilters() {
     `;
     overlay.appendChild(box);
     document.body.appendChild(overlay);
-    const cleanup = () => document.body.removeChild(overlay);
+    const cleanup = () => if (overlay.parentNode) overlay.remove();
     box.querySelector('#btn-qr-close').onclick = cleanup;
     overlay.addEventListener('click', e => { if (e.target === overlay) cleanup(); });
     box.querySelector('#btn-qr-open').onclick = () => window.open(url, '_blank');
@@ -844,7 +844,7 @@ function renderFilters() {
     overlay.appendChild(box);
     document.body.appendChild(overlay);
 
-    const cleanup = () => document.body.removeChild(overlay);
+    const cleanup = () => if (overlay.parentNode) overlay.remove();
     box.querySelector('#btn-export-all').onclick = () => listDiv.querySelectorAll('input').forEach(i => i.checked = true);
     box.querySelector('#btn-export-none').onclick = () => listDiv.querySelectorAll('input').forEach(i => i.checked = false);
     box.querySelector('#btn-export-cancel').onclick = cleanup;
@@ -2088,7 +2088,7 @@ function initCloudSync() {
     box.innerHTML = html;
     overlay.appendChild(box);
     document.body.appendChild(overlay);
-    const cleanup = () => document.body.removeChild(overlay);
+    const cleanup = () => if (overlay.parentNode) overlay.remove();
     box.querySelector('#btn-inbox-cancel').onclick = cleanup;
     box.querySelector('#btn-inbox-all').onclick = () => box.querySelectorAll('input[type=checkbox]').forEach(i => i.checked = true);
     box.querySelector('#btn-inbox-none').onclick = () => box.querySelectorAll('input[type=checkbox]').forEach(i => i.checked = false);
@@ -2281,7 +2281,7 @@ function askConflictChoice(remoteUpdatedAt) {
     `;
     overlay.appendChild(box);
     document.body.appendChild(overlay);
-    const close = (v) => { document.body.removeChild(overlay); resolve(v); };
+    const close = (v) => { if (overlay.parentNode) overlay.remove(); resolve(v); };
     box.querySelectorAll('button').forEach(b => {
       b.addEventListener('click', () => close(b.dataset.act));
     });
@@ -2483,7 +2483,7 @@ async function showStatsEditModal(userName, currentStats) {
       box.querySelector('#btn-stats-clear').onclick = () => {
         if (confirm('全項目をクリアします。よろしいですか？')) { ps = emptyPlayerStats(); rebuild(); }
       };
-      box.querySelector('#btn-stats-cancel').onclick = () => { document.body.removeChild(overlay); resolve(null); };
+      box.querySelector('#btn-stats-cancel').onclick = () => { if (overlay.parentNode) overlay.remove(); resolve(null); };
       box.querySelector('#btn-stats-save').onclick = async () => {
         const msg = box.querySelector('#stats-msg');
         msg.textContent = '保存中…';
@@ -2504,7 +2504,7 @@ async function showStatsEditModal(userName, currentStats) {
             state.playerStats[existing.id] = ps;
             saveState();
           }
-          setTimeout(() => { document.body.removeChild(overlay); resolve(ps); }, 800);
+          setTimeout(() => { if (overlay.parentNode) overlay.remove(); resolve(ps); }, 800);
         } catch (e) {
           msg.textContent = `❌ 保存失敗: ${e.message}`;
         }
@@ -2581,7 +2581,7 @@ function showStatsCompareModal() {
       }
       rebuild();
     }));
-    box.querySelector('#btn-cmp-close').onclick = () => document.body.removeChild(overlay);
+    box.querySelector('#btn-cmp-close').onclick = () => if (overlay.parentNode) overlay.remove();
   }
   overlay.appendChild(box);
   document.body.appendChild(overlay);
