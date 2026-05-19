@@ -958,9 +958,10 @@ function renderFilters() {
         }
       },
     },
-    { id: 'bulk-bt3',          apply: (own, on) => { own.breakthrough = on ? 3 : (own.breakthrough === 3 ? 0 : own.breakthrough); } },
-    { id: 'bulk-bt4',          apply: (own, on) => { own.breakthrough = on ? 4 : (own.breakthrough === 4 ? 0 : own.breakthrough); } },
-    { id: 'bulk-equipment',    apply: (own, on) => { own.equipment    = on ? 4 : 0; } },
+    // 3突/4突/4装 は排他（順序: なし → 3突 → 4突 → 4装）
+    { id: 'bulk-bt3',          apply: (own, on) => { if (on) { own.breakthrough = 3; own.equipment = 0; } else if (own.breakthrough === 3) own.breakthrough = 0; } },
+    { id: 'bulk-bt4',          apply: (own, on) => { if (on) { own.breakthrough = 4; own.equipment = 0; } else if (own.breakthrough === 4 && own.equipment === 0) own.breakthrough = 0; } },
+    { id: 'bulk-equipment',    apply: (own, on) => { if (on) { own.breakthrough = 4; own.equipment = 4; } else own.equipment = 0; } },
   ];
   for (const b of bulkBindings) {
     const cb = document.getElementById(b.id);
@@ -1379,7 +1380,7 @@ function updateBulkCheckboxes() {
   const axes = [
     { id: 'bulk-owned',         pick: o => o.owned },
     { id: 'bulk-bt3',           pick: o => o.breakthrough === 3 },
-    { id: 'bulk-bt4',           pick: o => o.breakthrough === 4 },
+    { id: 'bulk-bt4',           pick: o => o.breakthrough === 4 && o.equipment !== 4 },
     { id: 'bulk-equipment',     pick: o => o.equipment === 4 },
   ];
   for (const a of axes) {
@@ -1445,7 +1446,7 @@ function renderRoster() {
     tdProg.innerHTML = `
       <span class="progression">
         <label>3突<input type="checkbox" ${own.breakthrough === 3 ? 'checked' : ''} data-id="${g.id}" data-axis="bt3"></label>
-        <label>4突<input type="checkbox" ${own.breakthrough === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="bt4"></label>
+        <label>4突<input type="checkbox" ${own.breakthrough === 4 && own.equipment !== 4 ? 'checked' : ''} data-id="${g.id}" data-axis="bt4"></label>
         <label>4装<input type="checkbox" ${own.equipment === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="equipment_bool"></label>
         <label>印<input type="number" min="0" max="5" value="${own.seal}" data-id="${g.id}" data-axis="seal"></label>
       </span>
@@ -1458,26 +1459,27 @@ function renderRoster() {
   updateBulkCheckboxes();
 
   // bind progression inputs
+  // 3突/4突/4装 は排他（順序: なし → 3突 → 4突 → 4装、ひとつだけON）
   tbody.querySelectorAll('input[data-axis]').forEach(inp => {
     inp.addEventListener('change', () => {
       const id = inp.dataset.id;
       const axis = inp.dataset.axis;
       const own = getOwn(id);
       if (axis === 'bt3') {
-        // 突3 ON: breakthrough=3、突4の方は自動でOFF
-        if (inp.checked) own.breakthrough = 3;
+        if (inp.checked) { own.breakthrough = 3; own.equipment = 0; }
         else if (own.breakthrough === 3) own.breakthrough = 0;
       } else if (axis === 'bt4') {
-        if (inp.checked) own.breakthrough = 4;
-        else if (own.breakthrough === 4) own.breakthrough = 0;
+        if (inp.checked) { own.breakthrough = 4; own.equipment = 0; }
+        else if (own.breakthrough === 4 && own.equipment === 0) own.breakthrough = 0;
       } else if (axis === 'equipment_bool') {
-        own.equipment = inp.checked ? 4 : 0;
+        if (inp.checked) { own.breakthrough = 4; own.equipment = 4; }
+        else own.equipment = 0;
       } else {
         own[axis] = parseInt(inp.value, 10) || 0;
       }
       saveState();
-      // 突3/突4 は排他なのでロースタ全体を再描画して相手のチェック状態を反映
-      if (axis === 'bt3' || axis === 'bt4') renderRoster();
+      // 3突/4突/4装 は排他なのでロースタ全体を再描画
+      if (axis === 'bt3' || axis === 'bt4' || axis === 'equipment_bool') renderRoster();
       renderSummary();
     });
   });

@@ -217,7 +217,7 @@ function renderRoster() {
         </div>
         <div class="prog">
           <label class="${own.breakthrough === 3 ? 'on' : ''}"><input type="checkbox" ${own.breakthrough === 3 ? 'checked' : ''} data-id="${g.id}" data-axis="bt3">3突</label>
-          <label class="${own.breakthrough === 4 ? 'on' : ''}"><input type="checkbox" ${own.breakthrough === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="bt4">4突</label>
+          <label class="${own.breakthrough === 4 && own.equipment !== 4 ? 'on' : ''}"><input type="checkbox" ${own.breakthrough === 4 && own.equipment !== 4 ? 'checked' : ''} data-id="${g.id}" data-axis="bt4">4突</label>
           <label class="${own.equipment === 4 ? 'on' : ''}"><input type="checkbox" ${own.equipment === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="equipment">4装</label>
           <span class="seal-wrap">印<input type="number" min="0" max="5" value="${own.seal}" data-id="${g.id}" data-axis="seal"></span>
         </div>
@@ -233,16 +233,18 @@ function renderRoster() {
       const own = getOwn(id);
       let needFullRerender = false;
       if (axis === 'owned') { own.owned = inp.checked; needFullRerender = true; }
+      // 3突/4突/4装 は排他（順序: なし → 3突 → 4突 → 4装）
       else if (axis === 'bt3') {
-        if (inp.checked) own.breakthrough = 3;
+        if (inp.checked) { own.breakthrough = 3; own.equipment = 0; }
         else if (own.breakthrough === 3) own.breakthrough = 0;
         needFullRerender = true;
       } else if (axis === 'bt4') {
-        if (inp.checked) own.breakthrough = 4;
-        else if (own.breakthrough === 4) own.breakthrough = 0;
+        if (inp.checked) { own.breakthrough = 4; own.equipment = 0; }
+        else if (own.breakthrough === 4 && own.equipment === 0) own.breakthrough = 0;
         needFullRerender = true;
       } else if (axis === 'equipment') {
-        own.equipment = inp.checked ? 4 : 0;
+        if (inp.checked) { own.breakthrough = 4; own.equipment = 4; }
+        else own.equipment = 0;
         needFullRerender = true;
       }
       else if (axis === 'seal') own.seal = Math.max(0, Math.min(5, parseInt(inp.value, 10) || 0));
@@ -289,9 +291,10 @@ document.getElementById('user-name').addEventListener('input', e => {
     for (const g of filteredGenerals()) {
       const own = getOwn(g.id);
       if (id === 'bulk-owned') own.owned = on;
-      else if (id === 'bulk-bt3') own.breakthrough = on ? 3 : (own.breakthrough === 3 ? 0 : own.breakthrough);
-      else if (id === 'bulk-bt4') own.breakthrough = on ? 4 : (own.breakthrough === 4 ? 0 : own.breakthrough);
-      else if (id === 'bulk-equipment') own.equipment = on ? 4 : 0;
+      // 3突/4突/4装 は排他
+      else if (id === 'bulk-bt3') { if (on) { own.breakthrough = 3; own.equipment = 0; } else if (own.breakthrough === 3) own.breakthrough = 0; }
+      else if (id === 'bulk-bt4') { if (on) { own.breakthrough = 4; own.equipment = 0; } else if (own.breakthrough === 4 && own.equipment === 0) own.breakthrough = 0; }
+      else if (id === 'bulk-equipment') { if (on) { own.breakthrough = 4; own.equipment = 4; } else own.equipment = 0; }
     }
     saveLocal();
     renderRoster();
