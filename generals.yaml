@@ -234,6 +234,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 将印固有の強化。未確認
     confidence: unknown
   sources:
@@ -311,6 +316,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -431,6 +441,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -532,6 +547,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -616,6 +636,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -691,6 +716,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -779,6 +809,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -858,6 +893,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -981,6 +1021,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: '縁結: 趙雲（七進七出、全軍兵士攻撃力5%アップ）、豪龍胆との宝物縁結'
     confidence: low
   sources:
@@ -1019,6 +1064,11 @@ generals:
     direction: down
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -1066,6 +1116,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -1101,6 +1156,11 @@ generals:
     direction: down
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -1190,6 +1250,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -1286,6 +1351,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -1342,6 +1412,11 @@ generals:
     direction: down
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -1437,6 +1512,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -1473,6 +1553,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -1533,6 +1618,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -1575,6 +1665,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -1607,6 +1702,11 @@ generals:
     direction: down
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -1719,6 +1819,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -1841,6 +1946,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -1946,6 +2056,11 @@ generals:
     direction: down
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -2058,6 +2173,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -2090,6 +2210,11 @@ generals:
     direction: null
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -2198,6 +2323,11 @@ generals:
     direction: down
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -2315,6 +2445,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -2357,6 +2492,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -2392,6 +2532,11 @@ generals:
     direction: down
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -2508,6 +2653,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -2616,6 +2766,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -2659,6 +2814,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -2690,6 +2850,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -2731,6 +2896,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -2820,6 +2990,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -2920,6 +3095,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -2956,6 +3136,11 @@ generals:
       note: 主cap=典韋/曹仁共有80%。個別上限30%、馬スキル時15%は近似のため省略
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -3014,6 +3199,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -3104,6 +3294,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -3216,6 +3411,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -3335,6 +3535,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -3408,6 +3613,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -3521,6 +3731,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -3539,6 +3754,11 @@ generals:
   skills: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -3575,6 +3795,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -3622,6 +3847,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -3657,6 +3887,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -3773,6 +4008,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -3864,6 +4104,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -3901,6 +4146,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -3949,6 +4199,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -3984,6 +4239,11 @@ generals:
     direction: down
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -4098,6 +4358,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -4188,6 +4453,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -4302,6 +4572,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -4338,6 +4613,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -4385,6 +4665,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -4426,6 +4711,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -4447,6 +4737,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -4461,6 +4756,11 @@ generals:
   skills: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -4577,6 +4877,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -4687,6 +4992,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -4730,6 +5040,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -4765,6 +5080,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -4860,6 +5180,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -4896,6 +5221,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -5008,6 +5338,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -5100,6 +5435,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -5142,6 +5482,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -5177,6 +5522,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -5281,6 +5631,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -5403,6 +5758,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -5498,6 +5858,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -5560,6 +5925,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -5575,6 +5945,11 @@ generals:
   skills: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -5634,6 +6009,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -5665,6 +6045,11 @@ generals:
     direction: down
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -5764,6 +6149,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -5800,6 +6190,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -5899,6 +6294,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -5987,6 +6387,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -6103,6 +6508,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -6119,6 +6529,11 @@ generals:
   skills: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -6214,6 +6629,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -6253,6 +6673,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -6285,6 +6710,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -6343,6 +6773,11 @@ generals:
     direction: down
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -6442,6 +6877,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -6506,6 +6946,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -6542,6 +6987,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -6638,6 +7088,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -6690,6 +7145,11 @@ generals:
     direction: down
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -6803,6 +7263,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -6905,6 +7370,11 @@ generals:
     direction: up
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -7023,6 +7493,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -7132,6 +7607,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -7148,6 +7628,11 @@ generals:
   skills: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -7194,6 +7679,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -7209,6 +7699,11 @@ generals:
   skills: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -7246,6 +7741,11 @@ generals:
     direction: down
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -7335,6 +7835,11 @@ generals:
     direction: down
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -7445,6 +7950,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -7537,6 +8047,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   sources:
@@ -7551,6 +8066,11 @@ generals:
   - support
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -7661,6 +8181,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -7750,6 +8275,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -7811,6 +8341,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -7926,6 +8461,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -8020,6 +8560,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -8097,6 +8642,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -8190,6 +8740,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -8251,6 +8806,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -8334,6 +8894,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -8432,6 +8997,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -8513,6 +9083,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -8606,6 +9181,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -8683,6 +9263,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -8772,6 +9357,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -8854,6 +9444,11 @@ generals:
   - support
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -8952,6 +9547,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -9035,6 +9635,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -9096,6 +9701,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -9185,6 +9795,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -9246,6 +9861,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -9319,6 +9939,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -9380,6 +10005,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -9469,6 +10099,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -9530,6 +10165,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -9623,6 +10263,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -9706,6 +10351,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -9767,6 +10417,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -9840,6 +10495,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -9901,6 +10561,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -9972,6 +10637,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -10061,6 +10731,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -10144,6 +10819,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -10209,6 +10889,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -10298,6 +10983,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -10375,6 +11065,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -10464,6 +11159,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -10525,6 +11225,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -10602,6 +11307,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -10663,6 +11373,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -10752,6 +11467,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -10819,6 +11539,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -10880,6 +11605,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -10969,6 +11699,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -11030,6 +11765,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -11103,6 +11843,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -11164,6 +11909,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -11253,6 +12003,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -11336,6 +12091,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -11403,6 +12163,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -11464,6 +12229,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -11553,6 +12323,11 @@ generals:
     - null
     - null
     - null
+    - null
+    - null
+    - null
+    - null
+    - null
     effect_note: 未確認
     confidence: unknown
   skills:
@@ -11614,6 +12389,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null
@@ -11697,6 +12477,11 @@ generals:
   role_tags: []
   seal_bonus:
     by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
     - null
     - null
     - null

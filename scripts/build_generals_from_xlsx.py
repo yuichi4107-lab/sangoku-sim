@@ -257,7 +257,7 @@ def main():
             'role_tags': [],
             'skills': skills,
             'seal_bonus': {
-                'by_seal': [None] * 6,
+                'by_seal': [None] * 11,  # 印 0〜10
                 'effect_note': '未確認',
                 'confidence': 'unknown',
             },
