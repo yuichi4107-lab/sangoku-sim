@@ -2456,7 +2456,8 @@ async function showStatsEditModal(userName, currentStats) {
         ${buildTroopGrid()}
         <div style="font-weight:600;font-size:12px;margin-bottom:4px;">敵方への減益</div>
         ${buildDebuff()}
-        <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:8px;">
+        <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap;">
+          <button id="btn-stats-reocr" style="background:#4472c4;color:#fff;" title="この友人の提出画像から AI で再OCR">🤖 AIで再OCR</button>
           <button id="btn-stats-clear" style="background:#a66;color:#fff;">全クリア</button>
           <button id="btn-stats-cancel" style="background:#888;color:#fff;">キャンセル</button>
           <button id="btn-stats-save" style="background:var(--ok);color:#fff;">クラウドに保存</button>
@@ -2497,6 +2498,37 @@ async function showStatsEditModal(userName, currentStats) {
       };
       box.querySelector('#btn-stats-clear').onclick = () => {
         if (confirm('全項目をクリアします。よろしいですか？')) { ps = emptyPlayerStats(); rebuild(); }
+      };
+      box.querySelector('#btn-stats-reocr').onclick = async () => {
+        const msg = box.querySelector('#stats-msg');
+        msg.textContent = '🤖 AI で OCR 中…（5〜30秒ほどかかります）';
+        try {
+          // re_ocr 後に inbox 再取得して結果をフォームに反映
+          const form = new URLSearchParams();
+          form.append('payload', JSON.stringify({ action: 're_ocr', user_name: userName }));
+          await fetch(GROUP_API_URL, { method: 'POST', body: form, mode: 'no-cors' });
+          // 数秒待ってから inbox を取得して反映
+          let updated = null;
+          for (let i = 0; i < 12; i++) {
+            await new Promise(r => setTimeout(r, 2500));
+            const res = await fetch(GROUP_API_URL + '?action=get_inbox');
+            const r = await res.json();
+            const row = (r.inbox || []).find(x => x.user_name === userName);
+            if (row && row.player_stats && countFilledStats(row.player_stats) > 0) {
+              updated = row.player_stats;
+              break;
+            }
+          }
+          if (updated) {
+            ps = updated;
+            rebuild();
+            msg.textContent = '✅ AI OCR 完了。値を確認・修正してから「クラウドに保存」してください。';
+          } else {
+            msg.textContent = '⚠️ OCR タイムアウト（30秒）。GAS の実行ログを確認してください。';
+          }
+        } catch (e) {
+          msg.textContent = `❌ OCR 失敗: ${e.message}`;
+        }
       };
       box.querySelector('#btn-stats-cancel').onclick = () => { if (overlay.parentNode) overlay.remove(); resolve(null); };
       box.querySelector('#btn-stats-save').onclick = async () => {
