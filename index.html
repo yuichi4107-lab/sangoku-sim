@@ -2501,33 +2501,43 @@ async function showStatsEditModal(userName, currentStats) {
       };
       box.querySelector('#btn-stats-reocr').onclick = async () => {
         const msg = box.querySelector('#stats-msg');
-        msg.textContent = '🤖 AI で OCR 中…（5〜30秒ほどかかります）';
-        try {
-          // re_ocr 後に inbox 再取得して結果をフォームに反映
-          const form = new URLSearchParams();
-          form.append('payload', JSON.stringify({ action: 're_ocr', user_name: userName }));
-          await fetch(GROUP_API_URL, { method: 'POST', body: form, mode: 'no-cors' });
-          // 数秒待ってから inbox を取得して反映
-          let updated = null;
-          for (let i = 0; i < 12; i++) {
-            await new Promise(r => setTimeout(r, 2500));
+        const startTs = Date.now();
+        // 開始前の埋まり数を記録（変化を検出するため）
+        const initialFilled = countFilledStats(ps);
+        msg.textContent = '🤖 AI OCR 開始… (送信中)';
+        // POST は fire-and-forget(no-cors)。並行してポーリング開始
+        const form = new URLSearchParams();
+        form.append('payload', JSON.stringify({ action: 're_ocr', user_name: userName }));
+        fetch(GROUP_API_URL, { method: 'POST', body: form, mode: 'no-cors' }).catch(() => {});
+
+        let updated = null;
+        for (let i = 0; i < 25; i++) {
+          await new Promise(r => setTimeout(r, 2000));
+          const sec = Math.round((Date.now() - startTs) / 1000);
+          msg.textContent = `🤖 AI OCR 中… (${sec}秒経過 / 最大50秒)`;
+          try {
             const res = await fetch(GROUP_API_URL + '?action=get_inbox');
             const r = await res.json();
             const row = (r.inbox || []).find(x => x.user_name === userName);
-            if (row && row.player_stats && countFilledStats(row.player_stats) > 0) {
-              updated = row.player_stats;
-              break;
+            if (row && row.player_stats) {
+              const filled = countFilledStats(row.player_stats);
+              // 開始時より埋まり数が増えたら反映
+              if (filled > initialFilled) {
+                updated = row.player_stats;
+                break;
+              }
             }
+          } catch (e) {
+            console.warn('poll error', e);
           }
-          if (updated) {
-            ps = updated;
-            rebuild();
-            msg.textContent = '✅ AI OCR 完了。値を確認・修正してから「クラウドに保存」してください。';
-          } else {
-            msg.textContent = '⚠️ OCR タイムアウト（30秒）。GAS の実行ログを確認してください。';
-          }
-        } catch (e) {
-          msg.textContent = `❌ OCR 失敗: ${e.message}`;
+        }
+        if (updated) {
+          ps = updated;
+          rebuild();
+          const sec = Math.round((Date.now() - startTs) / 1000);
+          msg.textContent = `✅ AI OCR 完了 (${sec}秒)。値を確認・修正してから「クラウドに保存」してください。`;
+        } else {
+          msg.textContent = '⚠️ OCR タイムアウト（50秒）。GAS 実行ログを確認してください。\n（モデル名 / API KEY / 画像参照 が原因の可能性）';
         }
       };
       box.querySelector('#btn-stats-cancel').onclick = () => { if (overlay.parentNode) overlay.remove(); resolve(null); };
