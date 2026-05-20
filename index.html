@@ -181,6 +181,9 @@
       <strong>集結共通の優先属性</strong>
       <label>第一優先<select id="global-pri1"></select></label>
       <label>第二優先<select id="global-pri2"></select></label>
+      <label>第三優先<select id="global-pri3"></select></label>
+      <label>第四優先<select id="global-pri4"></select></label>
+      <label>第五優先<select id="global-pri5"></select></label>
       <span style="font-size:11px;color:var(--muted);">※ 全8軍団で共有。各軍団の兵種は個別に指定</span>
     </div>
     <div id="formation"></div>
@@ -320,8 +323,8 @@ const state = {
   activeUserId: 1,
   filters: { troop: '', rarity: '', search: '', ownedOnly: false },
   formations: defaultFormations(),
-  // 第一優先・第二優先は集結全体で共有（全軍団で1セット）
-  priority: { pri1: '', pri2: '' },
+  // 第一〜第五優先は集結全体で共有（全軍団で1セット）
+  priority: { pri1: '', pri2: '', pri3: '', pri4: '', pri5: '' },
   aggMode: 'formation',
 };
 
@@ -416,17 +419,19 @@ function loadState() {
       }
     }
 
-    // 第一/第二優先は集結全体で1セットに変更（v06後期）
-    // 既存データが無い場合は、各軍団の f.auto から最初の非空ペアを採用
+    // 第一〜第五優先は集結全体で1セット
     if (s.priority && typeof s.priority === 'object') {
       state.priority = {
         pri1: s.priority.pri1 || '',
         pri2: s.priority.pri2 || '',
+        pri3: s.priority.pri3 || '',
+        pri4: s.priority.pri4 || '',
+        pri5: s.priority.pri5 || '',
       };
     } else {
       const seed = state.formations.find(f => f.auto && (f.auto.pri1 || f.auto.pri2));
       if (seed) {
-        state.priority = { pri1: seed.auto.pri1 || '', pri2: seed.auto.pri2 || '' };
+        state.priority = { pri1: seed.auto.pri1 || '', pri2: seed.auto.pri2 || '', pri3: '', pri4: '', pri5: '' };
       }
     }
   } catch (e) { console.warn('localStorage load failed', e); }
@@ -1075,11 +1080,14 @@ function getCapInfo(sk) {
   return { ruleKey, isShared, capValue, scope, bucketKey };
 }
 
+// 優先度ごとの重み（第一優先が最も重い。geometric 2倍ずつ）
+const PRIORITY_WEIGHTS = [16, 8, 4, 2, 1];
+
 // 与えられた pool 状態のもとで、この武将を編成に加えたときの限界貢献スコアを計算
-// pool は { bucketKey: 現在の合計 } のマップ。返す newPool は更新版。
-function marginalContribution(g, pri1, pri2, pool, userId) {
+// pris は [pri1..pri5] の配列（空文字含む）。pool は { bucketKey: 現在の合計 }。
+function marginalContribution(g, pris, pool, userId) {
   const own = getOwn(userId != null ? userId : state.activeUserId, g.id);
-  let s1 = 0, s2 = 0;
+  const scores = [0, 0, 0, 0, 0];  // 各優先度ごとの貢献
   const newPool = { ...pool };
   for (const sk of (g.skills || [])) {
     // 派遣不要スキルは配置不要で常時発動 → 配置の限界貢献には数えない
@@ -1087,13 +1095,15 @@ function marginalContribution(g, pri1, pri2, pool, userId) {
     const eff = resolveSkillValue(sk, own);
     if (eff == null) continue;
     const key = `${sk.effect_attribute}/${sk.direction}`;
-    const matchP1 = pri1 && key === pri1;
-    const matchP2 = pri2 && key === pri2;
-    if (!matchP1 && !matchP2) continue;
+    // どの優先度にマッチするか（複数該当しうるが、最上位の1つに加算）
+    let matchIdx = -1;
+    for (let i = 0; i < pris.length; i++) {
+      if (pris[i] && key === pris[i]) { matchIdx = i; break; }
+    }
+    if (matchIdx < 0) continue;
     const info = getCapInfo(sk);
     let marginal = eff;
     if (info.bucketKey && info.capValue != null) {
-      // 共有プール: 現在合計を見て cap 超過分はカット
       const before = newPool[info.bucketKey] || 0;
       let after;
       if (info.capValue > 0) {
@@ -1104,26 +1114,24 @@ function marginalContribution(g, pri1, pri2, pool, userId) {
       marginal = after - before;
       newPool[info.bucketKey] = after;
     } else if (info.capValue != null) {
-      // 個別 cap: このスキル単独で cap 超過分カット
       if (info.capValue > 0) marginal = Math.min(eff, info.capValue);
       else marginal = Math.max(eff, info.capValue);
     }
-    const absM = Math.abs(marginal);
-    if (matchP1) s1 += absM;
-    if (matchP2) s2 += absM;
+    scores[matchIdx] += Math.abs(marginal);
   }
-  return { score: s1 * 2 + s2, newPool };
+  let score = 0;
+  for (let i = 0; i < scores.length; i++) score += scores[i] * (PRIORITY_WEIGHTS[i] || 0);
+  return { score, newPool };
 }
 
 function runAutoBuilderFor(legionIdx) {
   const f = state.formations[legionIdx];
   const userId = f.user_id;
   const troop = f.troop_type;
-  // 第一/第二優先は集結全体で共有
-  const pri1 = state.priority.pri1;
-  const pri2 = state.priority.pri2;
-  if (!pri1 && !pri2) {
-    notify('第一優先または第二優先を指定してください');
+  // 第一〜第五優先は集結全体で共有
+  const pris = [state.priority.pri1, state.priority.pri2, state.priority.pri3, state.priority.pri4, state.priority.pri5];
+  if (!pris.some(p => p)) {
+    notify('優先属性を1つ以上指定してください');
     return;
   }
   if (!troop) {
@@ -1153,7 +1161,7 @@ function runAutoBuilderFor(legionIdx) {
     troop_type: troop,
     battalions: [emptyBattalion(), emptyBattalion(), emptyBattalion(), emptyBattalion(), emptyBattalion()],
     array: emptyBattalion(),
-    auto: { pri1, pri2 },
+    auto: { pri1: pris[0], pri2: pris[1] },
   };
   const fNew = state.formations[legionIdx];
   const used = new Set();
@@ -1190,7 +1198,7 @@ function runAutoBuilderFor(legionIdx) {
     for (const g of ownedGens) {
       if (used.has(g.id)) continue;
       if (!candidateFilter(g)) continue;
-      const { score, newPool } = marginalContribution(g, pri1, pri2, pool, userId);
+      const { score, newPool } = marginalContribution(g, pris, pool, userId);
       if (best === null || score > best.score) {
         best = { g, score, newPool };
       }
@@ -1858,7 +1866,7 @@ function groupsHadAnyContent(aggregated) {
 // 集結共通の優先属性 UI（第一/第二優先を1セットだけ表示）
 function renderGlobalPriority() {
   const priOpts = buildPriorityOptions();
-  for (const key of ['pri1', 'pri2']) {
+  for (const key of ['pri1', 'pri2', 'pri3', 'pri4', 'pri5']) {
     const sel = document.getElementById(`global-${key}`);
     if (!sel) continue;
     sel.innerHTML = priOpts.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
