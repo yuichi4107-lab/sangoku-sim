@@ -2090,6 +2090,7 @@ function initCloudSync() {
         <div style="margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
           ${imgLinks}
           <button class="btn-edit-stats" data-name="${row.user_name}" style="font-size:11px;padding:2px 8px;margin-left:auto;background:#5a7a5a;color:#fff;border:none;border-radius:3px;cursor:pointer;">📋 ステ編集</button>
+          <button class="btn-del-inbox" data-name="${row.user_name}" style="font-size:11px;padding:2px 8px;background:#a66;color:#fff;border:none;border-radius:3px;cursor:pointer;">🗑 削除</button>
         </div>
       </div>`;
     });
@@ -2155,6 +2156,32 @@ function initCloudSync() {
         await showStatsEditModal(name, row && row.player_stats);
         // 編集後は受信箱再読込
         cleanup();
+        document.getElementById('btn-inbox').click();
+      });
+    });
+    // 削除ボタン: 受信箱からエントリ削除（画像も削除）
+    box.querySelectorAll('.btn-del-inbox').forEach(b => {
+      b.addEventListener('click', async () => {
+        const name = b.dataset.name;
+        if (!await askConfirm(`「${name}」を受信箱から削除します。\n（提出画像も Drive から削除されます）\nよろしいですか？`)) return;
+        const msg = box.querySelector('#batch-ocr-msg');
+        if (msg) msg.textContent = `🗑 「${name}」を削除中…`;
+        const form = new URLSearchParams();
+        form.append('payload', JSON.stringify({ action: 'delete_inbox', user_name: name, delete_images: true }));
+        fetch(GROUP_API_URL, { method: 'POST', body: form, mode: 'no-cors' }).catch(() => {});
+        // 削除完了をポーリング確認（最大20秒）
+        let gone = false;
+        for (let i = 0; i < 10; i++) {
+          await new Promise(r => setTimeout(r, 2000));
+          try {
+            const res = await fetch(GROUP_API_URL + '?action=get_inbox');
+            const r = await res.json();
+            if (!(r.inbox || []).find(x => x.user_name === name)) { gone = true; break; }
+          } catch (e) {}
+        }
+        cleanup();
+        if (gone) { notify(`🗑 「${name}」を削除しました。`); }
+        else { notify(`⚠️ 削除確認タイムアウト。受信箱を再取得して確認してください。`); }
         document.getElementById('btn-inbox').click();
       });
     });
