@@ -485,6 +485,16 @@ function isDispatchFree(sk) {
   const eff = (sk && sk.effect) || '';
   return eff.includes('派遣不要') || eff.includes('派遣なし') || eff.includes('派遣しなくても');
 }
+// スキルが「自身の配置スロット」を条件にしているか
+//   統率/武力/知性 のいずれか、または null（条件なし＝どのスロットでも発動）
+// 注意: 「陣の統帥が…」のような他者参照は条件としない（自身担当のみ拾う）
+function skillRequiredSlot(sk) {
+  const eff = (sk && sk.effect) || '';
+  if (/統帥を担当|統率を担当|主将になった|主将を担当|主将担当|主将の時|主将時/.test(eff)) return '統率';
+  if (/先鋒を担当|前衛を担当|先鋒担当|前衛担当|先鋒の時|前衛の時/.test(eff)) return '武力';
+  if (/軍師を担当|参謀を担当|軍師担当|参謀担当|知性を担当/.test(eff)) return '知性';
+  return null;
+}
 // スキルが戦闘系か（effect 文判別。name は見ない）
 function isCombatSkill(sk) {
   const eff = (sk && sk.effect) || '';
@@ -1085,13 +1095,19 @@ const PRIORITY_WEIGHTS = [16, 8, 4, 2, 1];
 
 // 与えられた pool 状態のもとで、この武将を編成に加えたときの限界貢献スコアを計算
 // pris は [pri1..pri5] の配列（空文字含む）。pool は { bucketKey: 現在の合計 }。
-function marginalContribution(g, pris, pool, userId) {
+// slot を渡すと、その配置スロットで発動しないスキル（配置条件不一致）は除外する。
+function marginalContribution(g, pris, pool, userId, slot) {
   const own = getOwn(userId != null ? userId : state.activeUserId, g.id);
   const scores = [0, 0, 0, 0, 0];  // 各優先度ごとの貢献
   const newPool = { ...pool };
   for (const sk of (g.skills || [])) {
     // 派遣不要スキルは配置不要で常時発動 → 配置の限界貢献には数えない
     if (isDispatchFree(sk)) continue;
+    // 配置条件: スキルが特定スロット担当を要求し、現在のスロットと違うなら発動しない
+    if (slot) {
+      const req = skillRequiredSlot(sk);
+      if (req && req !== slot) continue;
+    }
     const eff = resolveSkillValue(sk, own);
     if (eff == null) continue;
     const key = `${sk.effect_attribute}/${sk.direction}`;
@@ -1186,19 +1202,13 @@ function runAutoBuilderFor(legionIdx) {
     }
   }
 
-  function slotMatch(g, slot) {
-    const ss = g.slot_stat;
-    if (ss == null) return true;
-    if (Array.isArray(ss)) return ss.includes(slot);
-    return ss === slot;
-  }
-
-  function pickBest(candidateFilter) {
+  // slot_stat による配置制限は廃止。スキルの配置条件は marginalContribution が考慮する。
+  function pickBest(slot, candidateFilter) {
     let best = null;
     for (const g of ownedGens) {
       if (used.has(g.id)) continue;
       if (!candidateFilter(g)) continue;
-      const { score, newPool } = marginalContribution(g, pris, pool, userId);
+      const { score, newPool } = marginalContribution(g, pris, pool, userId, slot);
       if (best === null || score > best.score) {
         best = { g, score, newPool };
       }
@@ -1209,7 +1219,7 @@ function runAutoBuilderFor(legionIdx) {
   for (let bi = 0; bi < 5; bi++) {
     const bat = fNew.battalions[bi];
     for (const slot of SLOT_KEYS) {
-      const best = pickBest(g => canPlaceInTroop(g, troop) && slotMatch(g, slot));
+      const best = pickBest(slot, g => canPlaceInTroop(g, troop));
       if (best) {
         bat[slot] = best.g.id;
         used.add(best.g.id);
@@ -1218,8 +1228,8 @@ function runAutoBuilderFor(legionIdx) {
     }
   }
   for (const slot of SLOT_KEYS) {
-    let best = pickBest(g => g.troop_type === '戦車' && slotMatch(g, slot));
-    if (!best) best = pickBest(g => slotMatch(g, slot));
+    let best = pickBest(slot, g => g.troop_type === '戦車');
+    if (!best) best = pickBest(slot, () => true);
     if (best) {
       fNew.array[slot] = best.g.id;
       used.add(best.g.id);
