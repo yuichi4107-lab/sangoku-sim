@@ -481,9 +481,12 @@ const COMBAT_KEYWORDS = [
 // 非戦闘系（戦闘外の用途のみ）の典型語彙: 派遣収益/内政/採集/建設/探索
 const NON_COMBAT_KEYWORDS = ['派遣収益', '内政', '採集', '建設', '探索', '研究'];
 // 派遣不要スキル（配置不要で常時発動）の判定
+//  「派遣不要」「派遣なし(で)」「派遣しなくても」「派遣せず(に)」等の表現に対応
 function isDispatchFree(sk) {
   const eff = (sk && sk.effect) || '';
-  return eff.includes('派遣不要') || eff.includes('派遣なし') || eff.includes('派遣しなくても');
+  return eff.includes('派遣不要') || eff.includes('派遣なし') ||
+         eff.includes('派遣しなくても') || eff.includes('派遣せず') ||
+         eff.includes('派遣をせず');
 }
 // スキルが「自身の配置スロット」を条件にしているか
 //   統率/武力/知性 のいずれか、または null（条件なし＝どのスロットでも発動）
