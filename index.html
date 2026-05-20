@@ -495,6 +495,22 @@ function skillRequiredSlot(sk) {
   if (/軍師を担当|参謀を担当|軍師担当|参謀担当|知性を担当/.test(eff)) return '知性';
   return null;
 }
+// スキルが対象とする兵種（単一兵種を対象にしている場合のみ）。null=兵種非依存
+//   全兵士/全軍/複数兵種に言及 → null（どの軍団でも有効）
+//   特殊兵（連弩兵=弓兵, 槍盾兵=歩兵）も親兵種にマップ
+function skillTargetTroop(sk) {
+  const eff = (sk && sk.effect) || '';
+  if (/全兵士|全軍|全部隊|全武将|一兵種|猛獣/.test(eff)) return null;
+  // 特殊兵
+  if (/連弩兵/.test(eff)) return '弓兵';
+  if (/槍盾兵|盾槍兵/.test(eff)) return '歩兵';
+  const troops = [];
+  if (eff.includes('騎兵')) troops.push('騎兵');
+  if (eff.includes('歩兵')) troops.push('歩兵');
+  if (eff.includes('弓兵')) troops.push('弓兵');
+  if (eff.includes('戦車')) troops.push('戦車');
+  return troops.length === 1 ? troops[0] : null;
+}
 // スキルが戦闘系か（effect 文判別。name は見ない）
 function isCombatSkill(sk) {
   const eff = (sk && sk.effect) || '';
@@ -1095,8 +1111,8 @@ const PRIORITY_WEIGHTS = [16, 8, 4, 2, 1];
 
 // 与えられた pool 状態のもとで、この武将を編成に加えたときの限界貢献スコアを計算
 // pris は [pri1..pri5] の配列（空文字含む）。pool は { bucketKey: 現在の合計 }。
-// slot を渡すと、その配置スロットで発動しないスキル（配置条件不一致）は除外する。
-function marginalContribution(g, pris, pool, userId, slot) {
+// slot を渡すと配置スロット条件、legionTroop を渡すと兵種条件で発動可否を判定する。
+function marginalContribution(g, pris, pool, userId, slot, legionTroop) {
   const own = getOwn(userId != null ? userId : state.activeUserId, g.id);
   const scores = [0, 0, 0, 0, 0];  // 各優先度ごとの貢献
   const newPool = { ...pool };
@@ -1107,6 +1123,11 @@ function marginalContribution(g, pris, pool, userId, slot) {
     if (slot) {
       const req = skillRequiredSlot(sk);
       if (req && req !== slot) continue;
+    }
+    // 兵種条件: スキルが特定兵種を対象とし、軍団兵種と違うなら発動しない
+    if (legionTroop) {
+      const tt = skillTargetTroop(sk);
+      if (tt && tt !== legionTroop) continue;
     }
     const eff = resolveSkillValue(sk, own);
     if (eff == null) continue;
@@ -1202,13 +1223,13 @@ function runAutoBuilderFor(legionIdx) {
     }
   }
 
-  // slot_stat による配置制限は廃止。スキルの配置条件は marginalContribution が考慮する。
+  // slot_stat・兵種による配置制限は廃止。配置/兵種条件は marginalContribution が考慮する。
   function pickBest(slot, candidateFilter) {
     let best = null;
     for (const g of ownedGens) {
       if (used.has(g.id)) continue;
-      if (!candidateFilter(g)) continue;
-      const { score, newPool } = marginalContribution(g, pris, pool, userId, slot);
+      if (candidateFilter && !candidateFilter(g)) continue;
+      const { score, newPool } = marginalContribution(g, pris, pool, userId, slot, troop);
       if (best === null || score > best.score) {
         best = { g, score, newPool };
       }
@@ -1219,7 +1240,7 @@ function runAutoBuilderFor(legionIdx) {
   for (let bi = 0; bi < 5; bi++) {
     const bat = fNew.battalions[bi];
     for (const slot of SLOT_KEYS) {
-      const best = pickBest(slot, g => canPlaceInTroop(g, troop));
+      const best = pickBest(slot, null);  // 全所持武将が候補（兵種条件はスコアで考慮）
       if (best) {
         bat[slot] = best.g.id;
         used.add(best.g.id);
@@ -1228,8 +1249,7 @@ function runAutoBuilderFor(legionIdx) {
     }
   }
   for (const slot of SLOT_KEYS) {
-    let best = pickBest(slot, g => g.troop_type === '戦車');
-    if (!best) best = pickBest(slot, () => true);
+    const best = pickBest(slot, null);
     if (best) {
       fNew.array[slot] = best.g.id;
       used.add(best.g.id);
@@ -1383,18 +1403,14 @@ function makeSlotCell(bat, slot, opts) {
 
   const legionTroop = formation ? formation.troop_type : null;
 
+  // 手動配置の候補: 所持 & 他軍団未使用 & 戦闘スキルあり のみ。
+  // 兵種・slot_stat による制限はしない（どの武将もどのスロットに置ける）。
   const candidates = state.data.generals.filter(g => {
     const own = getOwn(userId, g.id);
     if (!own.owned) return false;
     if (usedElsewhere.has(g.id)) return false;
     if (!hasCombatSkill(g)) return false;  // 戦闘貢献なしは候補に出さない
-    if (!opts.isArray) {
-      if (!canPlaceInTroop(g, legionTroop)) return false;
-    }
-    const ss = g.slot_stat;
-    if (ss == null) return true;
-    if (Array.isArray(ss)) return ss.includes(slot);
-    return ss === slot;
+    return true;
   });
   for (const g of candidates) {
     const o = document.createElement('option');
