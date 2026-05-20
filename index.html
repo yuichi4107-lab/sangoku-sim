@@ -2094,7 +2094,9 @@ function initCloudSync() {
       </div>`;
     });
     html += `</div>
+      <div id="batch-ocr-msg" style="font-size:11px;color:#666;margin-bottom:6px;"></div>
       <div style="display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;">
+        <button id="btn-batch-ocr" style="background:#4472c4;color:#fff;" title="ステ未登録の友人を全員AI OCRする">🤖 全員OCR(未登録)</button>
         <button id="btn-inbox-all">全選択</button>
         <button id="btn-inbox-none">全解除</button>
         <button id="btn-inbox-ok" style="background:var(--accent);color:#fff;">選択を取込</button>
@@ -2105,6 +2107,44 @@ function initCloudSync() {
     document.body.appendChild(overlay);
     const cleanup = () => { if (overlay.parentNode) overlay.remove(); };
     box.querySelector('#btn-inbox-cancel').onclick = cleanup;
+
+    // 全員OCR(未登録のみ): 各エントリを順次 re_ocr → ポーリングで完了確認
+    box.querySelector('#btn-batch-ocr').onclick = async () => {
+      const msg = box.querySelector('#batch-ocr-msg');
+      // 画像あり & stats 未登録(空) の対象を抽出
+      const targets = inbox.filter(r => {
+        const imgs = (r.image_refs || []).filter(x => x && x.fileId);
+        const filled = r.player_stats ? countFilledStats(r.player_stats) : 0;
+        return imgs.length > 0 && filled === 0;
+      });
+      if (!targets.length) { msg.textContent = 'OCR対象（画像あり・ステ未登録）はありません。'; return; }
+      const btn = box.querySelector('#btn-batch-ocr');
+      btn.disabled = true;
+      let done = 0, failed = 0;
+      for (const t of targets) {
+        msg.textContent = `🤖 OCR中… ${done + failed + 1}/${targets.length} (${t.user_name})`;
+        try {
+          const form = new URLSearchParams();
+          form.append('payload', JSON.stringify({ action: 're_ocr', user_name: t.user_name }));
+          fetch(GROUP_API_URL, { method: 'POST', body: form, mode: 'no-cors' }).catch(() => {});
+          // ポーリングで stats が埋まるのを待つ（最大40秒）
+          let ok = false;
+          for (let i = 0; i < 20; i++) {
+            await new Promise(r => setTimeout(r, 2000));
+            try {
+              const res = await fetch(GROUP_API_URL + '?action=get_inbox');
+              const r = await res.json();
+              const row = (r.inbox || []).find(x => x.user_name === t.user_name);
+              if (row && row.player_stats && countFilledStats(row.player_stats) > 0) { ok = true; break; }
+            } catch (e) {}
+          }
+          if (ok) done++; else failed++;
+        } catch (e) { failed++; }
+      }
+      btn.disabled = false;
+      msg.textContent = `✅ 完了: ${done}名 / 失敗(タイムアウト): ${failed}名。受信箱を再取得します…`;
+      setTimeout(() => { cleanup(); document.getElementById('btn-inbox').click(); }, 1500);
+    };
     box.querySelector('#btn-inbox-all').onclick = () => box.querySelectorAll('input[type=checkbox]').forEach(i => i.checked = true);
     box.querySelector('#btn-inbox-none').onclick = () => box.querySelectorAll('input[type=checkbox]').forEach(i => i.checked = false);
     // ステ編集ボタン
