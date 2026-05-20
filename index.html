@@ -475,16 +475,28 @@ const COMBAT_KEYWORDS = [
 ];
 // 非戦闘系（戦闘外の用途のみ）の典型語彙: 派遣収益/内政/採集/建設/探索
 const NON_COMBAT_KEYWORDS = ['派遣収益', '内政', '採集', '建設', '探索', '研究'];
+// 派遣不要スキル（配置不要で常時発動）の判定
+function isDispatchFree(sk) {
+  const eff = (sk && sk.effect) || '';
+  return eff.includes('派遣不要') || eff.includes('派遣なし') || eff.includes('派遣しなくても');
+}
 // スキルが戦闘系か（effect 文判別。name は見ない）
 function isCombatSkill(sk) {
   const eff = (sk && sk.effect) || '';
   if (!eff) return false;
-  // 「派遣不要」自体は単なる発動条件ラベルなので戦闘判定に使わない
   return COMBAT_KEYWORDS.some(kw => eff.includes(kw));
 }
-// 武将に1つでも戦闘系スキルがあるか
+// 「配置貢献としての」戦闘系スキルか（派遣不要は配置不要なので除外）
+function isPlacementCombatSkill(sk) {
+  return isCombatSkill(sk) && !isDispatchFree(sk);
+}
+// 武将に1つでも戦闘系スキルがあるか（候補に出すか判定。派遣不要含む）
 function hasCombatSkill(g) {
   return (g.skills || []).some(isCombatSkill);
+}
+// 配置して意味のある戦闘スキルを持つか（派遣不要のみ＝false）
+function hasPlacementCombatSkill(g) {
+  return (g.skills || []).some(isPlacementCombatSkill);
 }
 
 // ============================================================
@@ -567,17 +579,31 @@ function aggregate() {
   const breakdown = [];
 
   // 評価対象の (general, own) ペアを集める
-  const targets = [];  // { g, own, userName }
+  const targets = [];  // { g, own, userName, onlyDispatchFree }
   const userById = Object.fromEntries(state.users.map(u => [u.id, u]));
   if (state.aggMode === 'formation') {
+    const placedSet = new Set();  // "userId:genId"
     for (const p of formationPlacements()) {
       const g = state.data.generals.find(x => x.id === p.genId);
       if (!g) continue;
+      placedSet.add(p.userId + ':' + p.genId);
       const own = getOwn(p.userId, p.genId);
       targets.push({ g, own, userName: userById[p.userId]?.name || '' });
     }
+    // 派遣不要スキル: 配置されていなくても所持していれば常時発動
+    // → 編成に参加している各プレイヤーの未配置所持武将の派遣不要スキルを加算
+    const involvedUserIds = [...new Set(state.formations.filter(f => f.selected !== false).map(f => f.user_id))];
+    for (const uid of involvedUserIds) {
+      for (const g of state.data.generals) {
+        if (placedSet.has(uid + ':' + g.id)) continue;  // 配置済みは通常処理で全スキル計上済み
+        const own = getOwn(uid, g.id);
+        if (!own.owned) continue;
+        if (!(g.skills || []).some(isDispatchFree)) continue;
+        targets.push({ g, own, userName: userById[uid]?.name || '', onlyDispatchFree: true });
+      }
+    }
   } else {
-    // 'owned-all': アクティブユーザーの所持武将のみ
+    // 'owned-all': アクティブユーザーの所持武将のみ（全スキル計上）
     const uid = state.activeUserId;
     for (const g of state.data.generals) {
       const own = getOwn(uid, g.id);
@@ -586,17 +612,20 @@ function aggregate() {
     }
   }
 
-  for (const { g, own, userName } of targets) {
+  for (const { g, own, userName, onlyDispatchFree } of targets) {
     for (const sk of g.skills) {
+      // 未配置武将は派遣不要スキルのみ計上
+      if (onlyDispatchFree && !isDispatchFree(sk)) continue;
       const detail = resolveSkillValueDetailed(sk, own);
       const eff = detail ? detail.value : null;
       const entry = {
-        general: userName ? `${userName}・${g.name}` : g.name,
+        general: (userName ? `${userName}・${g.name}` : g.name) + (onlyDispatchFree ? '（派遣不要・未配置）' : ''),
         skill: sk.name,
         scope: sk.scope,
         unit: sk.unit,
         value: eff,
         estimated: !!(detail && detail.estimated),
+        dispatchFree: isDispatchFree(sk),
         cap: sk.cap || null,
         stacking: sk.stacking || 'additive',
         confidence: (sk.value && sk.value.confidence) || 'unknown',
@@ -1053,6 +1082,8 @@ function marginalContribution(g, pri1, pri2, pool, userId) {
   let s1 = 0, s2 = 0;
   const newPool = { ...pool };
   for (const sk of (g.skills || [])) {
+    // 派遣不要スキルは配置不要で常時発動 → 配置の限界貢献には数えない
+    if (isDispatchFree(sk)) continue;
     const eff = resolveSkillValue(sk, own);
     if (eff == null) continue;
     const key = `${sk.effect_attribute}/${sk.direction}`;
