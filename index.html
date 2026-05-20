@@ -500,10 +500,11 @@ function skillRequiredSlot(sk) {
 //   特殊兵（連弩兵=弓兵, 槍盾兵=歩兵）も親兵種にマップ
 function skillTargetTroop(sk) {
   const eff = (sk && sk.effect) || '';
-  if (/全兵士|全軍|全部隊|全武将|一兵種|猛獣/.test(eff)) return null;
-  // 特殊兵
-  if (/連弩兵/.test(eff)) return '弓兵';
-  if (/槍盾兵|盾槍兵/.test(eff)) return '歩兵';
+  if (/全兵士|全軍|全部隊|全武将|一兵種/.test(eff)) return null;
+  // 特殊兵 → 親兵種
+  if (/連弩兵/.test(eff)) return '弓兵';     // 弓兵の特殊兵
+  if (/槍盾兵|盾槍兵/.test(eff)) return '歩兵'; // 歩兵の特殊兵
+  if (/猛獣/.test(eff)) return '騎兵';        // 騎兵の特殊兵
   const troops = [];
   if (eff.includes('騎兵')) troops.push('騎兵');
   if (eff.includes('歩兵')) troops.push('歩兵');
