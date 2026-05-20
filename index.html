@@ -2331,9 +2331,19 @@ const STATS_DEBUFF = [
   ['pierce_resist', '貫通抵抗'],
   ['discipline', '軍紀'],
 ];
+// 武府属性（プレイヤーが振っている属性。値>0のものを bufu_attrs にフラグ記録）
+const BUFU_MAP = [
+  ['rensa', '連撃上昇'],
+  ['resist', '抵抗上昇'],
+  ['shield', 'シールド上昇'],
+  ['pierce', '貫通上昇'],
+  ['attack', '攻撃上昇'],
+  ['defense', '防御上昇'],
+  ['pierce_resist', '貫通抵抗上昇'],
+];
 
 function emptyPlayerStats() {
-  const ps = { general: { march_count: null, max_legions: null }, by_troop: {}, tank_support: null, debuff_enemy: {} };
+  const ps = { general: { march_count: null, max_legions: null }, by_troop: {}, tank_support: null, debuff_enemy: {}, bufu_attrs: [] };
   for (const t of STATS_TROOPS) {
     ps.by_troop[t] = {};
     for (const [k] of STATS_TROOP_ATTRS) ps.by_troop[t][k] = null;
@@ -2353,6 +2363,7 @@ function parsePlayerStatsText(text) {
     const val = parseFloat(m[2].replace(/,/g, ''));
     return { key, val };
   }
+  if (!ps.bufu_attrs) ps.bufu_attrs = [];
   for (const raw of lines) {
     const m = matchLine(raw);
     if (!m) continue;
@@ -2361,6 +2372,12 @@ function parsePlayerStatsText(text) {
     if (key === '行軍部隊総数') { ps.general.march_count = val; continue; }
     if (key === '出征可軍団上限') { ps.general.max_legions = val; continue; }
     if (key === '戦車支援付加') { ps.tank_support = val; continue; }
+    // 武府属性（値>0 の属性キーを bufu_attrs に記録）
+    const bufu = BUFU_MAP.find(([, jp]) => jp === key);
+    if (bufu) {
+      if (val > 0 && ps.bufu_attrs.indexOf(bufu[0]) < 0) ps.bufu_attrs.push(bufu[0]);
+      continue;
+    }
     // 敵方への減益
     const debuffMatch = key.match(/^敵方の(.+?)に対する減益$/);
     if (debuffMatch) {
@@ -2370,14 +2387,12 @@ function parsePlayerStatsText(text) {
       continue;
     }
     // 兵種別属性
-    let matched = false;
     for (const troop of STATS_TROOPS) {
       if (!key.startsWith(troop)) continue;
       const rest = key.slice(troop.length);
       const found = STATS_TROOP_ATTRS.find(([, jp]) => jp === rest);
       if (found) {
         ps.by_troop[troop][found[0]] = val;
-        matched = true;
         break;
       }
     }
@@ -2414,14 +2429,19 @@ async function showStatsEditModal(userName, currentStats) {
     const box = document.createElement('div');
     box.style.cssText = 'background:#fff;padding:14px 16px;border-radius:6px;max-width:700px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 4px 16px rgba(0,0,0,0.3);';
     function buildTroopGrid() {
+      const bufu = ps.bufu_attrs || [];
       let h = '<table style="border-collapse:collapse;font-size:11px;width:100%;margin-bottom:8px;"><thead><tr><th style="border:1px solid #999;background:#ede7d9;padding:3px;">属性</th>';
       for (const t of STATS_TROOPS) h += `<th style="border:1px solid #999;background:#ede7d9;padding:3px;">${t}</th>`;
       h += '</tr></thead><tbody>';
       for (const [k, label] of STATS_TROOP_ATTRS) {
-        h += `<tr><td style="border:1px solid #999;padding:3px;font-weight:600;background:#f7f3e8;">${label}</td>`;
+        const isBufu = bufu.indexOf(k) >= 0;  // 武府投資ありの属性
+        const labelBg = isBufu ? '#ffe8a0' : '#f7f3e8';
+        const cellBg = isBufu ? '#fff6d8' : 'transparent';
+        const mark = isBufu ? '★' : '';
+        h += `<tr><td style="border:1px solid #999;padding:3px;font-weight:600;background:${labelBg};">${mark}${label}</td>`;
         for (const t of STATS_TROOPS) {
           const v = ps.by_troop[t][k];
-          h += `<td style="border:1px solid #999;padding:1px;"><input type="number" step="0.1" data-troop="${t}" data-attr="${k}" value="${v ?? ''}" style="width:100%;border:none;padding:3px;font-size:11px;text-align:right;background:transparent;"></td>`;
+          h += `<td style="border:1px solid #999;padding:1px;background:${cellBg};"><input type="number" step="0.1" data-troop="${t}" data-attr="${k}" value="${v ?? ''}" style="width:100%;border:none;padding:3px;font-size:11px;text-align:right;background:transparent;"></td>`;
         }
         h += '</tr>';
       }
@@ -2596,11 +2616,14 @@ function showStatsCompareModal() {
       h += '<thead><tr><th style="border:1px solid #999;background:#ede7d9;padding:4px;text-align:left;">項目</th>';
       for (const c of cols) h += `<th style="border:1px solid #999;background:#ede7d9;padding:4px;">${c.user.name}</th>`;
       h += '</tr></thead><tbody>';
-      function row(label, fn) {
+      // bufuKey 指定時は、各列のプレイヤーが武府投資ありなら該当セルを着色
+      function row(label, fn, bufuKey) {
         h += `<tr><td style="border:1px solid #999;padding:3px;background:#f7f3e8;">${label}</td>`;
         for (const c of cols) {
           const v = fn(c.ps);
-          h += `<td style="border:1px solid #999;padding:3px;text-align:right;${v == null ? 'color:#bbb;' : ''}">${v == null ? '—' : v}</td>`;
+          const isBufu = bufuKey && c.ps.bufu_attrs && c.ps.bufu_attrs.indexOf(bufuKey) >= 0;
+          const bg = isBufu ? 'background:#fff6d8;' : '';
+          h += `<td style="border:1px solid #999;padding:3px;text-align:right;${bg}${v == null ? 'color:#bbb;' : ''}">${v == null ? '—' : v}${isBufu ? ' ★' : ''}</td>`;
         }
         h += '</tr>';
       }
@@ -2612,7 +2635,7 @@ function showStatsCompareModal() {
           row(`　${label}`, ps => {
             const v = ps.by_troop && ps.by_troop[t] ? ps.by_troop[t][k] : null;
             return v != null ? v + '%' : null;
-          });
+          }, k);
         }
       }
       row('戦車支援付加', ps => ps.tank_support != null ? ps.tank_support + '%' : null);
