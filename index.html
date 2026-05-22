@@ -1022,10 +1022,10 @@ function renderFilters() {
         }
       },
     },
-    // 3突/4突/4装 は排他（順序: なし → 3突 → 4突 → 4装）
-    { id: 'bulk-bt3',          apply: (own, on) => { if (on) { own.breakthrough = 3; own.equipment = 0; } else if (own.breakthrough === 3) own.breakthrough = 0; } },
-    { id: 'bulk-bt4',          apply: (own, on) => { if (on) { own.breakthrough = 4; own.equipment = 0; } else if (own.breakthrough === 4 && own.equipment === 0) own.breakthrough = 0; } },
-    { id: 'bulk-equipment',    apply: (own, on) => { if (on) { own.breakthrough = 4; own.equipment = 4; } else own.equipment = 0; } },
+    // なし→3突→4突→(4装 or 将印)。4装と将印は排他。
+    { id: 'bulk-bt3',          apply: (own, on) => { if (on) { own.breakthrough = 3; own.equipment = 0; own.seal = 0; } else if (own.breakthrough === 3) own.breakthrough = 0; } },
+    { id: 'bulk-bt4',          apply: (own, on) => { if (on) { own.breakthrough = 4; own.equipment = 0; own.seal = 0; } else if (own.breakthrough === 4 && own.equipment === 0 && (own.seal||0) === 0) own.breakthrough = 0; } },
+    { id: 'bulk-equipment',    apply: (own, on) => { if (on) { own.breakthrough = 4; own.equipment = 4; own.seal = 0; } else own.equipment = 0; } },
   ];
   for (const b of bulkBindings) {
     const cb = document.getElementById(b.id);
@@ -1449,7 +1449,7 @@ function updateBulkCheckboxes() {
   const axes = [
     { id: 'bulk-owned',         pick: o => o.owned },
     { id: 'bulk-bt3',           pick: o => o.breakthrough === 3 },
-    { id: 'bulk-bt4',           pick: o => o.breakthrough === 4 && o.equipment !== 4 },
+    { id: 'bulk-bt4',           pick: o => o.breakthrough === 4 && o.equipment !== 4 && (o.seal||0) === 0 },
     { id: 'bulk-equipment',     pick: o => o.equipment === 4 },
   ];
   for (const a of axes) {
@@ -1510,12 +1510,13 @@ function renderRoster() {
       `<span style="font-size:11px;color:var(--muted);">${slotS}</span>`;
     tr.appendChild(tdAttr);
 
-    // 育成段階（突破は 3段/4段、装備は 4段、将印は数値）
+    // 育成段階（なし→3突→4突→ 4装 or 将印 ※4装と将印は排他）
     const tdProg = document.createElement('td');
+    const bt4pure = own.breakthrough === 4 && own.equipment !== 4 && (own.seal || 0) === 0;
     tdProg.innerHTML = `
       <span class="progression">
         <label>3突<input type="checkbox" ${own.breakthrough === 3 ? 'checked' : ''} data-id="${g.id}" data-axis="bt3"></label>
-        <label>4突<input type="checkbox" ${own.breakthrough === 4 && own.equipment !== 4 ? 'checked' : ''} data-id="${g.id}" data-axis="bt4"></label>
+        <label>4突<input type="checkbox" ${bt4pure ? 'checked' : ''} data-id="${g.id}" data-axis="bt4"></label>
         <label>4装<input type="checkbox" ${own.equipment === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="equipment_bool"></label>
         <label>印<input type="number" min="0" max="10" value="${own.seal}" data-id="${g.id}" data-axis="seal"></label>
       </span>
@@ -1528,27 +1529,33 @@ function renderRoster() {
   updateBulkCheckboxes();
 
   // bind progression inputs
-  // 3突/4突/4装 は排他（順序: なし → 3突 → 4突 → 4装、ひとつだけON）
+  // なし→3突→4突→(4装 or 将印)。4装と将印(印>0)は排他。
   tbody.querySelectorAll('input[data-axis]').forEach(inp => {
     inp.addEventListener('change', () => {
       const id = inp.dataset.id;
       const axis = inp.dataset.axis;
       const own = getOwn(id);
       if (axis === 'bt3') {
-        if (inp.checked) { own.breakthrough = 3; own.equipment = 0; }
+        if (inp.checked) { own.breakthrough = 3; own.equipment = 0; own.seal = 0; }
         else if (own.breakthrough === 3) own.breakthrough = 0;
       } else if (axis === 'bt4') {
-        if (inp.checked) { own.breakthrough = 4; own.equipment = 0; }
-        else if (own.breakthrough === 4 && own.equipment === 0) own.breakthrough = 0;
+        if (inp.checked) { own.breakthrough = 4; own.equipment = 0; own.seal = 0; }
+        else if (own.breakthrough === 4 && own.equipment === 0 && (own.seal||0) === 0) own.breakthrough = 0;
       } else if (axis === 'equipment_bool') {
-        if (inp.checked) { own.breakthrough = 4; own.equipment = 4; }
+        // 4装パス: 4突到達 + 装備。将印とは排他なので印をクリア
+        if (inp.checked) { own.breakthrough = 4; own.equipment = 4; own.seal = 0; }
         else own.equipment = 0;
+      } else if (axis === 'seal') {
+        const v = Math.max(0, Math.min(10, parseInt(inp.value, 10) || 0));
+        own.seal = v;
+        // 将印パス: 印>0 なら 4突到達 + 装備とは排他なので装備をクリア
+        if (v > 0) { own.breakthrough = 4; own.equipment = 0; }
       } else {
         own[axis] = parseInt(inp.value, 10) || 0;
       }
       saveState();
-      // 3突/4突/4装 は排他なのでロースタ全体を再描画
-      if (axis === 'bt3' || axis === 'bt4' || axis === 'equipment_bool') renderRoster();
+      // 状態が排他で変わるので再描画（印も装備チェックに影響）
+      renderRoster();
       renderSummary();
     });
   });
