@@ -148,6 +148,16 @@ function getOwn(genId) {
   if (!state.ownerships[genId]) state.ownerships[genId] = defaultOwn();
   return state.ownerships[genId];
 }
+// 武将の育成タイプ: 'equipment'(装備武将) | 'seal'(将印武将) | 'none'(4突どまり)
+function devType(g) {
+  const tags = (g && g.role_tags) || [];
+  if (tags.indexOf('将印武将') >= 0) return 'seal';
+  if (tags.indexOf('装備武将') >= 0) return 'equipment';
+  return 'none';
+}
+function genById(id) {
+  return state.data.generals.find(x => x.id === id);
+}
 
 function loadData() {
   if (!window.GENERALS_DATA) {
@@ -202,8 +212,20 @@ function renderRoster() {
   const list = filteredGenerals();
   for (const g of list) {
     const own = getOwn(g.id);
+    const dt = devType(g);
     const card = document.createElement('div');
     card.className = 'gcard' + (own.owned ? ' owned' : '');
+    let progInner = `
+          <label class="${own.breakthrough === 3 ? 'on' : ''}"><input type="checkbox" ${own.breakthrough === 3 ? 'checked' : ''} data-id="${g.id}" data-axis="bt3">3突</label>
+          <label class="${own.breakthrough === 4 && (own.equipment||0) === 0 && (own.seal||0) === 0 ? 'on' : ''}"><input type="checkbox" ${own.breakthrough === 4 && (own.equipment||0) === 0 && (own.seal||0) === 0 ? 'checked' : ''} data-id="${g.id}" data-axis="bt4">4突</label>`;
+    if (dt === 'equipment') {
+      progInner += `
+          <label class="${own.equipment === 3 ? 'on' : ''}"><input type="checkbox" ${own.equipment === 3 ? 'checked' : ''} data-id="${g.id}" data-axis="eq3">3装</label>
+          <label class="${own.equipment === 4 ? 'on' : ''}"><input type="checkbox" ${own.equipment === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="eq4">4装</label>`;
+    } else if (dt === 'seal') {
+      progInner += `
+          <span class="seal-wrap ${(own.seal||0) > 0 ? 'on' : ''}">印<input type="number" min="0" max="10" value="${own.seal}" data-id="${g.id}" data-axis="seal"></span>`;
+    }
     card.innerHTML = `
       <div class="owned-check">
         <input type="checkbox" ${own.owned ? 'checked' : ''} data-id="${g.id}" data-axis="owned">
@@ -216,13 +238,7 @@ function renderRoster() {
             <span class="badge troop-${g.troop_type}">${g.troop_type || '?'}</span>
           </span>
         </div>
-        <div class="prog">
-          <label class="${own.breakthrough === 3 ? 'on' : ''}"><input type="checkbox" ${own.breakthrough === 3 ? 'checked' : ''} data-id="${g.id}" data-axis="bt3">3突</label>
-          <label class="${own.breakthrough === 4 && (own.equipment||0) === 0 && (own.seal||0) === 0 ? 'on' : ''}"><input type="checkbox" ${own.breakthrough === 4 && (own.equipment||0) === 0 && (own.seal||0) === 0 ? 'checked' : ''} data-id="${g.id}" data-axis="bt4">4突</label>
-          <label class="${own.equipment === 3 ? 'on' : ''}"><input type="checkbox" ${own.equipment === 3 ? 'checked' : ''} data-id="${g.id}" data-axis="eq3">3装</label>
-          <label class="${own.equipment === 4 ? 'on' : ''}"><input type="checkbox" ${own.equipment === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="eq4">4装</label>
-          <span class="seal-wrap ${(own.seal||0) > 0 ? 'on' : ''}">印<input type="number" min="0" max="10" value="${own.seal}" data-id="${g.id}" data-axis="seal"></span>
-        </div>
+        <div class="prog">${progInner}</div>
       </div>
     `;
     container.appendChild(card);
@@ -304,8 +320,8 @@ document.getElementById('user-name').addEventListener('input', e => {
       // なし→3突→4突→(3装/4装 or 将印)。装備と将印は排他
       else if (id === 'bulk-bt3') { if (on) { own.breakthrough = 3; own.equipment = 0; own.seal = 0; } else if (own.breakthrough === 3) own.breakthrough = 0; }
       else if (id === 'bulk-bt4') { if (on) { own.breakthrough = 4; own.equipment = 0; own.seal = 0; } else if (own.breakthrough === 4 && (own.equipment||0) === 0 && (own.seal||0) === 0) own.breakthrough = 0; }
-      else if (id === 'bulk-eq3') { if (on) { own.breakthrough = 4; own.equipment = 3; own.seal = 0; } else if (own.equipment === 3) own.equipment = 0; }
-      else if (id === 'bulk-equipment') { if (on) { own.breakthrough = 4; own.equipment = 4; own.seal = 0; } else if (own.equipment === 4) own.equipment = 0; }
+      else if (id === 'bulk-eq3') { if (devType(g) !== 'equipment') continue; if (on) { own.breakthrough = 4; own.equipment = 3; own.seal = 0; } else if (own.equipment === 3) own.equipment = 0; }
+      else if (id === 'bulk-equipment') { if (devType(g) !== 'equipment') continue; if (on) { own.breakthrough = 4; own.equipment = 4; own.seal = 0; } else if (own.equipment === 4) own.equipment = 0; }
     }
     saveLocal();
     renderRoster();

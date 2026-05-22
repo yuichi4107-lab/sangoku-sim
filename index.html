@@ -309,6 +309,14 @@ function defaultFormations() {
   return Array.from({ length: NUM_LEGIONS }, (_, i) => emptyFormation(Math.floor(i / 2) + 1));
 }
 
+// 武将の育成タイプ: 'equipment'(装備武将) | 'seal'(将印武将) | 'none'(4突どまり)
+function devType(g) {
+  const tags = (g && g.role_tags) || [];
+  if (tags.indexOf('将印武将') >= 0) return 'seal';
+  if (tags.indexOf('装備武将') >= 0) return 'equipment';
+  return 'none';
+}
+
 function canPlaceInTroop(general, troop) {
   if (!troop) return true;
   if (general.troop_type === troop) return true;
@@ -1026,8 +1034,9 @@ function renderFilters() {
     // なし→3突→4突→(3装/4装 or 将印)。装備と将印は排他。
     { id: 'bulk-bt3',          apply: (own, on) => { if (on) { own.breakthrough = 3; own.equipment = 0; own.seal = 0; } else if (own.breakthrough === 3) own.breakthrough = 0; } },
     { id: 'bulk-bt4',          apply: (own, on) => { if (on) { own.breakthrough = 4; own.equipment = 0; own.seal = 0; } else if (own.breakthrough === 4 && (own.equipment||0) === 0 && (own.seal||0) === 0) own.breakthrough = 0; } },
-    { id: 'bulk-eq3',          apply: (own, on) => { if (on) { own.breakthrough = 4; own.equipment = 3; own.seal = 0; } else if (own.equipment === 3) own.equipment = 0; } },
-    { id: 'bulk-equipment',    apply: (own, on) => { if (on) { own.breakthrough = 4; own.equipment = 4; own.seal = 0; } else if (own.equipment === 4) own.equipment = 0; } },
+    // 3装/4装 は装備武将のみ対象（出し分けに合わせる）
+    { id: 'bulk-eq3',          apply: (own, on, g) => { if (devType(g) !== 'equipment') return; if (on) { own.breakthrough = 4; own.equipment = 3; own.seal = 0; } else if (own.equipment === 3) own.equipment = 0; } },
+    { id: 'bulk-equipment',    apply: (own, on, g) => { if (devType(g) !== 'equipment') return; if (on) { own.breakthrough = 4; own.equipment = 4; own.seal = 0; } else if (own.equipment === 4) own.equipment = 0; } },
   ];
   for (const b of bulkBindings) {
     const cb = document.getElementById(b.id);
@@ -1055,9 +1064,9 @@ function renderFilters() {
       notify('チェックを入れた軍団がありません');
       return;
     }
-    // 第一/第二優先は集結全体で共有 → どちらか1つでも未指定なら全体停止
-    if (!state.priority.pri1 && !state.priority.pri2) {
-      notify('第一優先または第二優先を指定してください（集結全体共通）');
+    // 優先属性は集結全体で共有 → 1つも未指定なら停止
+    if (![state.priority.pri1, state.priority.pri2, state.priority.pri3, state.priority.pri4, state.priority.pri5].some(p => p)) {
+      notify('優先属性を1つ以上指定してください（集結全体共通）');
       return;
     }
     // 兵種未指定の軍団チェック（兵種は軍団ごとに残す）
@@ -1513,18 +1522,23 @@ function renderRoster() {
       `<span style="font-size:11px;color:var(--muted);">${slotS}</span>`;
     tr.appendChild(tdAttr);
 
-    // 育成段階（なし→3突→4突→ 3装/4装 or 将印 ※装備と将印は排他）
+    // 育成段階（武将タイプで選択肢を出し分け）
+    //   装備武将: 3突/4突/3装/4装   将印武将: 3突/4突/印   どちらでもない: 3突/4突
     const tdProg = document.createElement('td');
     const bt4pure = own.breakthrough === 4 && (own.equipment || 0) === 0 && (own.seal || 0) === 0;
-    tdProg.innerHTML = `
-      <span class="progression">
+    const dt = devType(g);
+    let progHtml = `
         <label>3突<input type="checkbox" ${own.breakthrough === 3 ? 'checked' : ''} data-id="${g.id}" data-axis="bt3"></label>
-        <label>4突<input type="checkbox" ${bt4pure ? 'checked' : ''} data-id="${g.id}" data-axis="bt4"></label>
+        <label>4突<input type="checkbox" ${bt4pure ? 'checked' : ''} data-id="${g.id}" data-axis="bt4"></label>`;
+    if (dt === 'equipment') {
+      progHtml += `
         <label>3装<input type="checkbox" ${own.equipment === 3 ? 'checked' : ''} data-id="${g.id}" data-axis="eq3"></label>
-        <label>4装<input type="checkbox" ${own.equipment === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="eq4"></label>
-        <label>印<input type="number" min="0" max="10" value="${own.seal}" data-id="${g.id}" data-axis="seal"></label>
-      </span>
-    `;
+        <label>4装<input type="checkbox" ${own.equipment === 4 ? 'checked' : ''} data-id="${g.id}" data-axis="eq4"></label>`;
+    } else if (dt === 'seal') {
+      progHtml += `
+        <label>印<input type="number" min="0" max="10" value="${own.seal}" data-id="${g.id}" data-axis="seal"></label>`;
+    }
+    tdProg.innerHTML = `<span class="progression">${progHtml}</span>`;
     tr.appendChild(tdProg);
 
     tbody.appendChild(tr);
