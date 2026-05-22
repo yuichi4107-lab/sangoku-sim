@@ -255,6 +255,7 @@ generals:
   - 騎兵軍団触媒
   - 集結強化
   - 最優先育成
+  - 装備武将
   skills:
   - name: 恐弦
     type: buff
@@ -332,6 +333,11 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B43
   - https://sangoku-haou.gamer-wiki.com/character/uki-n
+  stats:
+    統率: 97
+    武力: 92
+    知性: 80
+    魅力: 53
 - id: kanu
   name: 関羽
   yomi: かんう
@@ -342,6 +348,7 @@ generals:
   role_tags:
   - 集結攻撃ダウン
   - 覚醒推奨
+  - 装備武将
   skills:
   - name: 武聖
     type: debuff
@@ -452,6 +459,11 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B10
   - https://sangoku-haou.gamer-wiki.com/character/kanu
   - screenshot:IMG_0697.PNG
+  stats:
+    統率: 95
+    武力: 98
+    知性: 75
+    魅力: 93
 - id: batyou
   name: 馬超
   yomi: ばちょう
@@ -919,6 +931,7 @@ generals:
   - 集結兵種比率バフ
   - 汎用
   - 覚醒元あり
+  - 装備武将
   base_general_id: chouun
   skills:
   - name: 龍胆
@@ -1033,6 +1046,11 @@ generals:
   - https://sangoku-haou.gamer-wiki.com/character/gen-chouun
   - screenshot:IMG_0680.PNG
   - screenshot:IMG_6347.png
+  stats:
+    統率: 93
+    武力: 101
+    知性: 80
+    魅力: 90
 - id: 玄孫権
   name: 玄孫権
   yomi: null
@@ -1575,7 +1593,8 @@ generals:
   base_rarity: 玄
   troop_type: 歩兵
   slot_stat: 知性
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: ダメ15%減（累加不可）
     type: debuff
@@ -1628,6 +1647,11 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B13
   xlsx_remarks: ダメ15%減（累加不可）、最終抵抗1%高×0.5減（上限25%・上限累加可、1スキル上限10%）
+  stats:
+    統率: 17
+    武力: 11
+    知性: 97
+    魅力: null
 - id: 曹仁
   name: 曹仁
   yomi: null
@@ -1724,7 +1748,8 @@ generals:
   base_rarity: 玄
   troop_type: 歩兵
   slot_stat: 知性
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 画策
     type: debuff
@@ -1837,6 +1862,11 @@ generals:
   - screenshot:IMG_0684.PNG
   xlsx_remarks: ダメ18%減、元兵敵より大+5%減（累加不可）、【装備】抵抗5%増（上限10%）
   base_general_id: 荀攸
+  stats:
+    統率: 75
+    武力: 51
+    知性: 99
+    魅力: null
 - id: 麹義
   name: 麹義
   yomi: null
@@ -1963,7 +1993,8 @@ generals:
   base_rarity: 橙
   troop_type: 戦車
   slot_stat: 武力
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 養孝
     type: buff
@@ -2074,13 +2105,19 @@ generals:
   - screenshot:IMG_0691.PNG
   - screenshot:ADD9C1DA.png
   xlsx_remarks: ダメージ増（味方残存兵士率x16.5%）、ダメージ減（敵方残存兵士率x16.5%）【装備】敵軍紀5%減（累加不可）
+  stats:
+    統率: 90
+    武力: 98
+    知性: 73
+    魅力: null
 - id: 玄周泰
   name: 玄周泰
   yomi: null
   base_rarity: 玄
   troop_type: 歩兵
   slot_stat: 武力
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 忠魂
     type: buff
@@ -2184,6 +2221,11 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B20
   - screenshot:IMG_0685.PNG
   xlsx_remarks: ダメージ増（味方残シールド率x27.5%）【装備】貫通抵抗5%増（累加不可）
+  stats:
+    統率: 81
+    武力: 99
+    知性: 60
+    魅力: null
 - id: 姜維
   name: 姜維
   yomi: null
@@ -2232,7 +2274,8 @@ generals:
   base_rarity: 橙
   troop_type: 歩兵
   slot_stat: 武力
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 武試
     type: buff
@@ -2341,13 +2384,19 @@ generals:
   - screenshot:IMG_0707.PNG
   - screenshot:A93218F5.png
   xlsx_remarks: ダメージ増（抵抗勝の場合追加5.5％）【装備】抵抗低下5％＋敵方歩兵比率×3％
+  stats:
+    統率: 88
+    武力: 98
+    知性: 67
+    魅力: null
 - id: 楽進
   name: 楽進
   yomi: null
   base_rarity: 橙
   troop_type: 歩兵
   slot_stat: 統率
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 虎青
     type: buff
@@ -2455,6 +2504,11 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B23
   - screenshot:IMG_0704.PNG
+  stats:
+    統率: 97
+    武力: 92
+    知性: 81
+    魅力: 78
 - id: 関平
   name: 関平
   yomi: null
@@ -2554,7 +2608,8 @@ generals:
   base_rarity: 玄
   troop_type: 騎兵
   slot_stat: 武力
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 範隼
     type: buff
@@ -2664,13 +2719,19 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B28
   - screenshot:IMG_0700.PNG
   xlsx_remarks: 抵抗20%減（上限50%・非共有）
+  stats:
+    統率: 88
+    武力: 97
+    知性: 70
+    魅力: null
 - id: 玄司馬懿
   name: 玄司馬懿
   yomi: null
   base_rarity: 玄
   troop_type: 騎兵
   slot_stat: 統率
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 将才
     type: buff
@@ -2778,6 +2839,11 @@ generals:
   - screenshot:IMG_0681.PNG
   xlsx_remarks: ダメ味方兵比率×20増、ダメ敵方兵比率×20減（上限25%増、10%減）
   base_general_id: 司馬懿
+  stats:
+    統率: 100
+    武力: 60
+    知性: 97
+    魅力: 88
 - id: 玄郭嘉
   name: 玄郭嘉
   yomi: null
@@ -3318,7 +3384,8 @@ generals:
   base_rarity: 橙
   troop_type: 騎兵
   slot_stat: 統率
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 青虎
     type: buff
@@ -3428,13 +3495,19 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B39
   - screenshot:IMG_0698.PNG
   xlsx_remarks: 味方貫通10%増・敵10%減（上限20%）、【装備】連撃5%増（上限10%）
+  stats:
+    統率: 97
+    武力: 79
+    知性: 65
+    魅力: 68
 - id: 夏侯玄
   name: 夏侯玄
   yomi: null
   base_rarity: 橙
   troop_type: 騎兵
   slot_stat: 知性
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 風雅
     type: buff
@@ -3546,6 +3619,11 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B40
   - screenshot:IMG_0692.PNG
   xlsx_remarks: シールド敵より大・次交戦ダメ10％減（累加不可）、敵貫通15%減（累加不可）、所在馬敵防御力8%減（上限16%）【装備】抵抗基礎速度×15%（累加不可）
+  stats:
+    統率: 59
+    武力: 38
+    知性: 98
+    魅力: 92
 - id: 審配
   name: 審配
   yomi: null
@@ -3635,7 +3713,8 @@ generals:
   base_rarity: 橙
   troop_type: 騎兵
   slot_stat: 武力
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 烈胆
     type: buff
@@ -3744,6 +3823,11 @@ generals:
   - screenshot:IMG_0709.PNG
   - screenshot:A333B1B6.png
   xlsx_remarks: 軍紀19.8％ダウン(上限30％)
+  stats:
+    統率: 88
+    武力: 98
+    知性: 58
+    魅力: null
 - id: 沙摩柯
   name: 沙摩柯
   yomi: null
@@ -3909,7 +3993,8 @@ generals:
   base_rarity: 橙
   troop_type: 弓兵
   slot_stat: 知性
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 風雷
     type: buff
@@ -4019,6 +4104,11 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B51
   - screenshot:IMG_0696.PNG
   xlsx_remarks: 敵兵10%移動（上限10%）、追加ダメ敵非参戦数×100%（ダメ上限20%）
+  stats:
+    統率: 80
+    武力: 44
+    知性: 98
+    魅力: null
 - id: 玄陸遜
   name: 玄陸遜
   yomi: null
@@ -4261,7 +4351,8 @@ generals:
   base_rarity: 玄
   troop_type: 弓兵
   slot_stat: 武力
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 覇射
     type: buff
@@ -4370,6 +4461,11 @@ generals:
   - screenshot:玄呂布_20260515
   xlsx_remarks: 連撃武力差分×3%増（上限35%）【装備】ダメージ増（連撃増% x 20%）
   base_general_id: 呂布
+  stats:
+    統率: 90
+    武力: 101
+    知性: 63
+    魅力: null
 - id: 玄徐庶
   name: 玄徐庶
   yomi: null
@@ -4476,7 +4572,8 @@ generals:
   base_rarity: 玄
   troop_type: 弓兵
   slot_stat: 武力
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 夜戦
     type: debuff
@@ -4583,6 +4680,11 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B58
   - screenshot:IMG_0688.PNG
   xlsx_remarks: ダメ18%減、最終連撃高の場合ダメ5%減追加（累加不可）
+  stats:
+    統率: 90
+    武力: 98
+    知性: 75
+    魅力: 69
 - id: 玄夏侯淵
   name: 玄夏侯淵
   yomi: null
@@ -4681,7 +4783,8 @@ generals:
   base_rarity: 玄
   troop_type: 弓兵
   slot_stat: 知性
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 貫通減16.5％（上限20％）貫通アップ5.5％（10％）
     type: debuff
@@ -4721,6 +4824,11 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B61
   xlsx_remarks: 貫通減16.5％（上限20％）貫通アップ5.5％（10％）
+  stats:
+    統率: 12
+    武力: 11
+    知性: 98
+    魅力: null
 - id: 賀斉
   name: 賀斉
   yomi: null
@@ -4777,7 +4885,8 @@ generals:
   base_rarity: 玄
   troop_type: 弓兵
   slot_stat: 武力
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 鏡姿
     type: debuff
@@ -4888,13 +4997,19 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B64
   - screenshot:IMG_0699.PNG
   xlsx_remarks: 防御力×15%増（上限25%）、兵種比率20%毎敵抑制5%減（累加不可）、戦時軍紀5%増（上限10%）、【装備】敵貫通抵抗5%減（累加不可）
+  stats:
+    統率: 74
+    武力: 97
+    知性: 29
+    魅力: 78
 - id: 玄程昱
   name: 玄程昱
   yomi: null
   base_rarity: 玄
   troop_type: 弓兵
   slot_stat: 知性
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 興駄
     type: buff
@@ -5003,6 +5118,11 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B65
   - screenshot:IMG_0695.PNG
   xlsx_remarks: 実ダメ15%増（上限20％）、確率75%実ダメ10％増（累加不可）、【装備】攻撃力6%増（上限12%）
+  stats:
+    統率: 70
+    武力: 49
+    知性: 98
+    魅力: 56
 - id: 荀攸
   name: 荀攸
   yomi: null
@@ -5243,7 +5363,8 @@ generals:
   base_rarity: 玄
   troop_type: 戦車
   slot_stat: 知性
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 興兵
     type: buff
@@ -5351,6 +5472,11 @@ generals:
   - screenshot:EE27CEBC.png
   xlsx_remarks: 主陣ダメ15%減（累加不可）、角陣ダメ15%減（上限30%）、【装備】交戦毎兵士4%増
   base_general_id: 黄月英
+  stats:
+    統率: 70
+    武力: 28
+    知性: 98
+    魅力: 79
 - id: 玄陳宮
   name: 玄陳宮
   yomi: null
@@ -5544,7 +5670,8 @@ generals:
   base_rarity: 橙
   troop_type: 歩兵
   slot_stat: 知性
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 忠魂
     type: buff
@@ -5648,13 +5775,19 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B76
   - screenshot:4426ED34.png
   xlsx_remarks: 主陣実ダメ増（味方角陣初回交戦攻撃力 / 敵角陣初回交戦攻撃力) x 16.5%（累計不可）　【装備】味方角陣連撃12%増
+  stats:
+    統率: 81
+    武力: 30
+    知性: 99
+    魅力: null
 - id: 玄廖化
   name: 玄廖化
   yomi: null
   base_rarity: 玄
   troop_type: 戦車
   slot_stat: 武力
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 壮心
     type: buff
@@ -5769,13 +5902,19 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B77
   - screenshot:IMG_0701.PNG
   xlsx_remarks: 主陣ダメ15%増（累加不可）、角陣ダメ15%増（上限30%）、【装備】戦車基礎軍紀×20%増
+  stats:
+    統率: 82
+    武力: 98
+    知性: 64
+    魅力: null
 - id: 朱然
   name: 朱然
   yomi: null
   base_rarity: 橙
   troop_type: 戦車
   slot_stat: 武力
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 胆守
     type: buff
@@ -5869,6 +6008,11 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B78
   - screenshot:IMG_0710.PNG
   xlsx_remarks: 実ダメ減（味方角陣防御 / 敵角陣防御) x 16.5%【装備】味方角陣連撃12%増
+  stats:
+    統率: 92
+    武力: 98
+    知性: 76
+    魅力: null
 - id: 馬鈞
   name: 馬鈞
   yomi: null
@@ -6410,7 +6554,8 @@ generals:
   base_rarity: 橙
   troop_type: 歩兵
   slot_stat: 知性
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 平定
     type: buff
@@ -6519,6 +6664,11 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B91
   - screenshot:IMG_0686.PNG
   xlsx_remarks: 味方連撃10%増・敵10%減（上限30%）
+  stats:
+    統率: 89
+    武力: 74
+    知性: 99
+    魅力: null
 - id: 玄周瑜
   name: 玄周瑜
   yomi: null
@@ -7167,7 +7317,8 @@ generals:
   base_rarity: 玄
   troop_type: 弓兵
   slot_stat: 武力
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 狼針
     type: buff
@@ -7274,13 +7425,19 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B102
   - screenshot:IMG_0693.PNG
   xlsx_remarks: 敵実ダメ15%反射（累加不可）、連撃8%増（累加不可）、【装備】集結陣内基礎軍紀10%増（上限無し）
+  stats:
+    統率: 92
+    武力: 98
+    知性: 78
+    魅力: 80
 - id: 玄張郃
   name: 玄張郃
   yomi: null
   base_rarity: 玄
   troop_type: 騎兵
   slot_stat: 統率
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 節度
     type: buff
@@ -7388,13 +7545,19 @@ generals:
   - screenshot:IMG_0694.PNG
   - screenshot:B4A8397E.png
   xlsx_remarks: 兵種比率20%毎抵抗4%増（累加不可）、戦時軍紀15%増（上限25%）【装備】敵の参戦可能兵士5%が味方にダメージ与えられない（累加不可）
+  stats:
+    統率: 98
+    武力: 90
+    知性: 84
+    魅力: 70
 - id: 玄曹彰
   name: 玄曹彰
   yomi: null
   base_rarity: 玄
   troop_type: 騎兵
   slot_stat: 武力
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 威壮
     type: buff
@@ -7505,13 +7668,19 @@ generals:
   - screenshot:IMG_0689.PNG
   - screenshot:CFF32D4B.png
   xlsx_remarks: 兵種比率20%毎連撃4%増（累加不可）、戦時軍紀 馬比率x22%増、弓比率x22%減【装備】敵の防御6%減
+  stats:
+    統率: 89
+    武力: 98
+    知性: 59
+    魅力: null
 - id: 玄黄蓋
   name: 玄黄蓋
   yomi: null
   base_rarity: 玄
   troop_type: 弓兵
   slot_stat: 武力
-  role_tags: []
+  role_tags:
+  - 将印武将
   skills:
   - name: 炎舟
     type: debuff
@@ -7618,6 +7787,11 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B105
   - screenshot:DDF7302D.png
   xlsx_remarks: 初回交戦味方参戦可能兵士数の10％ダメージ、毎回交戦敵方参戦兵士の10％がダメージ与えられない（累計不可）
+  stats:
+    統率: 87
+    武力: 98
+    知性: 71
+    魅力: null
 - id: 馬岱
   name: 馬岱
   yomi: null
@@ -7860,7 +8034,8 @@ generals:
   slot_stat:
   - 統率
   - 知性
-  role_tags: []
+  role_tags:
+  - 将印武将
   skills:
   - name: 将才
     type: buff
@@ -7960,6 +8135,11 @@ generals:
   sources:
   - screenshot:IMG_0675.jpg
   - wiki:sangoku-haou.gamer-wiki.com/character/sousou
+  stats:
+    統率: 101
+    武力: 72
+    知性: 91
+    魅力: null
 - id: 諸葛亮
   name: 諸葛亮
   yomi: しょかつりょう
@@ -7968,7 +8148,8 @@ generals:
   slot_stat:
   - 知性
   - 統率
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 空城
     type: buff
@@ -8057,6 +8238,11 @@ generals:
   sources:
   - screenshot:IMG_0678.PNG
   - wiki:sangoku-haou.gamer-wiki.com/character/syokatu-ryou
+  stats:
+    統率: 91
+    武力: 38
+    知性: 101
+    魅力: null
 - id: 曹節
   name: 曹節
   yomi: そうせつ
@@ -8064,6 +8250,7 @@ generals:
   troop_type: 万能
   role_tags:
   - support
+  - 装備武将
   seal_bonus:
     by_seal:
     - null
@@ -8167,12 +8354,18 @@ generals:
   sources:
   - screenshot:IMG_0702.PNG
   - screenshot:B6260651.png
+  stats:
+    統率: 13
+    武力: 29
+    知性: 78
+    魅力: null
 - id: 玄黄忠
   name: 玄黄忠
   yomi: げんこうちゅう
   base_rarity: 玄
   troop_type: 弓兵
-  role_tags: []
+  role_tags:
+  - 将印武将
   seal_bonus:
     by_seal:
     - null
@@ -8260,6 +8453,11 @@ generals:
     direction: up
   sources:
   - screenshot:IMG_0705.PNG
+  stats:
+    統率: 98
+    武力: 93
+    知性: 79
+    魅力: null
 - id: 嵇康
   name: 嵇康
   yomi: けいこう
@@ -8338,7 +8536,8 @@ generals:
   yomi: げんかこうとん
   base_rarity: 玄
   troop_type: 弓兵
-  role_tags: []
+  role_tags:
+  - 将印武将
   seal_bonus:
     by_seal:
     - null
@@ -8446,6 +8645,11 @@ generals:
     direction: up
   sources:
   - screenshot:1984C071.png
+  stats:
+    統率: 99
+    武力: 87
+    知性: 82
+    魅力: null
 - id: 南華老仙
   name: 南華老仙
   yomi: なんかろうせん
@@ -8453,6 +8657,7 @@ generals:
   troop_type: 歩兵
   role_tags:
   - support
+  - 装備武将
   seal_bonus:
     by_seal:
     - null
@@ -8545,6 +8750,11 @@ generals:
     direction: down
   sources:
   - screenshot:9D2F3B11.png
+  stats:
+    統率: 12
+    武力: 26
+    知性: 98
+    魅力: null
 - id: 羊徽瑜
   name: 羊徽瑜
   yomi: ようきゆ
@@ -8552,6 +8762,7 @@ generals:
   troop_type: 万能
   role_tags:
   - support
+  - 装備武将
   seal_bonus:
     by_seal:
     - null
@@ -8634,6 +8845,11 @@ generals:
     direction: down
   sources:
   - screenshot:B74AAD4A.png
+  stats:
+    統率: 20
+    武力: 16
+    知性: 81
+    魅力: 88
 - id: 夏侯覇
   name: 夏侯覇
   yomi: null
@@ -12541,3 +12757,96 @@ generals:
     direction: up
   sources:
   - screenshot:高順.PNG
+- id: 文聘
+  name: 文聘
+  yomi: null
+  base_rarity: 橙
+  troop_type: null
+  slot_stat: null
+  role_tags:
+  - 装備武将
+  stats:
+    統率: 98
+    武力: 86
+    知性: 76
+    魅力: 78
+  skills: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  sources:
+  - user_stats_table_20260522
+- id: 魏義
+  name: 魏義
+  yomi: null
+  base_rarity: 橙
+  troop_type: null
+  slot_stat: null
+  role_tags:
+  - 装備武将
+  stats:
+    統率: 98
+    武力: 92
+    知性: 62
+    魅力: 49
+  skills: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  sources:
+  - user_stats_table_20260522
+- id: 祢衡
+  name: 祢衡
+  yomi: null
+  base_rarity: 橙
+  troop_type: null
+  slot_stat: null
+  role_tags:
+  - 装備武将
+  stats:
+    統率: 18
+    武力: 45
+    知性: 93
+    魅力: null
+  skills: []
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  sources:
+  - user_stats_table_20260522
