@@ -16,6 +16,7 @@ YAML_PATH = ROOT / 'generals.yaml'
 HTML_TARGETS = [
     ROOT / 'index.html',     # メインシミュレータ
     ROOT / 'register.html',  # 友人配布用 所持登録ツール
+    ROOT / 'status.html',    # 登録状況ダッシュボード
 ]
 
 START = '<!--DATA_START-->'
