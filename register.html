@@ -44,6 +44,9 @@
   .gcard .badges { font-size: 11px; color: var(--muted); display: inline-flex; gap: 4px; flex-wrap: wrap; }
   .gcard .badge { display: inline-block; padding: 1px 6px; background: #ede7d9; border-radius: 8px; }
   .gcard .badge.gen { background: #c8b070; color: #fff; }
+  .gcard .badge.dev-seal { background: #c0392b; color: #fff; }
+  .gcard .badge.dev-equipment { background: #2e6da4; color: #fff; }
+  .gcard .badge.dev-none { background: #bbb; color: #444; }
   .gcard .badge.troop-騎兵 { background: #b3d4f0; }
   .gcard .badge.troop-歩兵 { background: #d4e0b3; }
   .gcard .badge.troop-弓兵 { background: #e8d0a8; }
@@ -92,8 +95,8 @@
       <option>歩兵</option><option>騎兵</option><option>弓兵</option><option>戦車</option><option>万能</option>
     </select>
     <select id="filter-rarity">
-      <option value="">レア：全て</option>
-      <option>橙</option><option>玄</option>
+      <option value="">タイプ：全て</option>
+      <option value="seal">将印</option><option value="equipment">装備</option><option value="none">無印</option>
     </select>
     <input type="text" id="filter-search" placeholder="🔍 武将名" style="flex:1;min-width:100px;">
     <label class="field"><input type="checkbox" id="filter-owned-only">所持のみ</label>
@@ -155,6 +158,8 @@ function devType(g) {
   if (tags.indexOf('装備武将') >= 0) return 'equipment';
   return 'none';
 }
+const DEV_TYPE_LABEL = { seal: '将印', equipment: '装備', none: '無印' };
+function devTypeLabel(g) { return DEV_TYPE_LABEL[devType(g)]; }
 function genById(id) {
   return state.data.generals.find(x => x.id === id);
 }
@@ -189,7 +194,7 @@ function loadLocal() {
 function filteredGenerals() {
   return state.data.generals.filter(g => {
     if (state.filters.troop && g.troop_type !== state.filters.troop) return false;
-    if (state.filters.rarity && g.base_rarity !== state.filters.rarity) return false;
+    if (state.filters.rarity && devType(g) !== state.filters.rarity) return false;
     if (state.filters.search && !g.name.includes(state.filters.search) && !((g.yomi||'').includes(state.filters.search))) return false;
     if (state.filters.ownedOnly && !getOwn(g.id).owned) return false;
     return true;
@@ -234,7 +239,7 @@ function renderRoster() {
         <div class="name-row">
           <span class="name">${g.name}</span>
           <span class="badges">
-            <span class="badge ${g.base_rarity === '玄' ? 'gen' : ''}">${g.base_rarity}</span>
+            <span class="badge dev-${devType(g)}">${devTypeLabel(g)}</span>
             <span class="badge troop-${g.troop_type}">${g.troop_type || '?'}</span>
           </span>
         </div>

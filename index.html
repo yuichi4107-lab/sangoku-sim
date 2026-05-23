@@ -51,6 +51,9 @@
   .badge { display: inline-block; padding: 1px 5px; font-size: 11px; border-radius: 2px; margin-right: 4px; }
   .b-rarity-橙 { background: #f5a623; color: #fff; }
   .b-rarity-玄 { background: #4a4a4a; color: #fff; }
+  .b-dev-seal { background: #c0392b; color: #fff; }
+  .b-dev-equipment { background: #2e6da4; color: #fff; }
+  .b-dev-none { background: #bbb; color: #444; }
   .b-troop { background: #ddd; color: #333; }
   .b-troop-歩兵 { background: #c7d8c0; }
   .b-troop-騎兵 { background: #e6c5a3; }
@@ -137,7 +140,7 @@
     <div id="user-tabs" style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;align-items:center;font-size:12px;"></div>
     <div class="filters">
       <label>兵種<select id="filter-troop"><option value="">全</option></select></label>
-      <label>レア<select id="filter-rarity"><option value="">全</option></select></label>
+      <label>タイプ<select id="filter-rarity"><option value="">全</option><option value="seal">将印</option><option value="equipment">装備</option><option value="none">無印</option></select></label>
       <label>検索<input id="filter-search" type="text" placeholder="武将名" style="width:120px;"></label>
       <label><input type="checkbox" id="filter-owned-only">所持のみ</label>
       <button id="btn-clear-state">状態リセット</button>
@@ -316,6 +319,10 @@ function devType(g) {
   if (tags.indexOf('装備武将') >= 0) return 'equipment';
   return 'none';
 }
+
+// 武将タイプの表示ラベル（バッジ用）。型不明は「無印」。
+const DEV_TYPE_LABEL = { seal: '将印', equipment: '装備', none: '無印' };
+function devTypeLabel(g) { return DEV_TYPE_LABEL[devType(g)]; }
 
 function canPlaceInTroop(general, troop) {
   if (!troop) return true;
@@ -830,13 +837,11 @@ function renderFilters() {
     opt.value = t; opt.textContent = t;
     troopSel.appendChild(opt);
   });
-  state.data.meta.rarity_order.forEach(r => {
-    const opt = document.createElement('option');
-    opt.value = r; opt.textContent = r;
-    raritySel.appendChild(opt);
-  });
+  // タイプ（将印/装備/無印）の選択肢は HTML 側で静的に定義済み
   troopSel.value = state.filters.troop;
   raritySel.value = state.filters.rarity;
+  // 旧レア値（玄/橙）が localStorage に残っている場合は無効化（空 = 全表示）
+  if (raritySel.value !== state.filters.rarity) { state.filters.rarity = raritySel.value; }
   document.getElementById('filter-search').value = state.filters.search;
   document.getElementById('filter-owned-only').checked = state.filters.ownedOnly;
 
@@ -1430,7 +1435,7 @@ function makeSlotCell(bat, slot, opts) {
   for (const g of candidates) {
     const o = document.createElement('option');
     o.value = g.id;
-    o.textContent = `${g.name} (${g.troop_type}/${g.base_rarity})`;
+    o.textContent = `${g.name} (${g.troop_type}/${devTypeLabel(g)})`;
     if (bat[slot] === g.id) o.selected = true;
     sel.appendChild(o);
   }
@@ -1447,7 +1452,7 @@ function makeSlotCell(bat, slot, opts) {
 function filteredGenerals() {
   return state.data.generals.filter(g => {
     if (state.filters.troop && g.troop_type !== state.filters.troop) return false;
-    if (state.filters.rarity && g.base_rarity !== state.filters.rarity) return false;
+    if (state.filters.rarity && devType(g) !== state.filters.rarity) return false;
     if (state.filters.search && !g.name.includes(state.filters.search) && !(g.yomi || '').includes(state.filters.search)) return false;
     if (state.filters.ownedOnly && !getOwn(g.id).owned) return false;
     return true;
@@ -1517,7 +1522,7 @@ function renderRoster() {
     const tdAttr = document.createElement('td');
     const slotS = Array.isArray(g.slot_stat) ? g.slot_stat.join('/') : (g.slot_stat || '?');
     tdAttr.innerHTML =
-      `<span class="badge b-rarity-${g.base_rarity}">${g.base_rarity}</span>` +
+      `<span class="badge b-dev-${devType(g)}">${devTypeLabel(g)}</span>` +
       `<span class="badge b-troop b-troop-${g.troop_type}">${g.troop_type}</span>` +
       `<span style="font-size:11px;color:var(--muted);">${slotS}</span>`;
     tr.appendChild(tdAttr);
