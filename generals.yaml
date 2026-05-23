@@ -379,22 +379,6 @@ generals:
       confidence: high
     effect_attribute: 防御
     direction: up
-  - name: 鉄壁・盾備
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の槍盾兵防御力を基礎防御力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 過関斬将
     type: debuff
     scope: legion
@@ -610,22 +594,6 @@ generals:
       note: スクショ由来の上限
     effect_attribute: 攻撃
     direction: up
-  - name: 奮起・猛獣
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 疾風虎勁
     type: buff
     scope: rally
@@ -706,22 +674,6 @@ generals:
       - null
       - null
       - 30
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
       confidence: high
     effect_attribute: 攻撃
     direction: up
@@ -979,22 +931,6 @@ generals:
       note: 上限30%、最高50pt
     effect_attribute: 防御
     direction: up
-  - name: 奮起・猛獣
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 武神
     type: buff
     scope: legion
@@ -1173,22 +1109,6 @@ generals:
       - 20
       confidence: high
     effect_attribute: 攻撃
-    direction: up
-  - name: 鉄壁・盾槍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の盾槍兵防御力を基礎防御力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 防御
     direction: up
   - name: 驍雄
     type: buff
@@ -1397,22 +1317,6 @@ generals:
   slot_stat: 武力
   role_tags: []
   skills:
-  - name: 奮起・歩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の歩兵攻撃力を基礎攻撃力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 斬羽
     type: buff
     scope: rally
@@ -1763,38 +1667,6 @@ generals:
       confidence: high
     effect_attribute: 率兵
     direction: up
-  - name: 鉄壁・歩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の歩兵防御力を基礎防御力×44%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 44
-      confidence: high
-    effect_attribute: 防御
-    direction: up
-  - name: 鉄壁・盾槍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の盾槍兵防御力を基礎防御力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 八門金鎖
     type: debuff
     scope: rally
@@ -1954,22 +1826,6 @@ generals:
       confidence: high
     effect_attribute: 率兵
     direction: up
-  - name: 攻城・車
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の戦車攻城力を基礎攻城×16%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 16
-      confidence: high
-    effect_attribute: その他
-    direction: up
   - name: 察見知謀
     type: debuff
     scope: legion
@@ -2078,22 +1934,6 @@ generals:
       note: 抑制率増減80%
     effect_attribute: 抑制
     direction: both
-  - name: 鉄壁・盾備
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の槍盾兵防御力を基礎防御力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 先登拒陽
     type: buff
     scope: legion
@@ -2198,22 +2038,6 @@ generals:
       note: 低下軍紀15%まで
     effect_attribute: 軍紀
     direction: down
-  - name: 鉄壁・盾備
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の槍盾兵防御力を基礎防御力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 臨江南救
     type: buff
     scope: legion
@@ -2381,22 +2205,6 @@ generals:
   slot_stat: 統率
   role_tags: []
   skills:
-  - name: 鉄壁・歩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の歩兵防御力を基礎防御力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 強御・歩
     type: buff
     scope: legion
@@ -2598,22 +2406,6 @@ generals:
       note: シールド増50%上限
     effect_attribute: シールド
     direction: up
-  - name: 鉄壁・盾備
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の槍盾兵防御力を基礎防御力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 紫旗破爆
     type: buff
     scope: legion
@@ -2784,22 +2576,6 @@ generals:
       note: スクショ由来の上限
     effect_attribute: 抑制
     direction: down
-  - name: 鉄壁・騎
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の騎兵防御力を基礎防御力×44%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 44
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 挺身独戦
     type: buff
     scope: legion
@@ -2875,22 +2651,6 @@ generals:
       confidence: high
     effect_attribute: 防御
     direction: both
-  - name: 奮起・猛獣
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 勇威胡騎
     type: debuff
     scope: legion
@@ -2997,22 +2757,6 @@ generals:
       confidence: high
     stacking: non_stackable
     effect_attribute: 兵士数
-    direction: up
-  - name: 鉄壁・車
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の戦車防御力を基礎防御力×16%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 16
-      confidence: high
-    effect_attribute: 防御
     direction: up
   - name: 兵勘若神
     type: buff
@@ -3673,22 +3417,6 @@ generals:
       note: 攻撃50%・300pt上限
     effect_attribute: 攻撃
     direction: up
-  - name: 攻城・車
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の戦車攻城値を基礎攻城値×14%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 14
-      confidence: high
-    effect_attribute: その他
-    direction: up
   - name: 錦馬騰馳
     type: buff
     scope: legion
@@ -3766,22 +3494,6 @@ generals:
       - 15
       confidence: high
     effect_attribute: 軍紀
-    direction: up
-  - name: 奮起・猛獣
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 切磋砕誌
     type: buff
@@ -3895,22 +3607,6 @@ generals:
     stacking: non_stackable
     effect_attribute: シールド
     direction: both
-  - name: 奮起・猛獣
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 砍雷破社
     type: debuff
     scope: legion
@@ -4348,22 +4044,6 @@ generals:
       note: スクショ由来の上限
     effect_attribute: 抑制
     direction: down
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 雕翎飛鬼
     type: buff
     scope: rally
@@ -4520,22 +4200,6 @@ generals:
       cap_value: 10
       note: 累加上限10%
     effect_attribute: その他
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 誘伏撃奇
     type: buff
@@ -4950,22 +4614,6 @@ generals:
     stacking: non_stackable
     effect_attribute: 兵士数
     direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: legion
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 寒星開月
     type: buff
     scope: legion
@@ -5156,22 +4804,6 @@ generals:
       - 20
       confidence: high
     effect_attribute: 連撃
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 隠者攻撃
     type: debuff
@@ -5592,22 +5224,6 @@ generals:
       confidence: high
     effect_attribute: 攻撃
     direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 江東統領
     type: buff
     scope: legion
@@ -5686,22 +5302,6 @@ generals:
       - 40
       confidence: high
     effect_attribute: 防御
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 火神疾魔
     type: buff
@@ -5804,22 +5404,6 @@ generals:
       - 15
       confidence: high
     effect_attribute: 軍紀
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 十面埋伏
     type: buff
@@ -5925,22 +5509,6 @@ generals:
       confidence: high
     effect_attribute: その他
     direction: up
-  - name: 攻城・車
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の戦車攻城値を基礎攻城値×14%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 14
-      confidence: high
-    effect_attribute: その他
-    direction: up
   - name: 破勢
     type: debuff
     scope: rally
@@ -5988,22 +5556,6 @@ generals:
   slot_stat: 知性
   role_tags: []
   skills:
-  - name: 鉄壁・弓
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の弓兵防御力を基礎防御力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 無双・弓
     type: buff
     scope: legion
@@ -6019,22 +5571,6 @@ generals:
       - 20
       confidence: high
     effect_attribute: 攻撃
-    direction: up
-  - name: 攻城・虎戦
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の虎戦車攻城値+24%
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: その他
     direction: up
   - name: 遠近帰心
     type: buff
@@ -6272,22 +5808,6 @@ generals:
       confidence: high
     stacking: non_stackable
     effect_attribute: 貫通抵抗
-    direction: up
-  - name: 鉄壁・車
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の戦車防御力を基礎防御力×20%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 20
-      confidence: high
-    effect_attribute: 防御
     direction: up
   - name: 威厳と思
     type: buff
@@ -6632,22 +6152,6 @@ generals:
       confidence: high
     effect_attribute: 防御
     direction: up
-  - name: 鉄壁・盾備
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の槍盾兵防御力を基礎防御力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 鋼鉄装骨
     type: buff
     scope: legion
@@ -6755,22 +6259,6 @@ generals:
       cap_value: 25
       note: 追加兵士25%上限
     effect_attribute: 兵士数
-    direction: up
-  - name: 攻城
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の戦車攻城値を基礎攻城値×20%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 20
-      confidence: high
-    effect_attribute: その他
     direction: up
   - name: 老兵壮志
     type: buff
@@ -7301,22 +6789,6 @@ generals:
       confidence: high
     effect_attribute: 連撃
     direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 一統の威
     type: buff
     scope: legion
@@ -7399,22 +6871,6 @@ generals:
       cap_value: 50
       note: スクショ由来の上限
     effect_attribute: 防御
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 堅塁
     type: buff
@@ -7656,22 +7112,6 @@ generals:
       - 30
       confidence: high
     effect_attribute: 兵士数
-    direction: up
-  - name: 鉄壁・盾備
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の槍盾兵防御力を基礎防御力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 防御
     direction: up
   - name: 改天換日
     type: debuff
@@ -8368,22 +7808,6 @@ generals:
       confidence: high
     effect_attribute: 防御
     direction: up
-  - name: 鉄壁・盾備
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の槍盾兵防御力を基礎防御力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 破讒
     type: buff
     scope: legion
@@ -8543,22 +7967,6 @@ generals:
       confidence: high
     effect_attribute: 軍紀
     direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 重鎧堅墨
     type: buff
     scope: legion
@@ -8661,22 +8069,6 @@ generals:
       confidence: high
     stacking: non_stackable
     effect_attribute: 抵抗
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 助兵聚集
     type: buff
@@ -8781,22 +8173,6 @@ generals:
       confidence: high
     stacking: non_stackable
     effect_attribute: 連撃
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 回馬射月
     type: buff
@@ -8906,22 +8282,6 @@ generals:
     stacking: non_stackable
     effect_attribute: 兵士数
     direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 烈成猛攻
     type: buff
     scope: legion
@@ -9021,22 +8381,6 @@ generals:
       - 27
       confidence: high
     effect_attribute: 防御
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 狂瀾既倒
     type: debuff
@@ -9419,22 +8763,6 @@ generals:
       confidence: high
     effect_attribute: 攻撃
     direction: up
-  - name: 奮起・猛獣
-    type: buff
-    scope: legion
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 唯才
     type: buff
     scope: legion
@@ -9516,22 +8844,6 @@ generals:
       - 20
       confidence: high
     effect_attribute: 防御
-    direction: up
-  - name: 奮起・連
-    type: buff
-    scope: legion
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 八陣
     type: buff
@@ -9765,22 +9077,6 @@ generals:
     stacking: non_stackable
     effect_attribute: 貫通
     direction: up
-  - name: 奮起・猛獣
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 穿雲撃石
     type: buff
     scope: legion
@@ -9940,22 +9236,6 @@ generals:
       note: 累加上限12%
     effect_attribute: 防御
     direction: down
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 略誅決死
     type: buff
     scope: legion
@@ -10256,22 +9536,6 @@ generals:
       note: 援軍上限20%
     effect_attribute: 抑制
     direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 上下一撃
     type: buff
     scope: legion
@@ -10413,22 +9677,6 @@ generals:
       - null
       - null
       - 34
-      confidence: high
-    effect_attribute: 防御
-    direction: up
-  - name: 鉄壁・盾槍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の盾槍兵防御力を基礎防御力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
       confidence: high
     effect_attribute: 防御
     direction: up
@@ -10729,22 +9977,6 @@ generals:
       confidence: high
     effect_attribute: 防御
     direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 高射
     type: buff
     scope: self
@@ -10800,38 +10032,6 @@ generals:
       - 78
       confidence: high
     effect_attribute: 率兵
-    direction: up
-  - name: 鉄壁・弓
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の弓兵防御力を基礎防御力×44%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 44
-      confidence: high
-    effect_attribute: 防御
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 伐異
     type: buff
@@ -10904,22 +10104,6 @@ generals:
       - 22
       confidence: high
     effect_attribute: 防御
-    direction: up
-  - name: 奮起・猛獣
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×21%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 21
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 尖刃
     type: buff
@@ -11143,22 +10327,6 @@ generals:
       confidence: high
     effect_attribute: 攻撃
     direction: up
-  - name: 奮起・猛獣
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   sources:
   - screenshot:かすが.PNG
 - id: 呉懿
@@ -11214,22 +10382,6 @@ generals:
       - 34
       confidence: high
     effect_attribute: シールド
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 動合自在
     type: buff
@@ -11415,22 +10567,6 @@ generals:
     effect_note: 未確認
     confidence: unknown
   skills:
-  - name: 奮起・歩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の歩兵攻撃力を基礎攻撃力×20%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 20
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 強御・歩
     type: buff
     scope: legion
@@ -11444,22 +10580,6 @@ generals:
       - null
       - null
       - 10
-      confidence: high
-    effect_attribute: 防御
-    direction: up
-  - name: 鉄壁・盾槍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の盾槍兵防御力を基礎防御力×21%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 21
       confidence: high
     effect_attribute: 防御
     direction: up
@@ -11487,54 +10607,6 @@ generals:
     effect_note: 未確認
     confidence: unknown
   skills:
-  - name: 奮起・弓
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の弓兵攻撃力が基礎攻撃力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
-  - name: 鉄壁・弓
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の弓兵防御力を基礎防御力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 防御
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×21%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 21
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 隕鳳落星
     type: buff
     scope: rally
@@ -11663,38 +10735,6 @@ generals:
       confidence: high
     effect_attribute: その他
     direction: up
-  - name: 鉄壁・歩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の歩兵防御力を基礎防御力×44%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 44
-      confidence: high
-    effect_attribute: 防御
-    direction: up
-  - name: 鉄壁・盾槍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の盾槍兵防御力を基礎防御力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 絶代芳華
     type: buff
     scope: legion
@@ -11739,22 +10779,6 @@ generals:
     effect_note: 未確認
     confidence: unknown
   skills:
-  - name: 奮起・歩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の歩兵攻撃力を基礎攻撃力×34%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 34
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 無双・歩
     type: buff
     scope: legion
@@ -11768,22 +10792,6 @@ generals:
       - null
       - null
       - 22
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
-  - name: 奮起・歩_2
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の歩兵攻撃力を基礎攻撃力×14%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 14
       confidence: high
     effect_attribute: 攻撃
     direction: up
@@ -11859,22 +10867,6 @@ generals:
       confidence: high
     effect_attribute: 攻撃
     direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×21%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 21
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   sources:
   - screenshot:徐庶.PNG
 - id: 文鴦
@@ -11899,22 +10891,6 @@ generals:
     effect_note: 未確認
     confidence: unknown
   skills:
-  - name: 奮起・騎
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の騎兵攻撃力を基礎攻撃力×20%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 20
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 無双・騎
     type: buff
     scope: legion
@@ -11971,22 +10947,6 @@ generals:
     effect_note: 未確認
     confidence: unknown
   skills:
-  - name: 奮起・歩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の歩兵攻撃力を基礎攻撃力×20%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 20
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 強御・歩
     type: buff
     scope: legion
@@ -12043,22 +11003,6 @@ generals:
     effect_note: 未確認
     confidence: unknown
   skills:
-  - name: 鉄壁・軍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 所属部隊全兵士の防御力を20%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 20
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 称象
     type: buff
     scope: legion
@@ -12135,38 +11079,6 @@ generals:
       confidence: high
     effect_attribute: その他
     direction: up
-  - name: 奮起・騎
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の騎兵攻撃力を基礎攻撃力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
-  - name: 奮起・猛獣
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×21%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 21
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 良謀大略
     type: buff
     scope: legion
@@ -12238,22 +11150,6 @@ generals:
       - 30
       confidence: high
     effect_attribute: 防御
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×21%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 21
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 剣閣守険
     type: buff
@@ -12331,22 +11227,6 @@ generals:
       note: 累加上限30%、下限10%
     effect_attribute: ダメージ
     direction: down
-  - name: 攻城・車
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の戦車攻城値を基礎攻城値×14%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 14
-      confidence: high
-    effect_attribute: その他
-    direction: up
   sources:
   - screenshot:玄田豊.PNG
 - id: 玄顔良
@@ -12402,22 +11282,6 @@ generals:
       - 30
       confidence: high
     effect_attribute: 防御
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 三軍戦慄
     type: buff
@@ -12488,22 +11352,6 @@ generals:
       - null
       - null
       - 60
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
       confidence: high
     effect_attribute: 攻撃
     direction: up
@@ -12579,22 +11427,6 @@ generals:
       confidence: high
     effect_attribute: その他
     direction: down
-  - name: 奮起・歩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の歩兵攻撃力を基礎攻撃力×12%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 12
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 深溝高塁
     type: buff
     scope: self
@@ -12855,38 +11687,6 @@ generals:
     effect_note: 未確認
     confidence: unknown
   skills:
-  - name: 奮起・騎
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の騎兵攻撃力を基礎攻撃力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
-  - name: 鉄壁・騎
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の騎兵防御力を基礎防御力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 民
     type: buff
     scope: self
@@ -12943,22 +11743,6 @@ generals:
     effect_note: 未確認
     confidence: unknown
   skills:
-  - name: 奮起・弓
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の弓兵攻撃力が基礎攻撃力×20%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 20
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 強御・弓
     type: buff
     scope: legion
@@ -12974,22 +11758,6 @@ generals:
       - 10
       confidence: high
     effect_attribute: 防御
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   sources:
   - screenshot:董襲.PNG
@@ -13087,54 +11855,6 @@ generals:
     effect_note: 未確認
     confidence: unknown
   skills:
-  - name: 鉄壁・歩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の歩兵防御力を基礎防御力×34%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 34
-      confidence: high
-    effect_attribute: 防御
-    direction: up
-  - name: 奮起・歩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の歩兵攻撃力を基礎攻撃力×34%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 34
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
-  - name: 鉄壁・盾槍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の盾槍兵防御力を基礎防御力×21%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 21
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 烈火真金
     type: buff
     scope: rally
@@ -13207,22 +11927,6 @@ generals:
       confidence: high
     effect_attribute: その他
     direction: up
-  - name: 攻城・虎戦
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の虎戦車攻城値+24%
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: その他
-    direction: up
   sources:
   - screenshot:許褚.PNG
 - id: 諸葛恪
@@ -13247,22 +11951,6 @@ generals:
     effect_note: 未確認
     confidence: unknown
   skills:
-  - name: 奮起・弓
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の弓兵攻撃力が基礎攻撃力×20%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 20
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 強御・弓
     type: buff
     scope: legion
@@ -13407,38 +12095,6 @@ generals:
       confidence: high
     effect_attribute: 率兵
     direction: up
-  - name: 鉄壁・弓
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の弓兵防御力を基礎防御力×34%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 34
-      confidence: high
-    effect_attribute: 防御
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 垂問秦雍
     type: buff
     scope: legion
@@ -13567,22 +12223,6 @@ generals:
     effect_note: 未確認
     confidence: unknown
   skills:
-  - name: 鉄壁・騎
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の騎兵防御力を基礎防御力×20%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 20
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 強御・騎
     type: buff
     scope: legion
@@ -13639,22 +12279,6 @@ generals:
     effect_note: 未確認
     confidence: unknown
   skills:
-  - name: 鉄壁・歩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の歩兵防御力を基礎防御力×20%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 20
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 応変
     type: debuff
     scope: legion
@@ -13711,22 +12335,6 @@ generals:
     effect_note: 未確認
     confidence: unknown
   skills:
-  - name: 攻城・車
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の戦車攻城値を基礎攻城値×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: その他
-    direction: up
   - name: 将才
     type: buff
     scope: self
@@ -13799,22 +12407,6 @@ generals:
     effect_note: 未確認
     confidence: unknown
   skills:
-  - name: 鉄壁・騎
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の騎兵防御力を基礎防御力×20%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 20
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 将才
     type: buff
     scope: self
@@ -13830,22 +12422,6 @@ generals:
       - 20
       confidence: high
     effect_attribute: 率兵
-    direction: up
-  - name: 奮起・猛獣
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×21%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 21
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   sources:
   - screenshot:韓遂.PNG
@@ -13871,22 +12447,6 @@ generals:
     effect_note: 未確認
     confidence: unknown
   skills:
-  - name: 鉄壁・騎
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の騎兵防御力を基礎防御力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 強御・騎
     type: buff
     scope: legion
@@ -13959,22 +12519,6 @@ generals:
     effect_note: 未確認
     confidence: unknown
   skills:
-  - name: 奮起・騎
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の騎兵攻撃力を基礎攻撃力×20%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 20
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 御影
     type: buff
     scope: self
@@ -14141,22 +12685,6 @@ generals:
       - 10
       confidence: high
     effect_attribute: その他
-    direction: up
-  - name: 鉄壁・盾槍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の盾槍兵防御力を基礎防御力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 防御
     direction: up
   - name: 蹶張士
     type: buff
@@ -14450,22 +12978,6 @@ generals:
       confidence: high
     effect_attribute: 攻撃
     direction: up
-  - name: 奮起・鉄騎
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の西涼鉄騎攻撃力を基礎攻撃力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 不惜身命
     type: debuff
     scope: rally
@@ -14692,22 +13204,6 @@ generals:
       - 20
       confidence: high
     effect_attribute: 攻撃
-    direction: up
-  - name: 攻城・井闌
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の井闌攻城値+24%
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: その他
     direction: up
   - name: 地公の魂
     type: buff
@@ -15305,22 +13801,6 @@ generals:
       note: スクショ由来の上限
     effect_attribute: ダメージ
     direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 勒石斬虜
     type: buff
     scope: legion
@@ -15362,22 +13842,6 @@ generals:
   slot_stat: null
   role_tags: []
   skills:
-  - name: 奮起・歩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の歩兵攻撃力を基礎攻撃力×44%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 44
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 厳法
     type: debuff
     scope: rally
@@ -15398,22 +13862,6 @@ generals:
       note: スクショ由来の上限
     effect_attribute: 抑制
     direction: down
-  - name: 鉄壁・盾槍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の盾槍兵防御力を基礎防御力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 掌刑
     type: debuff
     scope: rally
@@ -15694,22 +14142,6 @@ generals:
   slot_stat: null
   role_tags: []
   skills:
-  - name: 鉄壁・弓
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の弓兵防御力を基礎防御力×44%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 44
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 奮敵
     type: buff
     scope: rally
@@ -15729,22 +14161,6 @@ generals:
       cap_value: 80
       note: スクショ由来の上限
     effect_attribute: 抑制
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 陥陣馳射
     type: buff
@@ -16573,22 +14989,6 @@ generals:
       confidence: high
     effect_attribute: シールド
     direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 鴆羽潜智
     type: debuff
     scope: rally
@@ -16986,22 +15386,6 @@ generals:
       confidence: high
     effect_attribute: 防御
     direction: up
-  - name: 鉄壁・盾槍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の盾槍兵防御力を基礎防御力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 呉の武烈
     type: buff
     scope: legion
@@ -17058,38 +15442,6 @@ generals:
       - 34
       confidence: high
     effect_attribute: 率兵
-    direction: up
-  - name: 鉄壁・騎
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の騎兵防御力を基礎防御力×34%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 34
-      confidence: high
-    effect_attribute: 防御
-    direction: up
-  - name: 奮起・猛獣
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 白馬義従
     type: buff
@@ -17163,22 +15515,6 @@ generals:
       - 30
       confidence: high
     effect_attribute: 貫通抵抗
-    direction: up
-  - name: 鉄壁・盾槍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の盾槍兵防御力を基礎防御力×21%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 21
-      confidence: high
-    effect_attribute: 防御
     direction: up
   - name: 遼東占守
     type: buff
@@ -17306,22 +15642,6 @@ generals:
   slot_stat: null
   role_tags: []
   skills:
-  - name: 奮起・騎
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の騎兵攻撃力を基礎攻撃力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 無双・騎
     type: buff
     scope: legion
@@ -17335,22 +15655,6 @@ generals:
       - null
       - null
       - 20
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
-  - name: 奮起・猛獣
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×21%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 21
       confidence: high
     effect_attribute: 攻撃
     direction: up
@@ -17516,22 +15820,6 @@ generals:
       confidence: high
     effect_attribute: 攻撃
     direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 覇王破虜
     type: buff
     scope: legion
@@ -17604,22 +15892,6 @@ generals:
       - 23
       confidence: high
     effect_attribute: 防御
-    direction: up
-  - name: 奮起・猛獣
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 気震山河
     type: buff
@@ -17694,22 +15966,6 @@ generals:
       confidence: high
     effect_attribute: 連撃
     direction: up
-  - name: 奮起・猛獣
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 破阻疾進
     type: buff
     scope: rally
@@ -17782,22 +16038,6 @@ generals:
       - 22
       confidence: high
     effect_attribute: 攻撃
-    direction: up
-  - name: 鉄壁・盾槍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の盾槍兵防御力を基礎防御力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 防御
     direction: up
   - name: 諸軍鎮撫
     type: buff
@@ -17872,22 +16112,6 @@ generals:
       confidence: high
     effect_attribute: 防御
     direction: up
-  - name: 奮起・猛獣
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 躯戟雄戟
     type: buff
     scope: rally
@@ -17929,22 +16153,6 @@ generals:
   slot_stat: 統率
   role_tags: []
   skills:
-  - name: 奮起・騎
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の騎兵攻撃力を基礎攻撃力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 将才
     type: buff
     scope: self
@@ -17960,22 +16168,6 @@ generals:
       - 30
       confidence: high
     effect_attribute: 率兵
-    direction: up
-  - name: 奮起・猛獣
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×21%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 21
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 威督虎騎
     type: buff
@@ -18050,22 +16242,6 @@ generals:
       confidence: high
     effect_attribute: 抵抗
     direction: up
-  - name: 鉄壁・盾槍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の盾槍兵防御力を基礎防御力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 清風高節
     type: buff
     scope: rally
@@ -18138,22 +16314,6 @@ generals:
       - 8.1
       confidence: high
     effect_attribute: 率兵
-    direction: up
-  - name: 鉄壁・盾槍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の盾槍兵防御力を基礎防御力×21%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 21
-      confidence: high
-    effect_attribute: 防御
     direction: up
   - name: 千鈞強勢
     type: buff
@@ -18229,22 +16389,6 @@ generals:
       - null
       - null
       - 30
-      confidence: high
-    effect_attribute: 防御
-    direction: up
-  - name: 鉄壁・盾槍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の盾槍兵防御力を基礎防御力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
       confidence: high
     effect_attribute: 防御
     direction: up
@@ -18325,22 +16469,6 @@ generals:
       confidence: high
     effect_attribute: 攻撃
     direction: up
-  - name: 鉄壁・車
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の戦車防御力を基礎防御力×16%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 16
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 鳴鼓抗戦
     type: buff
     scope: legion
@@ -18382,22 +16510,6 @@ generals:
   slot_stat: null
   role_tags: []
   skills:
-  - name: 鉄壁・弓
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の弓兵防御力を基礎防御力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 無双・弓
     type: buff
     scope: legion
@@ -18411,22 +16523,6 @@ generals:
       - null
       - null
       - 20
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×18%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 18
       confidence: high
     effect_attribute: 攻撃
     direction: up
@@ -18503,22 +16599,6 @@ generals:
       confidence: high
     effect_attribute: 攻撃
     direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×21%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 21
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 狂鼓驚天
     type: buff
     scope: rally
@@ -18591,22 +16671,6 @@ generals:
       - 10
       confidence: high
     effect_attribute: 抵抗
-    direction: up
-  - name: 鉄壁・盾槍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の盾槍兵防御力を基礎防御力×21%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 21
-      confidence: high
-    effect_attribute: 防御
     direction: up
   - name: 白慈観音
     type: buff
@@ -18681,22 +16745,6 @@ generals:
       confidence: high
     effect_attribute: 防御
     direction: up
-  - name: 鉄壁・盾槍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の盾槍兵防御力を基礎防御力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
-      confidence: high
-    effect_attribute: 防御
-    direction: up
   - name: 破軍擢頷
     type: buff
     scope: legion
@@ -18738,22 +16786,6 @@ generals:
   slot_stat: null
   role_tags: []
   skills:
-  - name: 奮起・弓
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の弓兵攻撃力が基礎攻撃力×36%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 36
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 無双・弓
     type: buff
     scope: legion
@@ -18767,22 +16799,6 @@ generals:
       - null
       - null
       - 23
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
       confidence: high
     effect_attribute: 攻撃
     direction: up
@@ -18863,22 +16879,6 @@ generals:
       confidence: high
     effect_attribute: その他
     direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 奇襲
     type: buff
     scope: rally
@@ -18956,22 +16956,6 @@ generals:
       confidence: high
     effect_attribute: 攻撃
     direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 廬江上甲
     type: buff
     scope: legion
@@ -19042,22 +17026,6 @@ generals:
       - null
       - null
       - 24
-      confidence: high
-    effect_attribute: 防御
-    direction: up
-  - name: 鉄壁・盾槍
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の盾槍兵防御力を基礎防御力×27%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 27
       confidence: high
     effect_attribute: 防御
     direction: up
@@ -19133,22 +17101,6 @@ generals:
       - 34
       confidence: high
     effect_attribute: 率兵
-    direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×30%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 30
-      confidence: high
-    effect_attribute: 攻撃
     direction: up
   - name: 急羽追命
     type: buff
@@ -19227,22 +17179,6 @@ generals:
       confidence: high
     effect_attribute: 攻撃
     direction: up
-  - name: 奮起・連弩
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の連弩兵攻撃力を基礎攻撃力×24%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 24
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 老当益壮
     type: buff
     scope: legion
@@ -19284,22 +17220,6 @@ generals:
   slot_stat: null
   role_tags: []
   skills:
-  - name: 奮起・騎
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の騎兵攻撃力を基礎攻撃力×36%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 36
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
   - name: 無双・騎
     type: buff
     scope: legion
@@ -19313,22 +17233,6 @@ generals:
       - null
       - null
       - 23
-      confidence: high
-    effect_attribute: 攻撃
-    direction: up
-  - name: 奮起・猛獣
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 今いる部隊の猛獣軍団攻撃力を基礎攻撃力×21%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 21
       confidence: high
     effect_attribute: 攻撃
     direction: up
