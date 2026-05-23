@@ -1208,7 +1208,7 @@ function runAutoBuilderFor(legionIdx) {
   const ownedGens = state.data.generals.filter(g =>
     getOwn(userId, g.id).owned &&
     !usedByOtherSameUser.has(g.id) &&
-    hasCombatSkill(g)  // 戦闘系スキルが無い武将は編成候補から除外
+    hasPlacementCombatSkill(g)  // 派遣不要のみの武将は自動編成では配置しない（手動選択は可）
   );
 
   // この軍団をクリア（他軍団は触らない）
