@@ -22,7 +22,22 @@
   .seg button.on { background:#2c3e50; color:#fff; }
   label.tog { font-size:13px; display:inline-flex; align-items:center; gap:4px; }
   .list { padding:6px 10px 40px; }
-  .card { display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--border); border-left-width:5px; border-radius:8px; padding:9px 10px; margin-bottom:6px; }
+  .item { margin-bottom:6px; }
+  .card { display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--border); border-left-width:5px; border-radius:8px; padding:9px 10px; cursor:pointer; }
+  .item.open .card { border-bottom-left-radius:0; border-bottom-right-radius:0; }
+  .caret { color:var(--muted); font-size:12px; transition:transform .15s; }
+  .item.open .caret { transform:rotate(90deg); }
+  .detail { display:none; background:#fdfdfb; border:1px solid var(--border); border-top:0; border-radius:0 0 8px 8px; padding:4px 12px 8px; }
+  .item.open .detail { display:block; }
+  .sk { padding:7px 0; border-bottom:1px dashed #eee; }
+  .sk:last-child { border-bottom:0; }
+  .sk-head { font-size:13px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+  .sk-eff { font-size:12px; color:#555; margin-top:3px; line-height:1.55; }
+  .sk-attr { background:#eaeaff; color:#33a; border-radius:6px; padding:0 6px; font-size:11px; }
+  .sk-val { color:#1e8449; font-weight:bold; font-size:12px; }
+  .sk-cap { color:#b9560f; font-size:11px; }
+  .sk-scope { color:#999; font-size:11px; }
+  .sk-empty { font-size:12px; color:var(--muted); padding:6px 0; }
   .card .nm { font-weight:bold; flex:1; min-width:0; }
   .card .nm small { color:var(--muted); font-weight:normal; }
   .badge { display:inline-block; padding:1px 6px; font-size:11px; border-radius:8px; color:#fff; white-space:nowrap; }
@@ -73,8 +88,29 @@ let GENS = [];
 function load(){
   const data = window.GENERALS_DATA;
   if(!data){ document.getElementById('list').innerHTML='<div class="empty">データが読み込めません</div>'; return; }
-  GENS = data.generals.map(g => ({ name:g.name, yomi:g.yomi||'', troop:g.troop_type||'?', dt:devType(g), cnt:(g.skills||[]).length }));
+  GENS = data.generals.map(g => ({ name:g.name, yomi:g.yomi||'', troop:g.troop_type||'?', dt:devType(g), skills:(g.skills||[]), cnt:(g.skills||[]).length }));
   renderSummary(); render();
+}
+
+// 突破4（by_breakthrough の最後の非null）の値を取り出す
+function skVal(s){ const bt=(s.value&&s.value.by_breakthrough)||[]; for(let i=bt.length-1;i>=0;i--){ if(bt[i]!=null) return bt[i]; } return null; }
+function esc(t){ return String(t==null?'':t).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+const SCOPE_LABEL = { self:'自部隊', legion:'軍団', rally:'集結/陣', array:'角陣' };
+function skillsHtml(skills){
+  if(!skills.length) return '<div class="sk-empty">登録スキルなし</div>';
+  return skills.map(s => {
+    const v = skVal(s);
+    const unit = s.unit==='percent' ? '%' : '';
+    const dir = s.direction==='down' ? '↓' : (s.direction==='up' ? '↑' : '');
+    const attr = s.effect_attribute ? `<span class="sk-attr">${esc(s.effect_attribute)}${dir}</span>` : '';
+    const valTxt = (v!=null) ? `<span class="sk-val">${v}${unit}</span>` : '';
+    const cap = (s.cap && s.cap.cap_value!=null) ? `<span class="sk-cap">上限${s.cap.cap_value}${unit}${s.cap.shared?'(共有)':''}</span>` : '';
+    const scope = s.scope ? `<span class="sk-scope">${SCOPE_LABEL[s.scope]||s.scope}</span>` : '';
+    return `<div class="sk">`+
+      `<div class="sk-head"><b>${esc(s.name)}</b> ${attr} ${valTxt} ${cap} ${scope}</div>`+
+      `<div class="sk-eff">${esc(s.effect)}</div>`+
+    `</div>`;
+  }).join('');
 }
 
 function renderSummary(){
@@ -102,16 +138,25 @@ function render(){
   if(!rows.length){ el.innerHTML='<div class="empty">該当なし</div>'; return; }
   el.innerHTML = rows.map(g => {
     const [stCls, tagCls, tagTxt] = statusOf(g.cnt);
-    return `<div class="card ${stCls}">`+
-      `<span class="nm">${g.name}${g.yomi?` <small>${g.yomi}</small>`:''}</span>`+
-      `<span class="badge b-${g.dt}">${DEV[g.dt]}</span>`+
-      `<span class="badge tr">${g.troop}</span>`+
-      `<span class="tag ${tagCls}">${tagTxt}</span>`+
-      `<span class="cnt">${g.cnt}</span>`+
+    return `<div class="item">`+
+      `<div class="card ${stCls}">`+
+        `<span class="nm">${esc(g.name)}${g.yomi?` <small>${esc(g.yomi)}</small>`:''}</span>`+
+        `<span class="badge b-${g.dt}">${DEV[g.dt]}</span>`+
+        `<span class="badge tr">${esc(g.troop)}</span>`+
+        `<span class="tag ${tagCls}">${tagTxt}</span>`+
+        `<span class="cnt">${g.cnt}</span>`+
+        `<span class="caret">▸</span>`+
+      `</div>`+
+      `<div class="detail">${skillsHtml(g.skills)}</div>`+
     `</div>`;
   }).join('');
 }
 
+// 武将名（カード）クリックで登録スキル詳細を開閉
+document.getElementById('list').addEventListener('click', e => {
+  const card = e.target.closest('.card'); if(!card) return;
+  card.parentElement.classList.toggle('open');
+});
 document.getElementById('q').addEventListener('input', e => { state.q=e.target.value.trim(); render(); });
 document.getElementById('incomplete').addEventListener('change', e => { state.incomplete=e.target.checked; render(); });
 function seg(id, key){ const box=document.getElementById(id); box.addEventListener('click', e => { const b=e.target.closest('button'); if(!b)return; state[key]=b.dataset.v; [...box.children].forEach(c=>c.classList.toggle('on', c===b)); render(); }); }
