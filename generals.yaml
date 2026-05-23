@@ -5444,11 +5444,43 @@ generals:
   role_tags:
   - 装備武将
   skills:
-  - name: 貫通減16.5％（上限20％）貫通アップ5.5％（10％）
+  - name: 出塞
     type: debuff
-    scope: self
+    scope: rally
     unlocked_at: 0
-    effect: 貫通減16.5％（上限20％）貫通アップ5.5％（10％）
+    effect: 所属陣の戦闘時、味方が受ける実ダメージが減少、減少値は10%×味方の前回の交戦で損失した参戦可能兵士数（集結による累加なし、効果が最も高いもののみ有効）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - -10
+      confidence: high
+    effect_attribute: 兵士数
+    direction: down
+  - name: 終曲
+    type: debuff
+    scope: rally
+    unlocked_at: 0
+    effect: 所属部隊が弓兵の場合、所属陣の戦闘時、敵方の攻撃力-20%。低下の上限は（100+300×敵方弓兵比率）、集結による累加は不可
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - -20
+      confidence: high
+    effect_attribute: 攻撃
+    direction: both
+  - name: 胡笳悲歌
+    type: debuff
+    scope: rally
+    unlocked_at: 0
+    effect: 所属陣の戦闘時、敵方兵士の貫通が減少。減少値は、戦闘前における元の貫通のより高いほうの数値×16.5%（集結時、同じ陣で累加可能。減少する貫通は敵方の元の貫通の20%）。同時に味方兵士の貫通がアップ、アップ値は戦闘前の元の貫通のより高いほうの数値×5.5%（集結時、同じ陣で累加可能。増加する貫通上限は味方の元の貫通の10%）
     unit: percent
     value:
       by_breakthrough:
@@ -5457,12 +5489,28 @@ generals:
       - null
       - null
       - -16.5
-      confidence: medium
+      confidence: high
     cap:
       rule: no_cap
-      cap_value: -20.0
-      note: xlsx備考由来の固定%上限
+      cap_value: -20
+      note: スクショ由来の上限
     effect_attribute: 貫通
+    direction: both
+  - name: 乱世の哀音
+    type: debuff
+    scope: rally
+    unlocked_at: 0
+    effect: 所属陣の戦闘時、敵方の連撃が低下。低下率は（5%+敵方の弓兵比率×3%）。集結による累加は不可、効果が最も高いもののみ有効
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - -5
+      confidence: high
+    effect_attribute: 連撃
     direction: both
   seal_bonus:
     by_seal:
@@ -19359,6 +19407,88 @@ generals:
       confidence: high
     effect_attribute: 連撃
     direction: up
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  sources:
+  - screenshot:三国覇王戦記_武将情報
+- id: 玄文鴦
+  name: 玄文鴦
+  yomi: null
+  base_rarity: 玄
+  troop_type: 騎兵
+  slot_stat: 統率
+  role_tags:
+  - 将印武将
+  skills:
+  - name: 突騎
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 統帥となり騎兵を帯同時、自身の率兵数が基礎率兵数×50%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 50
+      confidence: high
+    effect_attribute: 率兵
+    direction: up
+  - name: 斬帥
+    type: debuff
+    scope: rally
+    unlocked_at: 0
+    effect: 戦闘勝利時、10%の確率で敵方武将に重傷を負わせる。属する陣の戦闘時、敵方の攻撃力が低下。低下率は、属する陣内にいる重傷スキルを有する武将数×5%（処刑スキルは含まない。集結時の重ねがけ不可、効果が最高値のみ有効。低下率の上限は20%まで、絶対値の上限はなし）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - -5
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: -20
+      note: スクショ由来の上限
+    effect_attribute: 攻撃
+    direction: down
+  - name: 勇力絶大
+    type: debuff
+    scope: rally
+    unlocked_at: 0
+    effect: 所属陣の初回交戦、味方が受けるダメージ20%低下。その後の毎回の交戦で、味方が受けるダメージ減少、数値は前回の交戦の味方の元ダメージ×20%、減少するダメージの上限は敵方の元ダメージの25%、下限は15%（集結時の累加は不可。効果が最高値のみ有効）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - -20
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: -25
+      note: スクショ由来の上限
+    effect_attribute: ダメージ
+    direction: down
   seal_bonus:
     by_seal:
     - null
