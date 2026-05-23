@@ -10129,9 +10129,9 @@ generals:
   skills:
   - name: 慈威
     type: debuff
-    scope: legion
+    scope: rally
     unlocked_at: 0
-    effect: 敵方集結の全兵士の軍紀が基礎軍紀×8%低下（派遣不要ですぐに有効、敵方プレイヤーにのみ有効、複数人の集結時はプレイヤーの兵力に応じて平均値をとる）
+    effect: 敵方集結の全兵士の軍紀が基礎軍紀×8%低下（派遣不要ですぐ有効、敵方プレイヤーに対してのみ有効。複数人の集結時はプレイヤーの兵力に応じて平均値をとる）
     unit: percent
     value:
       by_breakthrough:
@@ -10139,15 +10139,15 @@ generals:
       - null
       - null
       - null
-      - 8
+      - -8
       confidence: high
     effect_attribute: 軍紀
     direction: down
   - name: 温恵
     type: buff
-    scope: self
+    scope: rally
     unlocked_at: 0
-    effect: 味方主陣の集結回能兵士数の上限+10%、味方主陣の採取可能な敵援兵士数の上限+10%（派遣不要ですぐに有効）
+    effect: 味方主陣の集結可能兵士数の上限+10%、味方主陣の収容可能な救援兵士数の上限+10%（派遣不要ですぐ有効）
     unit: percent
     value:
       by_breakthrough:
@@ -10159,27 +10159,11 @@ generals:
       confidence: high
     effect_attribute: その他
     direction: up
-  - name: 精工
-    type: buff
-    scope: self
-    unlocked_at: 0
-    effect: 所属軍団の採取効率が基礎採取効率×14%アップ（スキルの累加上限は基礎採取効率×200%を超えない）
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 14
-      confidence: high
-    effect_attribute: その他
-    direction: up
-  - name: 名門世育
+  - name: 名門世冑
     type: debuff
-    scope: legion
+    scope: rally
     unlocked_at: 0
-    effect: 戦闘時、敵方全兵士の貫通が編成時の貫通×10%低下、同時に敵方が味方シールドに与えるダメージが元の数値×10%低下（派遣不要ですぐに有効、複数人の集結時はプレイヤーの兵力に応じて平均値をとる）
+    effect: 戦闘時、敵方全兵士の貫通が編成時の貫通×11%低下、同時に敵方が味方シールドに与えるダメージが元の数値×11%低下（派遣不要ですぐ有効。複数人の集結時はプレイヤーの兵力に応じて平均値をとる）
     unit: percent
     value:
       by_breakthrough:
@@ -10187,9 +10171,25 @@ generals:
       - null
       - null
       - null
-      - 10
+      - -11
       confidence: high
     effect_attribute: シールド
+    direction: down
+  - name: 布徳化民
+    type: debuff
+    scope: rally
+    unlocked_at: 0
+    effect: 敵方集結の全兵士の貫通が基礎貫通×20%低下（派遣不要ですぐ有効、敵方プレイヤーに対してのみ有効。複数人の集結時はプレイヤーの兵力に応じて平均値をとる）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - -20
+      confidence: high
+    effect_attribute: 貫通
     direction: down
   sources:
   - screenshot:B74AAD4A.png
