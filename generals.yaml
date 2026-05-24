@@ -236,6 +236,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B83
   - https://sangoku-haou.gamer-wiki.com/character/tyouryou
+  stats:
+    統率: 97
+    武力: 91
+    知性: 82
 - id: ukin
   name: 于禁
   yomi: うきん
@@ -545,6 +549,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B46
   - https://sangoku-haou.gamer-wiki.com/character/ba-tyou
+  stats:
+    統率: 92
+    武力: 98
+    知性: 65
 - id: tyou_neiki
   name: 張寧姫
   yomi: ちょうねいき
@@ -632,6 +640,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B29
   - https://sangoku-haou.gamer-wiki.com/character/tyou-ne-iki
+  stats:
+    統率: 81
+    武力: 97
+    知性: 80
 - id: koutyuu
   name: 黄忠
   yomi: こうちゅう
@@ -710,6 +722,10 @@ generals:
     confidence: unknown
   sources:
   - https://sangoku-haou.gamer-wiki.com/character/koutyuu
+  stats:
+    統率: 90
+    武力: 97
+    知性: 78
 - id: kaki
   name: 賈逵
   yomi: かき
@@ -792,6 +808,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B16
   - https://sangoku-haou.gamer-wiki.com/character/kaki
+  stats:
+    統率: 86
+    武力: 61
+    知性: 97
 - id: chouun
   name: 趙雲
   yomi: ちょううん
@@ -881,6 +901,10 @@ generals:
     confidence: unknown
   sources:
   - https://sangoku-haou.gamer-wiki.com/character/tyouun
+  stats:
+    統率: 91
+    武力: 97
+    知性: 76
 - id: gen_chouun
   name: 玄趙雲
   yomi: げんちょううん
@@ -996,6 +1020,7 @@ generals:
     武力: 101
     知性: 80
     魅力: 90
+    政治: 78
 - id: 玄孫権
   name: 玄孫権
   yomi: null
@@ -1070,6 +1095,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B4
   xlsx_remarks: 連撃20%減（上限50%・共有）
+  stats:
+    統率: 98
+    武力: 72
+    知性: 89
 - id: 玄孫策
   name: 玄孫策
   yomi: null
@@ -1148,6 +1177,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B5
   xlsx_remarks: 連撃歩比率×40%増（上限50%）
+  stats:
+    統率: 97
+    武力: 92
+    知性: 69
 - id: 司馬昭
   name: 司馬昭
   yomi: null
@@ -1230,6 +1263,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B6
   xlsx_remarks: ダメ10%反射（上限30%）
+  stats:
+    統率: 81
+    武力: 73
+    知性: 97
 - id: 玄鄧艾
   name: 玄鄧艾
   yomi: null
@@ -1309,6 +1346,10 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B7
   - screenshot:玄鄧艾.PNG
   xlsx_remarks: ダメ部隊100%増（上限25%）
+  stats:
+    統率: 98
+    武力: 88
+    知性: 89
 - id: 李典
   name: 李典
   yomi: null
@@ -1513,6 +1554,10 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B11
   - screenshot:玄龐徳.PNG
   xlsx_remarks: 貫通歩比率×40%増（上限50%）
+  stats:
+    統率: 85
+    武力: 98
+    知性: 69
 - id: 真田幸村
   name: 真田幸村
   yomi: null
@@ -1559,6 +1604,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B12
   xlsx_remarks: 追加ダメ比率歩部隊数×2%（上限15%）
+  stats:
+    統率: 82
+    武力: 98
+    知性: 58
 - id: 玄大喬
   name: 玄大喬
   yomi: null
@@ -1780,6 +1829,11 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B15
   xlsx_remarks: ダメ15%減（累加不可）
+  stats:
+    統率: 68
+    武力: 99
+    知性: 36
+    魅力: 60
 - id: 玄荀攸
   name: 玄荀攸
   yomi: null
@@ -1993,6 +2047,10 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B18
   - screenshot:IMG_0687.PNG
   xlsx_remarks: 敵抑制大時・被抑制12%増（味方抑制大時・抑制12%増）（累加不可）、武府連撃大/抵抗大/連抗同・連撃20%/抵抗20%/連撃10%抵抗10%増（上限25%）、【装備】防御6%増（上限12%）
+  stats:
+    統率: 98
+    武力: 92
+    知性: 62
 - id: 全琮
   name: 全琮
   yomi: null
@@ -2196,7 +2254,7 @@ generals:
     統率: 81
     武力: 99
     知性: 60
-    魅力: null
+    魅力: 67
 - id: 姜維
   name: 姜維
   yomi: null
@@ -2548,6 +2606,12 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B26
   xlsx_remarks: 連撃馬部隊数×5%減（上限50%・共有）
+  stats:
+    統率: 93
+    武力: 86
+    知性: 78
+    魅力: 79
+    政治: 64
 - id: 文醜
   name: 文醜
   yomi: null
@@ -2898,6 +2962,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B31
   xlsx_remarks: 兵20%増（上限30%）
+  stats:
+    統率: 75
+    武力: 34
+    知性: 100
 - id: 夏侯惇
   name: 夏侯惇
   yomi: null
@@ -2976,6 +3044,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B32
   xlsx_remarks: 追加ダメ損失兵×60%増（上限ダメ20%）
+  stats:
+    統率: 99
+    武力: 95
+    知性: 82
 - id: 武田信玄
   name: 武田信玄
   yomi: null
@@ -3054,6 +3126,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B33
   xlsx_remarks: 貫通集結馬部隊数×1.5%増（上限15%）
+  stats:
+    統率: 101
+    武力: 85
+    知性: 98
 - id: 閻行
   name: 閻行
   yomi: null
@@ -3212,6 +3288,10 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B35
   - screenshot:玄賈詡.PNG
   xlsx_remarks: 実ダメ25%減（上限40%）、兵50%未満時・実ダメ15%減（上限25%）
+  stats:
+    統率: 80
+    武力: 48
+    知性: 98
 - id: 王双
   name: 王双
   yomi: null
@@ -3291,6 +3371,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B36
   xlsx_remarks: 抵抗10%減・10%増（上限30%、馬スキル時上限15%、典韋・曹仁の80%・共有）
+  stats:
+    統率: 66
+    武力: 97
+    知性: 19
 - id: 玄馬雲騄
   name: 玄馬雲騄
   yomi: null
@@ -3373,6 +3457,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B37
   xlsx_remarks: 貫通抵抗15%減（上限40%）、実ダメ10%増（累加不可）
+  stats:
+    統率: 79
+    武力: 97
+    知性: 60
 - id: 玄馬超
   name: 玄馬超
   yomi: null
@@ -3454,6 +3542,10 @@ generals:
   - screenshot:玄馬超.PNG
   xlsx_remarks: 最終ダメ20%増（累加不可）、速度が敵より大5%増
   base_general_id: batyou
+  stats:
+    統率: 98
+    武力: 96
+    知性: 65
 - id: 曹洪
   name: 曹洪
   yomi: null
@@ -3750,6 +3842,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B41
   xlsx_remarks: 攻撃力×15%増（上限25%）、兵種比率20%毎抑制5%増（累加不可）、シールド5%増（上限10%）
+  stats:
+    統率: 77
+    武力: 38
+    知性: 97
 - id: 高覧
   name: 高覧
   yomi: null
@@ -4156,6 +4252,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B50
   xlsx_remarks: 抵抗15%+弓配置10%増（上限40%）
+  stats:
+    統率: 74
+    武力: 97
+    知性: 70
 - id: 龐統
   name: 龐統
   yomi: null
@@ -4338,6 +4438,10 @@ generals:
   - screenshot:玄陸遜.PNG
   xlsx_remarks: ダメ20%減（累加不可）
   base_general_id: 陸遜
+  stats:
+    統率: 98
+    武力: 73
+    知性: 92
 - id: 陸遜
   name: 陸遜
   yomi: null
@@ -4416,6 +4520,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B53
   xlsx_remarks: 追加ダメ35%確率5%増（上限10%）
+  stats:
+    統率: 97
+    武力: 69
+    知性: 95
 - id: 織田信長
   name: 織田信長
   yomi: null
@@ -4494,6 +4602,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B54
   xlsx_remarks: 兵数1%多で連撃1%増（下限10%、上限20%）
+  stats:
+    統率: 101
+    武力: 82
+    知性: 99
 - id: 玄貂蝉
   name: 玄貂蝉
   yomi: null
@@ -4572,6 +4684,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B55
   xlsx_remarks: ダメ男武将比率×0.2減（上限20%）
+  stats:
+    統率: 12
+    武力: 15
+    知性: 99
 - id: 玄呂布
   name: 玄呂布
   yomi: null
@@ -4676,7 +4792,7 @@ generals:
     統率: 90
     武力: 101
     知性: 63
-    魅力: null
+    魅力: 89
 - id: 玄徐庶
   name: 玄徐庶
   yomi: null
@@ -4760,6 +4876,10 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B57
   - screenshot:玄徐庶.PNG
   xlsx_remarks: ダメ15%増（累加不可）、最終連撃1%高×0.5増（上限25%・上限累加可、1スキル上限10%）
+  stats:
+    統率: 84
+    武力: 76
+    知性: 98
 - id: 玄丁奉
   name: 玄丁奉
   yomi: null
@@ -4937,6 +5057,12 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B59
   xlsx_remarks: 貫通抵抗弓比率×40%増（上限50%）
+  stats:
+    統率: 93
+    武力: 97
+    知性: 74
+    魅力: 85
+    政治: 70
 - id: 玄小喬
   name: 玄小喬
   yomi: null
@@ -5011,6 +5137,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B60
   xlsx_remarks: 貫通20%減（上限40%）
+  stats:
+    統率: 16
+    武力: 11
+    知性: 97
 - id: 玄蔡文姫
   name: 玄蔡文姫
   yomi: null
@@ -5257,6 +5387,10 @@ generals:
     confidence: unknown
   sources:
   - xlsx:3_20251224.xlsx#武将!B63
+  stats:
+    統率: 98
+    武力: 85
+    知性: 94
 - id: 玄祝融
   name: 玄祝融
   yomi: null
@@ -5548,6 +5682,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B66
   xlsx_remarks: 連撃20%減（上限50%・共有）
+  stats:
+    統率: 75
+    武力: 51
+    知性: 98
 - id: 歩練師
   name: 歩練師
   yomi: null
@@ -6425,7 +6563,8 @@ generals:
     統率: 92
     武力: 98
     知性: 76
-    魅力: null
+    魅力: 78
+    政治: 60
 - id: 馬鈞
   name: 馬鈞
   yomi: null
@@ -6508,6 +6647,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B79
   xlsx_remarks: 抵抗20%増（上限40%）、ダメ損失比率×10%減（上限30%）
+  stats:
+    統率: 97
+    武力: 42
+    知性: 91
 - id: 玄諸葛亮
   name: 玄諸葛亮
   yomi: null
@@ -6589,6 +6732,10 @@ generals:
     confidence: unknown
   sources:
   - xlsx:3_20251224.xlsx#武将!B82
+  stats:
+    統率: 90
+    武力: 40
+    知性: 101
 - id: 玄張角
   name: 玄張角
   yomi: null
@@ -6667,6 +6814,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B84
   xlsx_remarks: 被抑制10%減・プレイヤー数差×20%減、ダメ5%減・5%増（累加不可）
+  stats:
+    統率: 97
+    武力: 25
+    知性: 86
 - id: 玄曹操
   name: 玄曹操
   yomi: null
@@ -6745,6 +6896,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B85
   xlsx_remarks: 抑制10%減・プレイヤー数差×20%減
+  stats:
+    統率: 101
+    武力: 64
+    知性: 92
 - id: 司馬炎
   name: 司馬炎
   yomi: null
@@ -6828,6 +6983,10 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B86
   - screenshot:2EDA6658.png
   xlsx_remarks: 1属性15%増（上限50%）
+  stats:
+    統率: 97
+    武力: 59
+    知性: 76
 - id: 曹真
   name: 曹真
   yomi: null
@@ -6910,6 +7069,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B87
   xlsx_remarks: 抵抗20%増（上限60%）
+  stats:
+    統率: 98
+    武力: 89
+    知性: 87
 - id: 玄徐晃
   name: 玄徐晃
   yomi: null
@@ -6989,6 +7152,10 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B88
   - screenshot:玄徐晃.PNG
   xlsx_remarks: 貫通20%減（上限50%）
+  stats:
+    統率: 98
+    武力: 93
+    知性: 82
 - id: 皇甫嵩
   name: 皇甫嵩
   yomi: null
@@ -7072,6 +7239,10 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B89
   - screenshot:皇甫嵩.PNG
   xlsx_remarks: 貫通/シールド20%増（上限50%）
+  stats:
+    統率: 98
+    武力: 75
+    知性: 75
 - id: 司馬師
   name: 司馬師
   yomi: null
@@ -7360,6 +7531,11 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B94
   xlsx_remarks: ダメ(プレイヤー数差+1)×10%増（累加不可）
+  stats:
+    統率: 90
+    武力: 101
+    知性: 26
+    魅力: 68
 - id: 玄関羽
   name: 玄関羽
   yomi: null
@@ -7435,6 +7611,11 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B95
   xlsx_remarks: 実ダメ15%増（累加不可）
   base_general_id: kanu
+  stats:
+    統率: 97
+    武力: 99
+    知性: 78
+    魅力: 93
 - id: 于吉
   name: 于吉
   yomi: null
@@ -7517,6 +7698,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B96
   xlsx_remarks: スキル増益10%増、スキル減益10%減（上限20%）
+  stats:
+    統率: 26
+    武力: 35
+    知性: 97
 - id: 玄荀彧
   name: 玄荀彧
   yomi: null
@@ -7600,6 +7785,10 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B97
   - screenshot:玄荀彧.PNG
   xlsx_remarks: 連撃20%増（上限30%）
+  stats:
+    統率: 60
+    武力: 49
+    知性: 98
 - id: 玄呂蒙
   name: 玄呂蒙
   yomi: null
@@ -7689,6 +7878,10 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B98
   xlsx_remarks: 抵抗20%増（上限30%）、実ダメ6%増／減（上限10%）
   base_general_id: 呂蒙
+  stats:
+    統率: 89
+    武力: 97
+    知性: 92
 - id: 司馬懿
   name: 司馬懿
   yomi: null
@@ -7767,6 +7960,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B99
   xlsx_remarks: 連撃(プレイヤー数差+1)×10%増（上限50%）
+  stats:
+    統率: 100
+    武力: 63
+    知性: 96
 - id: 管路
   name: 管路
   yomi: null
@@ -7925,6 +8122,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B101
   xlsx_remarks: ダメ歩比率×20%増、弓比率×20%減（上限25%）
+  stats:
+    統率: 90
+    武力: 98
+    知性: 76
 - id: 玄太史慈
   name: 玄太史慈
   yomi: null
@@ -8493,6 +8694,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B107
   xlsx_remarks: 実ダメ10%減（上限10%）
+  stats:
+    統率: 18
+    武力: 25
+    知性: 97
 - id: 左慈
   name: 左慈
   yomi: null
@@ -8566,6 +8771,10 @@ generals:
     confidence: unknown
   sources:
   - xlsx:3_20251224.xlsx#武将!B108
+  stats:
+    統率: 27
+    武力: 35
+    知性: 98
 - id: 玄魏延
   name: 玄魏延
   yomi: null
@@ -8640,6 +8849,10 @@ generals:
   sources:
   - xlsx:3_20251224.xlsx#武将!B109
   xlsx_remarks: 貫通12%減（累加不可）
+  stats:
+    統率: 97
+    武力: 92
+    知性: 69
 - id: 典韋
   name: 典韋
   yomi: null
@@ -8720,6 +8933,10 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B110
   - screenshot:典韋.PNG
   xlsx_remarks: 抵抗35%減（上限80%・共有）
+  stats:
+    統率: 73
+    武力: 96
+    知性: 35
 - id: 曹操
   name: 曹操
   yomi: そうそう
@@ -9774,6 +9991,10 @@ generals:
     direction: up
   sources:
   - screenshot:玄孫堅.PNG
+  stats:
+    統率: 98
+    武力: 90
+    知性: 80
 - id: 玄張松
   name: 玄張松
   yomi: null
@@ -9923,6 +10144,10 @@ generals:
     direction: up
   sources:
   - screenshot:玄張飛.PNG
+  stats:
+    統率: 98
+    武力: 96
+    知性: 60
 - id: 玄袁紹
   name: 玄袁紹
   yomi: null
@@ -10401,6 +10626,10 @@ generals:
     direction: up
   sources:
   - screenshot:呉懿.PNG
+  stats:
+    統率: 93
+    武力: 76
+    知性: 68
 - id: 夏侯淵
   name: 夏侯淵
   yomi: null
@@ -10473,6 +10702,10 @@ generals:
     direction: up
   sources:
   - screenshot:夏侯淵.PNG
+  stats:
+    統率: 93
+    武力: 97
+    知性: 73
 - id: 孟獲
   name: 孟獲
   yomi: null
@@ -11169,6 +11402,10 @@ generals:
     direction: up
   sources:
   - screenshot:玄姜維.PNG
+  stats:
+    統率: 95
+    武力: 90
+    知性: 91
 - id: 玄田豊
   name: 玄田豊
   yomi: null
@@ -11373,6 +11610,10 @@ generals:
     direction: up
   sources:
   - screenshot:甘寧.PNG
+  stats:
+    統率: 97
+    武力: 90
+    知性: 78
 - id: 田豊
   name: 田豊
   yomi: null
@@ -11929,6 +12170,10 @@ generals:
     direction: up
   sources:
   - screenshot:許褚.PNG
+  stats:
+    統率: 68
+    武力: 96
+    知性: 36
 - id: 諸葛恪
   name: 諸葛恪
   yomi: null
@@ -13461,6 +13706,10 @@ generals:
     confidence: unknown
   sources:
   - screenshot:三国覇王戦記_武将情報
+  stats:
+    統率: 98
+    武力: 92
+    知性: 80
 - id: 棗祗
   name: 棗祗
   yomi: null
@@ -14134,6 +14383,10 @@ generals:
     confidence: unknown
   sources:
   - screenshot:三国覇王戦記_武将情報
+  stats:
+    統率: 34
+    武力: 21
+    知性: 97
 - id: 蒋欽
   name: 蒋欽
   yomi: null
@@ -14361,6 +14614,10 @@ generals:
     confidence: unknown
   sources:
   - screenshot:三国覇王戦記_武将情報
+  stats:
+    統率: 86
+    武力: 48
+    知性: 98
 - id: 蹋頓
   name: 蹋頓
   yomi: null
@@ -14876,6 +15133,10 @@ generals:
     confidence: unknown
   sources:
   - screenshot:三国覇王戦記_武将情報
+  stats:
+    統率: 99
+    武力: 71
+    知性: 85
 - id: 玄曹丕
   name: 玄曹丕
   yomi: null
@@ -15269,6 +15530,10 @@ generals:
     confidence: unknown
   sources:
   - screenshot:三国覇王戦記_武将情報
+  stats:
+    統率: 99
+    武力: 88
+    知性: 55
 - id: 玄魯粛
   name: 玄魯粛
   yomi: null
@@ -15419,6 +15684,10 @@ generals:
     confidence: unknown
   sources:
   - screenshot:三国覇王戦記_武将情報
+  stats:
+    統率: 94
+    武力: 90
+    知性: 74
 - id: 公孫瓚
   name: 公孫瓚
   yomi: null
@@ -15853,6 +16122,12 @@ generals:
     confidence: unknown
   sources:
   - screenshot:三国覇王戦記_武将情報
+  stats:
+    統率: 93
+    武力: 91
+    知性: 69
+    魅力: 89
+    政治: 70
 - id: 徐晃
   name: 徐晃
   yomi: null
@@ -16352,6 +16627,10 @@ generals:
     confidence: unknown
   sources:
   - screenshot:三国覇王戦記_武将情報
+  stats:
+    統率: 90
+    武力: 50
+    知性: 95
 - id: 玄諸葛瑾
   name: 玄諸葛瑾
   yomi: null
@@ -16916,6 +17195,10 @@ generals:
     confidence: unknown
   sources:
   - screenshot:三国覇王戦記_武将情報
+  stats:
+    統率: 95
+    武力: 87
+    知性: 89
 - id: 陳武
   name: 陳武
   yomi: null
@@ -17269,6 +17552,10 @@ generals:
     confidence: unknown
   sources:
   - screenshot:三国覇王戦記_武将情報
+  stats:
+    統率: 80
+    武力: 95
+    知性: 69
 - id: 玄文鴦
   name: 玄文鴦
   yomi: null
@@ -17351,6 +17638,10 @@ generals:
     confidence: unknown
   sources:
   - screenshot:三国覇王戦記_武将情報
+  stats:
+    統率: 98
+    武力: 94
+    知性: 78
 - id: 太史慈
   name: 太史慈
   yomi: null
@@ -17428,6 +17719,10 @@ generals:
     confidence: unknown
   sources:
   - screenshot:三国覇王戦記_武将情報
+  stats:
+    統率: 92
+    武力: 97
+    知性: 79
 - id: 戯志才
   name: 戯志才
   yomi: null
@@ -17817,3 +18112,149 @@ generals:
     confidence: unknown
   sources:
   - screenshot:三国覇王戦記_武将情報
+- id: 伊達政宗
+  name: 伊達政宗
+  yomi: null
+  base_rarity: 橙
+  troop_type: 万能
+  slot_stat: null
+  role_tags: []
+  skills: []
+  stats:
+    統率: 98
+    武力: 95
+    知性: 84
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  sources:
+  - 名将録:名将録_四段突破_追加_20260524.csv
+- id: 郭嘉
+  name: 郭嘉
+  yomi: null
+  base_rarity: 橙
+  troop_type: 万能
+  slot_stat: null
+  role_tags: []
+  skills: []
+  stats:
+    統率: 76
+    武力: 25
+    知性: 100
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  sources:
+  - 名将録:名将録_四段突破_追加_20260524.csv
+- id: 荀彧
+  name: 荀彧
+  yomi: null
+  base_rarity: 橙
+  troop_type: 万能
+  slot_stat: null
+  role_tags: []
+  skills: []
+  stats:
+    統率: 62
+    武力: 44
+    知性: 98
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  sources:
+  - 名将録:名将録_四段突破_追加_20260524.csv
+- id: 法正
+  name: 法正
+  yomi: null
+  base_rarity: 橙
+  troop_type: 万能
+  slot_stat: null
+  role_tags: []
+  skills: []
+  stats:
+    統率: 82
+    武力: 47
+    知性: 97
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  sources:
+  - 名将録:名将録_四段突破_追加_20260524.csv
+- id: 張飛
+  name: 張飛
+  yomi: null
+  base_rarity: 橙
+  troop_type: 万能
+  slot_stat: null
+  role_tags: []
+  skills: []
+  stats:
+    統率: 82
+    武力: 100
+    知性: 45
+    魅力: 64
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  sources:
+  - 名将録:名将録_四段突破_追加_20260524.csv
