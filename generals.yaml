@@ -17351,3 +17351,469 @@ generals:
     confidence: unknown
   sources:
   - screenshot:三国覇王戦記_武将情報
+- id: 太史慈
+  name: 太史慈
+  yomi: null
+  base_rarity: 橙
+  troop_type: 弓兵
+  slot_stat: null
+  role_tags: []
+  skills:
+  - name: 鋭意
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の弓兵の攻撃力20%アップ、特殊弓兵は追加で20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 篤厚
+    type: debuff
+    scope: rally
+    unlocked_at: 0
+    effect: 属する陣の戦闘時、敵方兵士の防御力20%低下（集結時、同じ陣の複数効果の累加は50%を超えず、1兵士の防御力最大100pt減少。凶暴スキルと比率上限を共有、絶対値上限は共有しない）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - -20
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: -50
+      note: スクショ由来の上限
+    effect_attribute: 防御
+    direction: down
+  - name: 義徹雲霄
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 集結が属する陣内の全弓兵の抵抗が（基礎抵抗×10%）アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 抵抗
+    direction: up
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  sources:
+  - screenshot:三国覇王戦記_武将情報
+- id: 戯志才
+  name: 戯志才
+  yomi: null
+  base_rarity: 橙
+  troop_type: 騎兵
+  slot_stat: null
+  role_tags: []
+  skills:
+  - name: 治軍
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 所属部隊の特殊騎兵の防御力が基礎防御力×40%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 40
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 奇兵
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 属する陣の戦闘時、30%の確率で（味方兵士攻撃力×10%）アップ（集結時、同じ陣の複数効果の累加は50%を超えず、1兵士の攻撃力最大100pt増加）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: 50
+      note: スクショ由来の上限
+    effect_attribute: 攻撃
+    direction: up
+  - name: 神機洞見
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 属する陣の戦闘時、味方シールドがアップ。数値は味方騎兵兵種比率×40%（集結時、同じ陣の複数スキル累加の場合、アップするシールドは元のシールドの50%を超えない）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 40
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: 50
+      note: スクショ由来の上限
+    effect_attribute: シールド
+    direction: up
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  sources:
+  - screenshot:三国覇王戦記_武将情報
+- id: 曹叡
+  name: 曹叡
+  yomi: null
+  base_rarity: 橙
+  troop_type: 騎兵
+  slot_stat: null
+  role_tags: []
+  skills:
+  - name: 魏鋒
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 所属部隊騎兵の貫通を基礎貫通×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 貫通
+    direction: up
+  - name: 無双・騎
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の騎兵攻撃力が基礎攻撃力×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 魏明大略
+    type: debuff
+    scope: rally
+    unlocked_at: 0
+    effect: 所属陣の戦闘時、敵方兵士の攻撃力が編成時の攻撃力×10%低下（集結時、同じ陣の複数効果の累加は50%を超えず、1兵士の攻撃力最大150pt減少。関羽の武聖、黄蓋の詐降スキルと比率上限を共有、絶対値上限は共有しない）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - -10
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: -50
+      note: スクショ由来の上限
+    effect_attribute: 攻撃
+    direction: down
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  sources:
+  - screenshot:三国覇王戦記_武将情報
+- id: 曹爽
+  name: 曹爽
+  yomi: null
+  base_rarity: 橙
+  troop_type: 騎兵
+  slot_stat: 統率
+  role_tags: []
+  skills:
+  - name: 将才
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 統帥を担当時、自身の率兵数が基礎率兵数×30%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 率兵
+    direction: up
+  - name: 疾行
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の行軍速度40%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 40
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 独断専行
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 属する陣の戦闘時、味方兵士の攻撃力20%アップ。集結時、同じ陣の累加は50%を超えない。敵方に抑制された場合（元の抑制を計算）、アップする1兵士の攻撃力は300ptを超えない。そうでない場合、アップする1兵士の攻撃力は200ptを超えない
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: 50
+      note: スクショ由来の上限
+    effect_attribute: 抑制
+    direction: up
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  sources:
+  - screenshot:三国覇王戦記_武将情報
+- id: 玄沮授
+  name: 玄沮授
+  yomi: null
+  base_rarity: 玄
+  troop_type: 万能
+  slot_stat: null
+  role_tags: []
+  skills:
+  - name: 揚威
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の兵士の攻撃力が基礎攻撃力×20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 規北
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 属する陣の戦闘時、30%の確率で味方防御力20%アップ（同じ陣の集結による累加は50%を超えず、1兵士の防御力は最大100ptアップ）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: 50
+      note: スクショ由来の上限
+    effect_attribute: 防御
+    direction: up
+  - name: 諫争南節
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 属する陣の1〜6回目の交戦開始時、味方の攻撃力が初回交戦前の攻撃力×5%アップ（集結時同じ陣の累加可能。毎回の交戦でアップする効果は10%を超えない。1回目の交戦は最大100ptの攻撃力アップ、2〜6回目の交戦は毎回最大50ptの攻撃力アップ、毎回アップする攻撃力は累加でき、戦闘終了まで持続する）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 5
+      confidence: high
+    cap:
+      rule: no_cap
+      cap_value: 10
+      note: スクショ由来の上限
+    effect_attribute: 攻撃
+    direction: up
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  sources:
+  - screenshot:三国覇王戦記_武将情報
+- id: 賈充
+  name: 賈充
+  yomi: null
+  base_rarity: 橙
+  troop_type: 騎兵
+  slot_stat: null
+  role_tags: []
+  skills:
+  - name: 弑逆
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の騎兵の攻撃力20%アップ、防御力20%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 機変
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 属する陣の戦闘時、味方が敵方に抑制された場合（元の抑制で計算）、援軍が（武将所属部隊兵士数×30%）アップ（同じ軍団の同じ陣で複数スキル所持時、累加可。援軍上限は軍団の該当陣の兵力数×20%）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 30
+      confidence: high
+    effect_attribute: 抑制
+    direction: up
+  - name: 詭道伴行
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 集結が属する陣内の全騎兵の連撃が（基礎連撃×10%）アップ（于禁、董卓突破スキル付加を受ける）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 連撃
+    direction: up
+  seal_bonus:
+    by_seal:
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    - null
+    effect_note: 未確認
+    confidence: unknown
+  sources:
+  - screenshot:三国覇王戦記_武将情報
