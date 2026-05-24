@@ -18116,10 +18116,58 @@ generals:
   name: 伊達政宗
   yomi: null
   base_rarity: 橙
-  troop_type: 万能
-  slot_stat: null
+  troop_type: 騎兵
+  slot_stat: 統率
   role_tags: []
-  skills: []
+  skills:
+  - name: WAR DANCE
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 武将所属部隊の防御付加46%無効、軍団が属する陣の攻撃力46%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 46
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: CRAZY STORM
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 統帥を担当時、自身の率兵数が基礎率兵数×70%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 70
+      confidence: high
+    effect_attribute: 率兵
+    direction: up
+  - name: TESTAMENT
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 所属集結が属する陣の全兵種の連撃が（基礎連撃×10%）アップ。特殊兵士は追加で10%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 10
+      confidence: high
+    effect_attribute: 連撃
+    direction: up
   stats:
     統率: 98
     武力: 95
@@ -18145,10 +18193,58 @@ generals:
   name: 郭嘉
   yomi: null
   base_rarity: 橙
-  troop_type: 万能
+  troop_type: 騎兵
   slot_stat: null
   role_tags: []
-  skills: []
+  skills:
+  - name: 鬼才
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 味方主陣の集結可能兵士数の上限+20%（所持ですぐに有効、派遣不要）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 祭酒
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の騎兵攻撃力が基礎攻撃力×25%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 25
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 奇佐
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 味方主陣の収容可能な救援兵士数の上限+20%（所持ですぐに有効、派遣不要）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 20
+      confidence: high
+    effect_attribute: その他
+    direction: up
   stats:
     統率: 76
     武力: 25
@@ -18203,10 +18299,58 @@ generals:
   name: 法正
   yomi: null
   base_rarity: 橙
-  troop_type: 万能
+  troop_type: 歩兵
   slot_stat: null
   role_tags: []
-  skills: []
+  skills:
+  - name: 智計・誘
+    type: buff
+    scope: self
+    unlocked_at: 0
+    effect: 誘兵成功時に、効果が元の効果×85%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 85
+      confidence: high
+    effect_attribute: その他
+    direction: up
+  - name: 強御・歩
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の歩兵の防御力が基礎防御力×27%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 27
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 披荊斬棘
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 軍団が属する陣の歩兵攻撃力アップ。数値は自身の総防御×11%
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 11
+      confidence: high
+    effect_attribute: 防御
+    direction: up
   stats:
     統率: 82
     武力: 47
@@ -18232,10 +18376,58 @@ generals:
   name: 張飛
   yomi: null
   base_rarity: 橙
-  troop_type: 万能
+  troop_type: 歩兵
   slot_stat: null
   role_tags: []
-  skills: []
+  skills:
+  - name: 無双・歩
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の歩兵の攻撃力が基礎攻撃力×27%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 27
+      confidence: high
+    effect_attribute: 攻撃
+    direction: up
+  - name: 強御・歩
+    type: buff
+    scope: legion
+    unlocked_at: 0
+    effect: 所属軍団が属する陣の歩兵の防御力が基礎防御力×27%アップ
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 27
+      confidence: high
+    effect_attribute: 防御
+    direction: up
+  - name: 万人敵
+    type: buff
+    scope: rally
+    unlocked_at: 0
+    effect: 属する陣の戦闘時、味方兵士のシールド値11%アップ（同じ陣の集結による累加でシールド値最大10000000pt増加）
+    unit: percent
+    value:
+      by_breakthrough:
+      - null
+      - null
+      - null
+      - null
+      - 11
+      confidence: high
+    effect_attribute: シールド
+    direction: up
   stats:
     統率: 82
     武力: 100
