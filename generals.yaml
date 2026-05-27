@@ -1413,72 +1413,6 @@ generals:
   - xlsx:3_20251224.xlsx#武将!B8
   - screenshot:李典.PNG
   xlsx_remarks: 抑制40%増（上限80%）
-- id: 満龍
-  name: 満龍
-  yomi: null
-  base_rarity: 橙
-  troop_type: 歩兵
-  slot_stat: 知性
-  role_tags: []
-  skills:
-  - name: 抑制40%減（上限80%）
-    type: debuff
-    scope: rally
-    unlocked_at: 0
-    effect: 抑制40%減（上限80%）
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - -40.0
-      confidence: medium
-    cap:
-      rule: no_cap
-      cap_value: -80.0
-      note: xlsx備考由来の固定%上限
-    effect_attribute: 抑制
-    direction: down
-  - name: 貫通20%減（上限50%）
-    type: debuff
-    scope: rally
-    unlocked_at: 0
-    effect: 貫通20%減（上限50%）
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - -20.0
-      confidence: medium
-    cap:
-      rule: no_cap
-      cap_value: -50.0
-      note: xlsx備考由来の固定%上限
-    effect_attribute: 貫通
-    direction: down
-  seal_bonus:
-    by_seal:
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    effect_note: 未確認
-    confidence: unknown
-  sources:
-  - xlsx:3_20251224.xlsx#武将!B9
-  xlsx_remarks: 抑制40%減（上限80%）、貫通20%減（上限50%）
 - id: 玄龐徳
   name: 玄龐徳
   yomi: null
@@ -1949,7 +1883,8 @@ generals:
   base_rarity: 橙
   troop_type: 歩兵
   slot_stat: 統率
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 鋒練
     type: buff
@@ -2051,6 +1986,7 @@ generals:
     統率: 98
     武力: 95
     知性: 95
+    魅力: 49
 - id: 全琮
   name: 全琮
   yomi: null
@@ -7964,86 +7900,6 @@ generals:
     統率: 100
     武力: 95
     知性: 96
-- id: 管路
-  name: 管路
-  yomi: null
-  base_rarity: 橙
-  troop_type: 歩兵
-  slot_stat: 知性
-  role_tags: []
-  skills:
-  - name: 衛廉
-    type: buff
-    scope: legion
-    unlocked_at: 0
-    effect: 軍団が属する陣の全兵士の抵抗が10%アップ。属する陣の戦闘時、味方が勝利する場合、敵方の負傷兵の30%が消滅（敵方プレイヤーにのみ有効、集結時は累加せず、確率も最も高いのみ有効）
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 10
-      confidence: high
-    stacking: non_stackable
-    effect_attribute: 兵士数
-    direction: up
-  - name: 知命
-    type: buff
-    scope: legion
-    unlocked_at: 0
-    effect: 所属軍団が属する陣の全兵士の防御力が基礎防御力×20%アップ
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 20
-      confidence: high
-    effect_attribute: 防御
-    direction: up
-  - name: 破讒
-    type: buff
-    scope: legion
-    unlocked_at: 0
-    effect: 属する陣の戦闘時、抵抗が味方10%×（敵方プレイヤー数÷味方プレイヤー数+1）アップ（プレイヤーとの戦闘時のみ有効。集結時に同じ陣の累加可能、アップする抵抗は元の抵抗の50%を超えず、且つ同じ陣集結内の効果が最も高いスキル数値を下回らない）
-    unit: percent
-    value:
-      by_breakthrough:
-      - null
-      - null
-      - null
-      - null
-      - 10
-      confidence: high
-    cap:
-      rule: no_cap
-      cap_value: 50
-      note: 抵抗50%上限
-    effect_attribute: 抵抗
-    direction: up
-  seal_bonus:
-    by_seal:
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    effect_note: 未確認
-    confidence: unknown
-  sources:
-  - xlsx:3_20251224.xlsx#武将!B100
-  - screenshot:9287B845.png
-  xlsx_remarks: 抵抗(プレイヤー数差+1)×10%増（上限50%）
 - id: 玄甘寧
   name: 玄甘寧
   yomi: null
@@ -12829,68 +12685,6 @@ generals:
     confidence: unknown
   sources:
   - user_stats_table_20260522
-- id: 魏義
-  name: 魏義
-  yomi: null
-  base_rarity: 橙
-  troop_type: null
-  slot_stat: null
-  role_tags:
-  - 装備武将
-  stats:
-    統率: 98
-    武力: 95
-    知性: 95
-    魅力: 49
-  skills: []
-  seal_bonus:
-    by_seal:
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    effect_note: 未確認
-    confidence: unknown
-  sources:
-  - user_stats_table_20260522
-- id: 祢衡
-  name: 祢衡
-  yomi: null
-  base_rarity: 橙
-  troop_type: null
-  slot_stat: null
-  role_tags:
-  - 装備武将
-  stats:
-    統率: 95
-    武力: 95
-    知性: 95
-    魅力: null
-  skills: []
-  seal_bonus:
-    by_seal:
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    - null
-    effect_note: 未確認
-    confidence: unknown
-  sources:
-  - user_stats_table_20260522
 - id: 劉寵
   name: 劉寵
   yomi: null
@@ -16844,7 +16638,8 @@ generals:
   base_rarity: 橙
   troop_type: 弓兵
   slot_stat: null
-  role_tags: []
+  role_tags:
+  - 装備武将
   skills:
   - name: 強御・弓
     type: buff
@@ -16911,6 +16706,10 @@ generals:
     confidence: unknown
   sources:
   - screenshot:三国覇王戦記_武将情報
+  stats:
+    統率: 95
+    武力: 95
+    知性: 95
 - id: 立花間千代
   name: 立花間千代
   yomi: null
