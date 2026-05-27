@@ -1281,6 +1281,9 @@ function runAutoBuilderFor(legionIdx) {
     }
   }
 
+  // 軍団内の枠を並べ替え（担当条件 ＞ 角陣 ＞ 能力値順）
+  rearrangeLegion(fNew);
+
   saveState();
   renderFormation();
   renderSummary();
@@ -1444,9 +1447,83 @@ function runAutoBuildAllGlobal(targetIdxs) {
     if (s.bi === -1) f.array[s.slot] = gid;
     else f.battalions[s.bi][s.slot] = gid;
   }
+  // 軍団内の枠を並べ替え（担当条件 ＞ 角陣 ＞ 能力値順）
+  for (const idx of targetIdxs) rearrangeLegion(state.formations[idx]);
   saveState();
   renderFormation();
   renderSummary();
+}
+
+// 軍団内の枠への並べ替え（担当条件スキル ＞ 角陣スキル ＞ 能力値順）。
+// 選定（どの武将を入れるか）は変えず、配置済み武将を枠に並べ替えるだけ（スコア中立）。
+function rearrangeLegion(f) {
+  const ids = [];
+  for (const b of f.battalions) for (const k of SLOT_KEYS) if (b[k]) ids.push(b[k]);
+  for (const k of SLOT_KEYS) if (f.array[k]) ids.push(f.array[k]);
+  if (!ids.length) return;
+
+  const gmap = new Map(state.data.generals.map(g => [g.id, g]));
+  const meta = {};
+  for (const id of ids) {
+    const g = gmap.get(id); const sks = (g && g.skills) || [];
+    let req = null;
+    for (const s of sks) { const r = skillRequiredSlot(s); if (r) { req = r; break; } }
+    const isArray = sks.some(s => s.scope === 'array' || /角陣/.test(s.effect || ''));
+    meta[id] = { req, isArray, stats: (g && g.stats) || {} };
+  }
+  const stat = (id, t) => Number(meta[id].stats[t]) || 0;
+
+  // 一旦クリア
+  for (const b of f.battalions) for (const k of SLOT_KEYS) b[k] = null;
+  for (const k of SLOT_KEYS) f.array[k] = null;
+
+  const pool = new Set(ids);
+  const setBat = (bi, t, id) => { f.battalions[bi][t] = id; pool.delete(id); };
+  const setArr = (t, id) => { f.array[t] = id; pool.delete(id); };
+
+  // 1) 担当条件スキル → 部隊(1→5)を type別に、その能力値の高い順で
+  for (const t of SLOT_KEYS) {
+    const conds = [...pool].filter(id => meta[id].req === t).sort((a, b) => stat(b, t) - stat(a, t));
+    let bi = 0;
+    for (const id of conds) {
+      while (bi <= 4 && f.battalions[bi][t]) bi++;
+      if (bi > 4) break;            // 部隊満杯 → 残りは後段で処理
+      setBat(bi, t, id); bi++;
+    }
+  }
+
+  // 2) 角陣スキル → 角陣スロットへ（希望type = 担当条件 or 最高能力値type）
+  const arrayGens = [...pool].filter(id => meta[id].isArray)
+    .sort((a, b) => Math.max(...SLOT_KEYS.map(t => stat(b, t))) - Math.max(...SLOT_KEYS.map(t => stat(a, t))));
+  for (const id of arrayGens) {
+    if (!pool.has(id)) continue;
+    const want = meta[id].req || [...SLOT_KEYS].sort((a, b) => stat(id, b) - stat(id, a))[0];
+    if (!f.array[want]) { setArr(want, id); continue; }
+    const free = SLOT_KEYS.find(k => !f.array[k]);
+    if (free) setArr(free, id);     // 角陣満杯なら後段で部隊へ
+  }
+
+  // 3) 残り → 能力値順で 統率部隊1-5 → 武力部隊1-5 → 知性部隊1-5 → 角陣統率/武力/知性
+  const order = [];
+  for (const t of SLOT_KEYS) for (let bi = 0; bi < 5; bi++) order.push({ arr: false, bi, t });
+  for (const t of SLOT_KEYS) order.push({ arr: true, t });
+  for (const sl of order) {
+    if (!pool.size) break;
+    const occupied = sl.arr ? f.array[sl.t] : f.battalions[sl.bi][sl.t];
+    if (occupied) continue;
+    let best = null, bv = -Infinity;
+    for (const id of pool) { const v = stat(id, sl.t); if (v > bv) { bv = v; best = id; } }
+    if (best == null) break;
+    if (sl.arr) setArr(sl.t, best); else setBat(sl.bi, sl.t, best);
+  }
+  // 余り（通常は発生しない）→ 空き枠へ
+  if (pool.size) for (const sl of order) {
+    if (!pool.size) break;
+    const occupied = sl.arr ? f.array[sl.t] : f.battalions[sl.bi][sl.t];
+    if (occupied) continue;
+    const id = pool.values().next().value;
+    if (sl.arr) setArr(sl.t, id); else setBat(sl.bi, sl.t, id);
+  }
 }
 
 function renderFormation() {
