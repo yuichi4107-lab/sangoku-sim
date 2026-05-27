@@ -520,6 +520,11 @@ function skillRequiredSlot(sk) {
 function skillTargetTroop(sk) {
   const eff = (sk && sk.effect) || '';
   if (/全兵士|全軍|全部隊|全武将|一兵種/.test(eff)) return null;
+  // 「味方[兵種]に対する敵方…」等、味方側の兵種を指定するスキルはその兵種が条件。
+  //   例: 厳法「味方歩兵に対する敵方騎兵の抑制係数…」→ 歩兵軍団でのみ有効。
+  //   味方の兵種が単一に特定できる場合のみ採用（複数兵種ならフォールスルー）。
+  const ally = [...new Set([...eff.matchAll(/味方(?:の)?(騎兵|歩兵|弓兵|戦車)/g)].map(m => m[1]))];
+  if (ally.length === 1) return ally[0];
   // 特殊兵 → 親兵種
   if (/連弩兵/.test(eff)) return '弓兵';     // 弓兵の特殊兵
   if (/槍盾兵|盾槍兵/.test(eff)) return '歩兵'; // 歩兵の特殊兵
