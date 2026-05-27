@@ -1085,11 +1085,10 @@ function renderFilters() {
       const names = missing.map(({ idx }) => `軍団${idx + 1}`).join('、');
       if (!await askConfirm(`${names} は兵種が未指定です。\nスキップして他軍団のみ編成しますか？`)) return;
     }
-    // 対象軍団を順番に編成（pool は runAutoBuilderFor 内で他軍団から自動集計）
-    for (const { idx, f } of targets) {
-      if (!f.troop_type) continue;
-      runAutoBuilderFor(idx);
-    }
+    // 全体最適（グローバル貪欲＋入れ替え改善）で一括編成
+    const idxs = targets.filter(({ f }) => f.troop_type).map(({ idx }) => idx);
+    if (!idxs.length) { notify('兵種が指定された対象軍団がありません'); return; }
+    runAutoBuildAllGlobal(idxs);
   });
 
   // 編成クリア（全軍団）
@@ -1282,6 +1281,169 @@ function runAutoBuilderFor(legionIdx) {
     }
   }
 
+  saveState();
+  renderFormation();
+  renderSummary();
+}
+
+// 全体最適（グローバル貪欲＋入れ替え改善）で複数軍団を一括編成。
+// 軍団番号順の逐次配置をやめ、全対象スロット×全候補から毎回最良を選ぶ。
+function runAutoBuildAllGlobal(targetIdxs) {
+  const pris = [state.priority.pri1, state.priority.pri2, state.priority.pri3, state.priority.pri4, state.priority.pri5];
+  const targetSet = new Set(targetIdxs);
+  const genMap = new Map(state.data.generals.map(g => [g.id, g]));  // id→武将 高速参照
+
+  // 対象軍団をクリア（兵種・選択・user_id は保持）
+  for (const idx of targetIdxs) {
+    const f = state.formations[idx];
+    f.battalions = [emptyBattalion(), emptyBattalion(), emptyBattalion(), emptyBattalion(), emptyBattalion()];
+    f.array = emptyBattalion();
+    f.auto = { pri1: pris[0], pri2: pris[1] };
+  }
+
+  // 基準 cap プール: 対象外軍団に既に置かれた武将の寄与
+  const basePool = {};
+  state.formations.forEach((other, i) => {
+    if (targetSet.has(i)) return;
+    const placed = new Set();
+    for (const b of other.battalions) for (const k of SLOT_KEYS) if (b[k]) placed.add(b[k]);
+    for (const k of SLOT_KEYS) if (other.array[k]) placed.add(other.array[k]);
+    for (const gid of placed) {
+      const g = genMap.get(gid);
+      if (!g) continue;
+      const own = getOwn(other.user_id, g.id);
+      for (const sk of (g.skills || [])) {
+        const eff = resolveSkillValue(sk, own);
+        if (eff == null) continue;
+        const info = getCapInfo(sk);
+        if (info.bucketKey) basePool[info.bucketKey] = (basePool[info.bucketKey] || 0) + eff;
+      }
+    }
+  });
+
+  // ユーザーごとの「対象外軍団で使用中」武将（候補から除外）
+  const usedElse = {};
+  state.formations.forEach((other, i) => {
+    if (targetSet.has(i)) return;
+    const u = other.user_id;
+    (usedElse[u] = usedElse[u] || new Set());
+    for (const b of other.battalions) for (const k of SLOT_KEYS) if (b[k]) usedElse[u].add(b[k]);
+    for (const k of SLOT_KEYS) if (other.array[k]) usedElse[u].add(other.array[k]);
+  });
+
+  // 全対象スロット（bi=-1 は角陣）
+  const slots = [];
+  for (const idx of targetIdxs) {
+    const f = state.formations[idx];
+    if (!f.troop_type) continue;
+    for (let bi = 0; bi < 5; bi++) for (const slot of SLOT_KEYS) slots.push({ idx, bi, slot, userId: f.user_id, troop: f.troop_type });
+    for (const slot of SLOT_KEYS) slots.push({ idx, bi: -1, slot, userId: f.user_id, troop: f.troop_type });
+  }
+  const slotKey = s => `${s.idx}:${s.bi}:${s.slot}`;
+
+  // ユーザーごとの候補武将（所持・派遣不要のみ除外・他軍団未使用）
+  const candByUser = {};
+  for (const s of slots) {
+    if (s.userId in candByUser) continue;
+    const ue = usedElse[s.userId] || new Set();
+    candByUser[s.userId] = state.data.generals.filter(g =>
+      getOwn(s.userId, g.id).owned && !ue.has(g.id) && hasPlacementCombatSkill(g));
+  }
+
+  const assign = new Map();   // slotKey -> genId
+  const usedRun = {};         // userId -> Set
+  const isUsed = (u, gid) => usedRun[u] && usedRun[u].has(gid);
+  const markUsed = (u, gid) => (usedRun[u] = usedRun[u] || new Set()).add(gid);
+
+  // ---- グローバル貪欲 ----
+  let pool = { ...basePool };
+  const remaining = [...slots];
+  while (remaining.length) {
+    // スコアは (userId, 兵種, スロット種) のみで決まる → 同一comboは代表1スロットだけ評価
+    const reps = new Map();  // comboKey -> 代表 ri
+    for (let ri = 0; ri < remaining.length; ri++) {
+      const s = remaining[ri];
+      const ck = `${s.userId}#${s.troop}#${s.slot}`;
+      if (!reps.has(ck)) reps.set(ck, ri);
+    }
+    let best = null;
+    for (const ri of reps.values()) {
+      const s = remaining[ri];
+      for (const g of candByUser[s.userId]) {
+        if (isUsed(s.userId, g.id)) continue;
+        const { score, newPool } = marginalContribution(g, pris, pool, s.userId, s.slot, s.troop);
+        if (best === null || score > best.score) best = { ri, g, score, newPool };
+      }
+    }
+    if (best === null) break;
+    const s = remaining[best.ri];
+    assign.set(slotKey(s), best.g.id);
+    markUsed(s.userId, best.g.id);
+    pool = best.newPool;
+    remaining.splice(best.ri, 1);
+  }
+
+  // ---- 入れ替え改善（local search）----
+  // 固定順で配置全体のスコアを評価（共有capも順次反映）
+  function configScore(amap) {
+    let p = { ...basePool };
+    let total = 0;
+    for (const s of slots) {
+      const gid = amap.get(slotKey(s));
+      if (!gid) continue;
+      const g = genMap.get(gid);
+      if (!g) continue;
+      const { score, newPool } = marginalContribution(g, pris, p, s.userId, s.slot, s.troop);
+      total += score;
+      p = newPool;
+    }
+    return total;
+  }
+  let curScore = configScore(assign);
+  const filled = slots.filter(s => assign.has(slotKey(s)));
+  const LS_BUDGET_MS = 2000;             // 入れ替え改善の時間予算
+  const lsStart = performance.now();
+  let improved = true, passes = 0;
+  while (improved && passes < 3 && performance.now() - lsStart < LS_BUDGET_MS) {
+    improved = false; passes++;
+    // (a) 同ユーザーの2スロット間で武将を入れ替え
+    for (let a = 0; a < filled.length; a++) {
+      if (performance.now() - lsStart > LS_BUDGET_MS) break;
+      for (let b = a + 1; b < filled.length; b++) {
+        if (filled[a].userId !== filled[b].userId) continue;
+        const ka = slotKey(filled[a]), kb = slotKey(filled[b]);
+        const ga = assign.get(ka), gb = assign.get(kb);
+        if (ga === gb) continue;
+        assign.set(ka, gb); assign.set(kb, ga);
+        const sc = configScore(assign);
+        if (sc > curScore + 1e-9) { curScore = sc; improved = true; }
+        else { assign.set(ka, ga); assign.set(kb, gb); }
+      }
+    }
+    // (b) 配置武将を同ユーザーの未使用候補と置換
+    for (const s of filled) {
+      if (performance.now() - lsStart > LS_BUDGET_MS) break;
+      const k = slotKey(s);
+      const cur = assign.get(k);
+      const usedNow = new Set(assign.values());
+      for (const g of candByUser[s.userId]) {
+        if (usedNow.has(g.id)) continue;
+        assign.set(k, g.id);
+        const sc = configScore(assign);
+        if (sc > curScore + 1e-9) { curScore = sc; improved = true; break; }
+        else assign.set(k, cur);
+      }
+    }
+  }
+
+  // ---- 反映 ----
+  for (const s of slots) {
+    const gid = assign.get(slotKey(s));
+    if (!gid) continue;
+    const f = state.formations[s.idx];
+    if (s.bi === -1) f.array[s.slot] = gid;
+    else f.battalions[s.bi][s.slot] = gid;
+  }
   saveState();
   renderFormation();
   renderSummary();
