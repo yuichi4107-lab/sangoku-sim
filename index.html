@@ -2343,17 +2343,22 @@ async function cloudGet() {
 async function cloudPut(payload) {
   // GAS Web App のリダイレクト先(googleusercontent.com)が Allow-Origin を返さない
   // 既知の問題を回避するため mode: 'no-cors' で送信。レスポンスは opaque
-  // になるため、送信成功後に GET で updated_at を確認する。
+  // になるため、送信前後の updated_at の変化で実際に保存されたか検証する。
+  // POST 直前に現在の updated_at を取得（lastCloudUpdatedAt は未初期化や古い場合がある）
+  let beforeTs = lastCloudUpdatedAt;
+  try {
+    const before = await cloudGet();
+    if (before && before.ok) beforeTs = before.updated_at || '';
+  } catch (e) {}
   const form = new URLSearchParams();
   form.append('payload', JSON.stringify(payload));
-  const beforeTs = lastCloudUpdatedAt;
   await fetch(GROUP_API_URL, {
     method: 'POST',
     body: form,
     mode: 'no-cors',
   });
-  // 送信完了を GET 結果の updated_at 変化で確認（最大3秒待つ）
-  for (let i = 0; i < 6; i++) {
+  // 送信完了を GET 結果の updated_at 変化で確認（GAS は応答が遅いことがあるので最大10秒待つ）
+  for (let i = 0; i < 20; i++) {
     await new Promise(r => setTimeout(r, 500));
     try {
       const r = await cloudGet();
@@ -2362,8 +2367,8 @@ async function cloudPut(payload) {
       }
     } catch (e) {}
   }
-  // タイムアウトでも保存自体は成功している可能性が高いので警告のみ
-  return { ok: true, updated_at: new Date().toISOString(), warning: 'unverified' };
+  // タイムアウト = サーバー側で反映が確認できなかった。サイレント失敗の可能性あり。
+  return { ok: false, warning: 'unverified' };
 }
 
 function buildSharedPayload() {
@@ -2695,8 +2700,14 @@ function initCloudSync() {
     setGroupStatus('保存中…', '#888');
     try {
       const r = await cloudPut(buildSharedPayload());
+      if (r.warning === 'unverified' || !r.ok) {
+        // サーバー側での反映を10秒以内に確認できなかった
+        setGroupStatus('保存未確認', '#c80');
+        notify('⚠️ 保存リクエストは送信しましたが、サーバー側での反映を確認できませんでした。\n\n考えられる原因:\n・ネットワーク不安定／タイムアウト\n・データサイズが大きすぎる\n・GAS 側で一時的にエラー\n\nしばらく待ってから「⬇️ クラウドから取得」で反映されているか確認するか、もう一度「⬆️ クラウドへ保存」を押してください。');
+        return;
+      }
       lastCloudUpdatedAt = r.updated_at || '';
-      notify('クラウドに保存しました。');
+      notify(`✅ クラウドに保存しました。\n更新時刻: ${new Date(r.updated_at).toLocaleString()}`);
       refreshModeUI();
       setGroupStatus(`保存完了 ${new Date().toLocaleTimeString()}`, '#3a5520');
     } catch (e) {
