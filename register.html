@@ -113,6 +113,9 @@
     <button id="btn-submit" style="background:#2e8b3a;font-weight:600;">📤 送信（オンライン）</button>
     <button id="btn-clear" class="red">🗑️ 全クリア</button>
   </div>
+  <div class="row">
+    <button id="btn-load-main" style="background:#5a7a8c;color:#fff;">🔄 メインから自分のデータを読込</button>
+  </div>
 </div>
 
 <div id="roster-list"></div>
@@ -479,6 +482,77 @@ document.getElementById('btn-clear').addEventListener('click', () => {
   state.ownerships = {};
   saveLocal();
   renderRoster();
+});
+
+// ============================================================
+// メイン(index.html)から自分のデータを読込（同一ブラウザのlocalStorage経由）
+// ============================================================
+function readMainData() {
+  try {
+    const raw = localStorage.getItem('sangoku_sim_v06');
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) { return null; }
+}
+
+function pickUserModal(users, activeId) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#fff;padding:16px 18px;border-radius:8px;max-width:480px;width:100%;box-shadow:0 4px 16px rgba(0,0,0,0.3);font-family:inherit;';
+    let html = '<div style="font-weight:600;margin-bottom:10px;">どのユーザーのデータを反映しますか？</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:50vh;overflow:auto;">';
+    users.forEach((u, i) => {
+      const checked = (u.id === activeId || (activeId == null && i === 0)) ? 'checked' : '';
+      const safeName = String(u.name == null ? '(無名)' : u.name).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+      html += `<label style="display:flex;gap:8px;align-items:center;cursor:pointer;padding:6px 10px;border:1px solid #ddd;border-radius:4px;">
+        <input type="radio" name="pickuser" value="${u.id}" ${checked}>
+        <span>${safeName}</span>
+      </label>`;
+    });
+    html += '</div>';
+    html += '<div style="display:flex;gap:8px;justify-content:flex-end;"><button id="pu-cancel">キャンセル</button><button id="pu-ok" style="background:#2e6da4;color:#fff;font-weight:600;">読込</button></div>';
+    box.innerHTML = html;
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    box.querySelector('#pu-cancel').onclick = () => { if (overlay.parentNode) overlay.remove(); resolve(null); };
+    box.querySelector('#pu-ok').onclick = () => {
+      const sel = box.querySelector('input[name="pickuser"]:checked');
+      const v = sel ? sel.value : null;
+      const id = v == null ? null : (isNaN(Number(v)) ? v : Number(v));
+      if (overlay.parentNode) overlay.remove();
+      resolve(id);
+    };
+  });
+}
+
+document.getElementById('btn-load-main').addEventListener('click', async () => {
+  const main = readMainData();
+  if (!main || !Array.isArray(main.users) || main.users.length === 0) {
+    notify('メイン側に登録ユーザーが見つかりません。\n同じブラウザで一度メイン（編成シミュレーター）を開き、ユーザーを登録してください。');
+    return;
+  }
+  let picked;
+  if (main.users.length === 1) {
+    picked = main.users[0].id;
+  } else {
+    picked = await pickUserModal(main.users, main.activeUserId);
+    if (picked === null) return;
+  }
+  const user = main.users.find(u => u.id === picked || String(u.id) === String(picked));
+  if (!user) { notify('対象ユーザーが見つかりませんでした。'); return; }
+  const own = (main.ownerships && (main.ownerships[user.id] || main.ownerships[String(user.id)])) || {};
+  if (state.userName || Object.keys(state.ownerships).length > 0) {
+    if (!confirm(`現在の入力内容を「${user.name || '(無名)'}」のデータで上書きします。よろしいですか？`)) return;
+  }
+  state.userName = user.name || '';
+  state.ownerships = JSON.parse(JSON.stringify(own));
+  document.getElementById('user-name').value = state.userName;
+  saveLocal();
+  renderRoster();
+  const ownedN = Object.values(state.ownerships).filter(o => o && o.owned).length;
+  notify(`✅ 「${state.userName}」のデータを読込みました（所持 ${ownedN} 体）`);
 });
 
 // 起動
