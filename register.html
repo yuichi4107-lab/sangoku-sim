@@ -173,10 +173,15 @@ function loadData() {
 }
 
 function saveLocal() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({
-    userName: state.userName,
-    ownerships: state.ownerships,
-  }));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      userName: state.userName,
+      ownerships: state.ownerships,
+    }));
+  } catch (e) {
+    console.error('localStorage save failed', e);
+    try { notify(`❌ ローカル保存に失敗しました: ${e.message}\n\nブラウザの容量上限やプライベートモードの可能性があります。\nこのままだと変更内容が次回起動時に失われます。`); } catch (_) {}
+  }
 }
 function loadLocal() {
   try {
@@ -185,7 +190,10 @@ function loadLocal() {
     const obj = JSON.parse(raw);
     state.userName = obj.userName || '';
     state.ownerships = obj.ownerships || {};
-  } catch (e) { console.warn(e); }
+  } catch (e) {
+    console.warn('localStorage load failed', e);
+    try { notify(`⚠️ 入力データの読込に失敗しました: ${e.message}\n（初期状態で続行します）`); } catch (_) {}
+  }
 }
 
 // =========================
@@ -297,6 +305,27 @@ function notify(msg) {
 document.getElementById('modal-ok').addEventListener('click', () => {
   document.getElementById('modal').classList.remove('active');
 });
+
+// グローバルエラーハンドラ: 未捕捉エラーをUIに出す
+(function setupGlobalErrorHandlers() {
+  let lastShown = 0;
+  function show(prefix, msg) {
+    const now = Date.now();
+    if (now - lastShown < 500) { console.error(prefix, msg); return; }
+    lastShown = now;
+    try { notify(`${prefix}: ${msg}`); } catch (_) { console.error(prefix, msg); }
+  }
+  window.addEventListener('error', ev => {
+    const m = ev && (ev.message || (ev.error && ev.error.message)) || 'unknown error';
+    const where = ev && ev.filename ? ` (${ev.filename}:${ev.lineno})` : '';
+    show('❌ エラー', `${m}${where}`);
+  });
+  window.addEventListener('unhandledrejection', ev => {
+    const r = ev && ev.reason;
+    const m = (r && (r.message || String(r))) || 'unknown rejection';
+    show('❌ 非同期エラー', m);
+  });
+})();
 
 // =========================
 // イベント
@@ -452,6 +481,17 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
       const b64 = await fileToBase64(f);
       images.push({ name: f.name, mimeType: f.type || 'image/png', base64: b64 });
     }
+    // 送信前のサーバー側 updated_at を取得（検証用ベースライン）
+    let beforeTs = '';
+    try {
+      const res = await fetch(SUBMIT_API_URL + '?action=get_inbox');
+      if (res.ok) {
+        const d = await res.json();
+        const row = (d.inbox || []).find(x => x.user_name === name);
+        if (row) beforeTs = row.updated_at || '';
+      }
+    } catch (e) { /* ベースライン取得失敗時は空文字のままで続行 */ }
+
     const payload = {
       action: 'submit_user',
       user_name: name,
@@ -465,9 +505,28 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
       body: form,
       mode: 'no-cors',
     });
-    notify(`✅ 送信完了\n\n名前: ${name}\n登録した武将数: ${Object.values(state.ownerships).filter(o => o.owned).length}\n添付画像: ${images.length}枚\n\nデータは依頼者に届きました。\nご協力ありがとうございました！`);
+
+    // 検証: サーバー側 updated_at が変わるまで最大10秒ポーリング
+    btn.textContent = '反映確認中…';
+    let verified = false;
+    for (let i = 0; i < 20; i++) {
+      await new Promise(r => setTimeout(r, 500));
+      try {
+        const res = await fetch(SUBMIT_API_URL + '?action=get_inbox');
+        if (!res.ok) continue;
+        const d = await res.json();
+        const row = (d.inbox || []).find(x => x.user_name === name);
+        if (row && row.updated_at && row.updated_at !== beforeTs) { verified = true; break; }
+      } catch (e) { /* ポーリング中の一時エラーは無視 */ }
+    }
+
+    if (verified) {
+      notify(`✅ 送信完了（サーバー反映確認済）\n\n名前: ${name}\n登録した武将数: ${Object.values(state.ownerships).filter(o => o.owned).length}\n添付画像: ${images.length}枚\n\nデータは依頼者に届きました。\nご協力ありがとうございました！`);
+    } else {
+      notify(`⚠️ 送信は試みましたが、サーバー側での反映を10秒以内に確認できませんでした。\n\n考えられる原因:\n・ネットワーク不安定／タイムアウト\n・データサイズが大きすぎる（画像が大量等）\n・サーバー側で一時的なエラー\n\nしばらく待ってから、もう一度「📤 送信」を押してみてください。\n何度試しても失敗する場合は依頼者にご連絡ください。`);
+    }
   } catch (err) {
-    notify(`❌ 送信失敗: ${err.message}\n\nお手数ですが「💾 JSONダウンロード」でファイル保存後、依頼者に直接お送りください。`);
+    notify(`❌ 送信失敗: ${err.message}\n\n通信状態を確認のうえ、もう一度「📤 送信」を押してください。`);
   } finally {
     btn.textContent = orig;
     btn.disabled = false;

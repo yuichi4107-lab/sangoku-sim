@@ -290,6 +290,31 @@ function notify(message) {
   return openModal({ message, withInput: false, alertOnly: true });
 }
 
+// ============================================================
+// グローバルエラーハンドラ: どこかで投げられた未捕捉エラーを表面化する
+// （no-cors の sync 失敗以外はここに到達する）
+// ============================================================
+(function setupGlobalErrorHandlers() {
+  let lastShown = 0;
+  function show(prefix, msg) {
+    // 同じエラーの連発で UI を埋めないよう、500ms 以内の重複は抑制
+    const now = Date.now();
+    if (now - lastShown < 500) { console.error(prefix, msg); return; }
+    lastShown = now;
+    try { notify(`${prefix}: ${msg}`); } catch (_) { console.error(prefix, msg); }
+  }
+  window.addEventListener('error', ev => {
+    const m = ev && (ev.message || (ev.error && ev.error.message)) || 'unknown error';
+    const where = ev && ev.filename ? ` (${ev.filename}:${ev.lineno})` : '';
+    show('❌ エラー', `${m}${where}`);
+  });
+  window.addEventListener('unhandledrejection', ev => {
+    const r = ev && ev.reason;
+    const m = (r && (r.message || String(r))) || 'unknown rejection';
+    show('❌ 非同期エラー', m);
+  });
+})();
+
 function emptyBattalion() { return { 統率: null, 武力: null, 知性: null }; }
 function defaultUsers() {
   return Array.from({ length: DEFAULT_NUM_USERS }, (_, i) => ({ id: i + 1, name: `プレイヤー${i + 1}` }));
@@ -451,7 +476,10 @@ function loadState() {
         state.priority = { pri1: seed.auto.pri1 || '', pri2: seed.auto.pri2 || '', pri3: '', pri4: '', pri5: '' };
       }
     }
-  } catch (e) { console.warn('localStorage load failed', e); }
+  } catch (e) {
+    console.warn('localStorage load failed', e);
+    try { notify(`⚠️ ローカル保存データの読込に失敗しました: ${e.message}\n（このまま初期状態で続行します）`); } catch(_) {}
+  }
 }
 
 function saveState() {
@@ -466,7 +494,11 @@ function saveState() {
       priority: state.priority,
       aggMode: state.aggMode,
     }));
-  } catch (e) { console.warn('localStorage save failed', e); }
+  } catch (e) {
+    console.warn('localStorage save failed', e);
+    // 容量超過などで保存できないと操作が消える致命的状況なので、毎回通知
+    try { notify(`❌ ローカル保存に失敗しました: ${e.message}\n\nブラウザのストレージ容量が一杯か、プライベートモードの可能性があります。\nこのままだと変更内容が次回起動時に失われます。`); } catch(_) {}
+  }
 }
 
 // 指定ユーザーの武将所持エントリを取得（初期化込み）
@@ -2514,7 +2546,10 @@ function initCloudSync() {
         try {
           const form = new URLSearchParams();
           form.append('payload', JSON.stringify({ action: 're_ocr', user_name: t.user_name }));
-          fetch(GROUP_API_URL, { method: 'POST', body: form, mode: 'no-cors' }).catch(() => {});
+          fetch(GROUP_API_URL, { method: 'POST', body: form, mode: 'no-cors' }).catch(err => {
+          console.error('POST failed', err);
+          try { notify(`❌ サーバーへのリクエスト送信失敗: ${err.message}`); } catch (_) {}
+        });
           // ポーリングで stats が埋まるのを待つ（最大40秒）
           let ok = false;
           for (let i = 0; i < 20; i++) {
@@ -2555,7 +2590,10 @@ function initCloudSync() {
         if (msg) msg.textContent = `🗑 「${name}」を削除中…`;
         const form = new URLSearchParams();
         form.append('payload', JSON.stringify({ action: 'delete_inbox', user_name: name, delete_images: true }));
-        fetch(GROUP_API_URL, { method: 'POST', body: form, mode: 'no-cors' }).catch(() => {});
+        fetch(GROUP_API_URL, { method: 'POST', body: form, mode: 'no-cors' }).catch(err => {
+          console.error('POST failed', err);
+          try { notify(`❌ サーバーへのリクエスト送信失敗: ${err.message}`); } catch (_) {}
+        });
         // 削除完了をポーリング確認（最大20秒）
         let gone = false;
         for (let i = 0; i < 10; i++) {
@@ -2988,7 +3026,10 @@ async function showStatsEditModal(userName, currentStats) {
         // POST は fire-and-forget(no-cors)。並行してポーリング開始
         const form = new URLSearchParams();
         form.append('payload', JSON.stringify({ action: 're_ocr', user_name: userName }));
-        fetch(GROUP_API_URL, { method: 'POST', body: form, mode: 'no-cors' }).catch(() => {});
+        fetch(GROUP_API_URL, { method: 'POST', body: form, mode: 'no-cors' }).catch(err => {
+          console.error('POST failed', err);
+          try { notify(`❌ サーバーへのリクエスト送信失敗: ${err.message}`); } catch (_) {}
+        });
 
         let updated = null;
         for (let i = 0; i < 25; i++) {
