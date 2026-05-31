@@ -113,6 +113,10 @@
     <button id="btn-submit" style="background:#2e8b3a;font-weight:600;">📤 送信（オンライン）</button>
     <button id="btn-clear" class="red">🗑️ 全クリア</button>
   </div>
+  <div class="row">
+    <button id="btn-restore" style="background:#5a7a8c;color:#fff;">📥 前回の登録を呼び戻す</button>
+    <span style="font-size:11px;color:#888;">機種変更・別端末でも、名前を入れて押すと前回送信した内容を復元できます。</span>
+  </div>
 </div>
 
 <div id="roster-list"></div>
@@ -538,6 +542,46 @@ document.getElementById('btn-clear').addEventListener('click', () => {
   state.ownerships = {};
   saveLocal();
   renderRoster();
+});
+
+// 前回サーバーに送信した自分のデータを名前で呼び戻す
+document.getElementById('btn-restore').addEventListener('click', async () => {
+  const name = (state.userName || '').trim();
+  if (!name) {
+    notify('先に「名前」を入力してから押してください。\n（前回送信したときと同じ名前で照合します）');
+    document.getElementById('user-name').focus();
+    return;
+  }
+  const btn = document.getElementById('btn-restore');
+  const orig = btn.textContent;
+  btn.textContent = '呼び戻し中…';
+  btn.disabled = true;
+  try {
+    const res = await fetch(SUBMIT_API_URL + '?action=get_inbox');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const d = await res.json();
+    if (!d.ok) throw new Error(d.error || 'unknown');
+    const inbox = d.inbox || [];
+    const row = inbox.find(r => String(r.user_name) === name);
+    if (!row) {
+      notify(`「${name}」の前回送信データが見つかりませんでした。\n\n・名前が前回と一致しているか確認してください（全角/空白も区別されます）\n・まだ一度も送信していない場合は、最初から入力して「📤 送信」してください。`);
+      return;
+    }
+    const own = row.ownerships || {};
+    const ownedN = Object.values(own).filter(o => o && o.owned).length;
+    if (Object.keys(state.ownerships).length > 0) {
+      if (!confirm(`現在の入力内容を、前回送信した「${name}」のデータ（所持 ${ownedN} 体）で置き換えます。よろしいですか？`)) return;
+    }
+    state.ownerships = JSON.parse(JSON.stringify(own));
+    saveLocal();
+    renderRoster();
+    notify(`✅ 前回の登録を呼び戻しました（所持 ${ownedN} 体）。\n\n更新したい武将を追加・変更して、もう一度「📤 送信」してください。`);
+  } catch (err) {
+    notify(`❌ 呼び戻し失敗: ${err.message}\n\n通信状態を確認のうえ、もう一度お試しください。`);
+  } finally {
+    btn.textContent = orig;
+    btn.disabled = false;
+  }
 });
 
 // 起動
