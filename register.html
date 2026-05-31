@@ -468,6 +468,41 @@ function showImageAttachModal(optional) {
   });
 }
 
+// 暗証番号（4桁数字）の入力モーダル。OK=4桁文字列を返す / キャンセル=null
+function showPinModal(title, desc) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:var(--paper);padding:18px 16px;border:1px solid var(--border);border-radius:6px;max-width:340px;width:100%;';
+    box.innerHTML = `
+      <div style="font-weight:600;font-size:15px;margin-bottom:6px;">🔑 ${title}</div>
+      <div style="font-size:12px;color:#555;margin-bottom:10px;line-height:1.5;">${desc || ''}</div>
+      <input id="pin-input" type="tel" inputmode="numeric" maxlength="4" placeholder="0000"
+        style="width:100%;font-size:24px;letter-spacing:8px;text-align:center;padding:8px;border:1px solid var(--border);border-radius:6px;box-sizing:border-box;">
+      <div id="pin-err" style="font-size:12px;color:#c33;min-height:16px;margin:6px 0;"></div>
+      <div style="display:flex;gap:6px;justify-content:flex-end;">
+        <button id="pin-cancel" style="background:#888;">キャンセル</button>
+        <button id="pin-ok" style="background:var(--ok);">OK</button>
+      </div>`;
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    const input = box.querySelector('#pin-input');
+    const err = box.querySelector('#pin-err');
+    input.focus();
+    input.addEventListener('input', () => { input.value = input.value.replace(/[^0-9]/g, '').slice(0, 4); err.textContent = ''; });
+    const close = v => { if (overlay.parentNode) overlay.remove(); resolve(v); };
+    box.querySelector('#pin-cancel').onclick = () => close(null);
+    const submit = () => {
+      const v = input.value.trim();
+      if (!/^\d{4}$/.test(v)) { err.textContent = '4桁の数字を入力してください。'; return; }
+      close(v);
+    };
+    box.querySelector('#pin-ok').onclick = submit;
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+  });
+}
+
 document.getElementById('btn-submit').addEventListener('click', async () => {
   const name = (state.userName || '').trim();
   if (!name) {
@@ -490,6 +525,12 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
   const files = await showImageAttachModal(hasPriorSubmission);
   if (!files) return;  // キャンセル
   if (!files.length && !hasPriorSubmission) { notify('画像が必要です。'); return; }
+
+  // 暗証番号の設定（4桁数字）。「📥 前回の登録を呼び戻す」時にこの番号が必要になる。
+  const pin = await showPinModal(
+    '暗証番号を設定（4桁の数字）',
+    'この番号は「📥 前回の登録を呼び戻す」ときに必要です。毎回設定でき、直近の番号のみ有効です。忘れないようにしてください。');
+  if (pin === null) return;  // キャンセル
 
   const btn = document.getElementById('btn-submit');
   const orig = btn.textContent;
@@ -518,6 +559,7 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
       user_name: name,
       ownerships: state.ownerships,
       images: images,
+      pin: pin,
     };
     const form = new URLSearchParams();
     form.append('payload', JSON.stringify(payload));
@@ -561,7 +603,7 @@ document.getElementById('btn-clear').addEventListener('click', () => {
   renderRoster();
 });
 
-// 前回サーバーに送信した自分のデータを名前で呼び戻す
+// 前回サーバーに送信した自分のデータを名前＋暗証番号で呼び戻す
 document.getElementById('btn-restore').addEventListener('click', async () => {
   const name = (state.userName || '').trim();
   if (!name) {
@@ -569,22 +611,31 @@ document.getElementById('btn-restore').addEventListener('click', async () => {
     document.getElementById('user-name').focus();
     return;
   }
+  // 暗証番号の入力（送信時に設定した4桁。既に送信済みで未設定の人は 1234）
+  const pin = await showPinModal(
+    '暗証番号を入力（4桁の数字）',
+    '前回の送信時に設定した番号を入力してください。\n（以前から送信済みでまだ設定していない方は「1234」です）');
+  if (pin === null) return;  // キャンセル
+
   const btn = document.getElementById('btn-restore');
   const orig = btn.textContent;
   btn.textContent = '呼び戻し中…';
   btn.disabled = true;
   try {
-    const res = await fetch(SUBMIT_API_URL + '?action=get_inbox');
+    const res = await fetch(SUBMIT_API_URL + '?action=get_user_by_pin&user_name=' + encodeURIComponent(name) + '&pin=' + encodeURIComponent(pin));
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const d = await res.json();
-    if (!d.ok) throw new Error(d.error || 'unknown');
-    const inbox = d.inbox || [];
-    const row = inbox.find(r => String(r.user_name) === name);
-    if (!row) {
-      notify(`「${name}」の前回送信データが見つかりませんでした。\n\n・名前が前回と一致しているか確認してください（全角/空白も区別されます）\n・まだ一度も送信していない場合は、最初から入力して「📤 送信」してください。`);
+    if (!d.ok) {
+      if (d.error === 'pin_mismatch') {
+        notify('❌ 暗証番号が違います。\n\n前回の送信時に設定した4桁を入力してください。\n（以前から送信済みでまだ設定していない方は「1234」です）');
+      } else if (d.error === 'not_found') {
+        notify(`「${name}」の前回送信データが見つかりませんでした。\n\n・名前が前回と一致しているか確認してください（全角/空白も区別されます）\n・まだ一度も送信していない場合は、最初から入力して「📤 送信」してください。`);
+      } else {
+        notify(`❌ 呼び戻し失敗: ${d.error || 'unknown'}`);
+      }
       return;
     }
-    const own = row.ownerships || {};
+    const own = d.ownerships || {};
     const ownedN = Object.values(own).filter(o => o && o.owned).length;
     if (Object.keys(state.ownerships).length > 0) {
       if (!confirm(`現在の入力内容を、前回送信した「${name}」のデータ（所持 ${ownedN} 体）で置き換えます。よろしいですか？`)) return;

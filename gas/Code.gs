@@ -51,6 +51,7 @@ function getInboxSheet_() {
     sheet.getRange(1,3).setValue('updated_at');
     sheet.getRange(1,4).setValue('image_refs_json');
     sheet.getRange(1,5).setValue('player_stats_json');
+    sheet.getRange(1,6).setValue('pin');
   }
   return sheet;
 }
@@ -70,6 +71,7 @@ function jsonOut_(obj) {
 function doGet(e) {
   const action = (e && e.parameter && e.parameter.action) || 'get_state';
   if (action === 'get_inbox') return getInbox_();
+  if (action === 'get_user_by_pin') return getUserByPin_(e);  // 暗証番号で本人の前回送信を取得
   return getState_();
 }
 function doPost(e) {
@@ -346,10 +348,38 @@ function submitUser_(obj) {
     sheet.getRange(targetRow,2).setValue(JSON.stringify(ownerships));
     sheet.getRange(targetRow,3).setValue(now);
     sheet.getRange(targetRow,4).setValue(JSON.stringify(imageRefsToSave));
+    // 暗証番号（4桁数字）: 送信時に設定。直近のもので上書き。空送信時は据え置き。
+    const pin = String(obj.pin || '').trim();
+    if (/^\d{4}$/.test(pin)) {
+      const cell = sheet.getRange(targetRow, 6);
+      cell.setNumberFormat('@');   // テキスト書式（先頭0を保持）
+      cell.setValue(pin);
+    }
     return jsonOut_({ ok: true, image_count: imageRefs.length, image_kept: imageRefsToSave.length });
   } catch (err) {
     return jsonOut_({ ok: false, error: String(err) });
   } finally { lock.releaseLock(); }
+}
+
+// 暗証番号で本人の前回送信データを取得（「📥 前回の登録を呼び戻す」用）。
+// 保存pinが空（既存ユーザー）なら "1234" として照合。pin不一致/未送信は ok:false。
+function getUserByPin_(e) {
+  const name = String((e.parameter && e.parameter.user_name) || '').trim();
+  const pin = String((e.parameter && e.parameter.pin) || '').trim();
+  if (!name) return jsonOut_({ ok: false, error: 'user_name required' });
+  if (!/^\d{4}$/.test(pin)) return jsonOut_({ ok: false, error: 'pin must be 4 digits' });
+  const sheet = getInboxSheet_();
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return jsonOut_({ ok: false, error: 'not_found' });
+  const data = sheet.getRange(2, 1, lastRow - 1, 6).getValues();
+  for (const r of data) {
+    if (String(r[0]) === name) {
+      const savedPin = String(r[5] == null ? '' : r[5]).trim() || '1234';  // 空なら1234
+      if (savedPin !== pin) return jsonOut_({ ok: false, error: 'pin_mismatch' });
+      return jsonOut_({ ok: true, ownerships: parseJson_(r[1], {}), player_stats: parseJson_(r[4], null) });
+    }
+  }
+  return jsonOut_({ ok: false, error: 'not_found' });
 }
 
 function updateStats_(obj) {
