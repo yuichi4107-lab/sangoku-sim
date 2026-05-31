@@ -136,10 +136,13 @@
 <main id="app">
 
   <section class="panel">
-    <h2 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">武将一覧 <span id="roster-count" style="font-weight:normal;font-size:12px;color:var(--muted);"></span>
-      <a href="register.html" target="_blank" style="font-size:14px;font-weight:600;color:#fff;background:#2e8b3a;padding:5px 14px;border-radius:6px;text-decoration:none;white-space:nowrap;">▶ 武将登録はこちら</a></h2>
+    <h2 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">プレイヤー
+      <a href="register.html" target="_blank" style="font-size:14px;font-weight:600;color:#fff;background:#2e8b3a;padding:5px 14px;border-radius:6px;text-decoration:none;white-space:nowrap;">▶ 武将登録はこちら</a>
+      <a href="https://github.com/yuichi4107-lab/sangoku-sim/blob/main/docs/usage.md" target="_blank" style="font-size:12px;color:var(--accent);">📖 使い方</a>
+      <span id="roster-count" style="display:none;"></span></h2>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">対象プレイヤー:</div>
     <div id="user-tabs" style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;align-items:center;font-size:12px;"></div>
-    <div class="filters">
+    <div class="filters" style="display:none;">
       <label>兵種<select id="filter-troop"><option value="">全</option></select></label>
       <label>タイプ<select id="filter-rarity"><option value="">全</option><option value="seal">将印</option><option value="equipment">装備</option><option value="none">無印</option></select></label>
       <label>検索<input id="filter-search" type="text" placeholder="武将名" style="width:120px;"></label>
@@ -150,7 +153,6 @@
       <input id="file-add-user-json" type="file" accept="application/json,.json" multiple style="display:none;">
       <button id="btn-import-register" title="同じブラウザで register.html に入力した内容を取り込む" style="background:#5a7a8c;color:#fff;">🔄 登録ツールから取込</button>
       <button id="btn-show-qr" title="登録ツールURLのQRコードを表示" style="font-size:12px;padding:2px 8px;">📱 QR</button>
-      <a href="https://github.com/yuichi4107-lab/sangoku-sim/blob/main/docs/usage.md" target="_blank" style="font-size:12px;color:var(--accent);margin-left:8px;">📖 使い方</a>
     </div>
     <div class="filters" style="border-top:1px dotted var(--border);padding-top:6px;display:none;">
       <span style="font-size:12px;color:var(--muted);">一括（表示中の武将に適用）:</span>
@@ -160,7 +162,7 @@
       <label><input type="checkbox" id="bulk-eq3">3装</label>
       <label><input type="checkbox" id="bulk-equipment">4装</label>
     </div>
-    <div class="roster-scroll">
+    <div class="roster-scroll" style="display:none;">
       <table id="roster-table">
         <thead><tr>
           <th>所持</th><th>武将</th><th>属性</th><th style="width:200px;">育成段階</th>
