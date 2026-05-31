@@ -2492,7 +2492,7 @@ function initCloudSync() {
     html += `</div>
       <div id="batch-ocr-msg" style="font-size:11px;color:#666;margin-bottom:6px;"></div>
       <div style="display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;">
-        <button id="btn-batch-ocr" style="background:#4472c4;color:#fff;" title="ステ未登録の友人を全員AI OCRする">🤖 全員OCR(未登録)</button>
+        <button id="btn-batch-ocr" style="background:#4472c4;color:#fff;" title="ステ未登録の友人を全員、画像から読み込む">🤖 全員画像読込(未登録)</button>
         <button id="btn-inbox-all">全選択</button>
         <button id="btn-inbox-none">全解除</button>
         <button id="btn-inbox-ok" style="background:var(--accent);color:#fff;">選択を取込</button>
@@ -2513,12 +2513,12 @@ function initCloudSync() {
         const filled = r.player_stats ? countFilledStats(r.player_stats) : 0;
         return imgs.length > 0 && filled === 0;
       });
-      if (!targets.length) { msg.textContent = 'OCR対象（画像あり・ステ未登録）はありません。'; return; }
+      if (!targets.length) { msg.textContent = '画像読込の対象（画像あり・ステ未登録）はありません。'; return; }
       const btn = box.querySelector('#btn-batch-ocr');
       btn.disabled = true;
       let done = 0, failed = 0;
       for (const t of targets) {
-        msg.textContent = `🤖 OCR中… ${done + failed + 1}/${targets.length} (${t.user_name})`;
+        msg.textContent = `🤖 画像読込中… ${done + failed + 1}/${targets.length} (${t.user_name})`;
         try {
           const form = new URLSearchParams();
           form.append('payload', JSON.stringify({ action: 're_ocr', user_name: t.user_name }));
@@ -2951,7 +2951,7 @@ async function showStatsEditModal(userName, currentStats) {
         <div style="font-weight:600;font-size:12px;margin-bottom:4px;">敵方への減益</div>
         ${buildDebuff()}
         <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap;">
-          <button id="btn-stats-reocr" style="background:#4472c4;color:#fff;" title="この友人の提出画像から AI で再OCR">🤖 AIで再OCR</button>
+          <button id="btn-stats-reocr" style="background:#4472c4;color:#fff;" title="この友人の提出画像から読み込む">🤖 画像から読込</button>
           <button id="btn-stats-clear" style="background:#a66;color:#fff;">全クリア</button>
           <button id="btn-stats-cancel" style="background:#888;color:#fff;">キャンセル</button>
           <button id="btn-stats-save" style="background:var(--ok);color:#fff;">クラウドに保存</button>
@@ -2998,7 +2998,7 @@ async function showStatsEditModal(userName, currentStats) {
         const startTs = Date.now();
         // 開始前の埋まり数を記録（変化を検出するため）
         const initialFilled = countFilledStats(ps);
-        msg.textContent = '🤖 AI OCR 開始… (送信中)';
+        msg.textContent = '🤖 画像読込 開始… (送信中)';
         // POST は fire-and-forget(no-cors)。並行してポーリング開始
         const form = new URLSearchParams();
         form.append('payload', JSON.stringify({ action: 're_ocr', user_name: userName }));
@@ -3011,7 +3011,7 @@ async function showStatsEditModal(userName, currentStats) {
         for (let i = 0; i < 25; i++) {
           await new Promise(r => setTimeout(r, 2000));
           const sec = Math.round((Date.now() - startTs) / 1000);
-          msg.textContent = `🤖 AI OCR 中… (${sec}秒経過 / 最大50秒)`;
+          msg.textContent = `🤖 画像読込中… (${sec}秒経過 / 最大50秒)`;
           try {
             const res = await fetch(GROUP_API_URL + '?action=get_inbox');
             const r = await res.json();
@@ -3032,9 +3032,9 @@ async function showStatsEditModal(userName, currentStats) {
           ps = updated;
           rebuild();
           const sec = Math.round((Date.now() - startTs) / 1000);
-          msg.textContent = `✅ AI OCR 完了 (${sec}秒)。値を確認・修正してから「クラウドに保存」してください。`;
+          msg.textContent = `✅ 画像読込 完了 (${sec}秒)。値を確認・修正してから「クラウドに保存」してください。`;
         } else {
-          msg.textContent = '⚠️ OCR タイムアウト（50秒）。GAS 実行ログを確認してください。\n（モデル名 / API KEY / 画像参照 が原因の可能性）';
+          msg.textContent = '⚠️ 画像読込 タイムアウト（50秒）。GAS 実行ログを確認してください。\n（モデル名 / API KEY / 画像参照 が原因の可能性）';
         }
       };
       box.querySelector('#btn-stats-cancel').onclick = () => { if (overlay.parentNode) overlay.remove(); resolve(null); };
