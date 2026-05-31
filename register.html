@@ -117,6 +117,10 @@
     <button id="btn-restore" style="background:#5a7a8c;color:#fff;">📥 前回の登録を呼び戻す</button>
     <span style="font-size:11px;color:#888;">機種変更・別端末でも、名前を入れて押すと前回送信した内容を復元できます。</span>
   </div>
+  <div class="row">
+    <button id="btn-load-main" style="background:#7a6a9c;color:#fff;">🔄 メイン画面から読込</button>
+    <span style="font-size:11px;color:#888;">同じブラウザでメイン画面を使っている場合、その編集内容をここに取り込めます。</span>
+  </div>
 </div>
 
 <div id="roster-list"></div>
@@ -385,19 +389,21 @@ function fileToBase64(file) {
 }
 
 // 画像添付モーダル → 添付なしでは送信不可（複数枚を追加・個別削除可）
-function showImageAttachModal() {
+function showImageAttachModal(optional) {
   return new Promise(resolve => {
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;';
     const box = document.createElement('div');
     box.style.cssText = 'background:var(--paper);padding:16px;border:1px solid var(--border);border-radius:4px;max-width:400px;width:100%;';
     box.innerHTML = `
-      <div style="font-weight:600;font-size:15px;margin-bottom:6px;">📸 兵士属性スクショの添付（必須）</div>
+      <div style="font-weight:600;font-size:15px;margin-bottom:6px;">📸 兵士属性スクショの添付${optional ? '（任意）' : '（必須）'}</div>
       <div style="font-size:12px;color:#555;margin-bottom:10px;line-height:1.5;">
         ゲーム内「詳細情報」画面の「兵士属性」スクショを添付してください。<br>
         通常はスクロールしながら <strong>3〜4枚</strong> 必要です。<br>
         「画像を追加」を繰り返し押して複数枚選択できます。<br>
-        <span style="color:#c33;">※ 1枚以上添付しないと送信できません。</span>
+        ${optional
+          ? '<span style="color:#2e8b3a;">※ 2回目以降の更新です。画像なしでもそのまま送信できます（前回の画像は維持されます）。兵士属性が変わった場合のみ添付してください。</span>'
+          : '<span style="color:#c33;">※ 1枚以上添付しないと送信できません。</span>'}
       </div>
       <button id="btn-img-add" style="background:#5a7a5a;padding:8px 14px;width:100%;margin-bottom:8px;">📷 画像を追加</button>
       <input type="file" id="img-input" accept="image/*" multiple style="display:none;">
@@ -437,9 +443,10 @@ function showImageAttachModal() {
         });
       });
       countLabel.textContent = files.length ? `添付中: ${files.length}枚` : '（まだ画像が添付されていません）';
-      btnOk.disabled = files.length === 0;
-      btnOk.style.opacity = files.length === 0 ? '0.4' : '1';
-      btnOk.textContent = files.length ? `📤 送信（${files.length}枚）` : '📤 送信';
+      const blocked = files.length === 0 && !optional;  // 任意モードなら0枚でも送信可
+      btnOk.disabled = blocked;
+      btnOk.style.opacity = blocked ? '0.4' : '1';
+      btnOk.textContent = files.length ? `📤 送信（${files.length}枚）` : (optional ? '📤 画像なしで送信' : '📤 送信');
     }
     refresh();
 
@@ -469,10 +476,20 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
     return;
   }
 
-  // 画像添付モーダル
-  const files = await showImageAttachModal();
+  // 2回目以降の判定: サーバー受信箱に同名の送信履歴があれば画像添付を任意にする
+  let hasPriorSubmission = false;
+  try {
+    const res = await fetch(SUBMIT_API_URL + '?action=get_inbox');
+    if (res.ok) {
+      const d = await res.json();
+      hasPriorSubmission = !!(d.inbox || []).find(r => String(r.user_name) === name);
+    }
+  } catch (e) { /* 確認失敗時は必須扱い（安全側） */ }
+
+  // 画像添付モーダル（2回目以降は任意）
+  const files = await showImageAttachModal(hasPriorSubmission);
   if (!files) return;  // キャンセル
-  if (!files.length) { notify('画像が必要です。'); return; }
+  if (!files.length && !hasPriorSubmission) { notify('画像が必要です。'); return; }
 
   const btn = document.getElementById('btn-submit');
   const orig = btn.textContent;
@@ -582,6 +599,63 @@ document.getElementById('btn-restore').addEventListener('click', async () => {
     btn.textContent = orig;
     btn.disabled = false;
   }
+});
+
+// 同一ブラウザのメイン画面(sangoku_sim_v06)の編集内容を取り込む
+function readMainData_() {
+  try {
+    const raw = localStorage.getItem('sangoku_sim_v06');
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) { return null; }
+}
+function pickMainUser_(users, activeId) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#fff;padding:16px 18px;border-radius:8px;max-width:460px;width:100%;box-shadow:0 4px 16px rgba(0,0,0,0.3);';
+    let html = '<div style="font-weight:600;margin-bottom:10px;">どのユーザーのデータを取り込みますか？</div><div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:50vh;overflow:auto;">';
+    users.forEach((u, i) => {
+      const checked = (u.id === activeId || (activeId == null && i === 0)) ? 'checked' : '';
+      const safe = String(u.name == null ? '(無名)' : u.name).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+      html += `<label style="display:flex;gap:8px;align-items:center;cursor:pointer;padding:6px 10px;border:1px solid #ddd;border-radius:4px;"><input type="radio" name="mpick" value="${u.id}" ${checked}><span>${safe}</span></label>`;
+    });
+    html += '</div><div style="display:flex;gap:8px;justify-content:flex-end;"><button id="mp-cancel">キャンセル</button><button id="mp-ok" style="background:#2e6da4;color:#fff;font-weight:600;">取り込む</button></div>';
+    box.innerHTML = html;
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    box.querySelector('#mp-cancel').onclick = () => { if (overlay.parentNode) overlay.remove(); resolve(null); };
+    box.querySelector('#mp-ok').onclick = () => {
+      const sel = box.querySelector('input[name="mpick"]:checked');
+      const v = sel ? sel.value : null;
+      if (overlay.parentNode) overlay.remove();
+      resolve(v == null ? null : (isNaN(Number(v)) ? v : Number(v)));
+    };
+  });
+}
+document.getElementById('btn-load-main').addEventListener('click', async () => {
+  const main = readMainData_();
+  if (!main || !Array.isArray(main.users) || !main.users.length) {
+    notify('メイン画面の登録ユーザーが見つかりません。\n同じブラウザでメイン画面を開き、ユーザーを登録してから押してください。');
+    return;
+  }
+  let picked;
+  if (main.users.length === 1) picked = main.users[0].id;
+  else { picked = await pickMainUser_(main.users, main.activeUserId); if (picked === null) return; }
+  const user = main.users.find(u => u.id === picked || String(u.id) === String(picked));
+  if (!user) { notify('対象ユーザーが見つかりませんでした。'); return; }
+  const own = (main.ownerships && (main.ownerships[user.id] || main.ownerships[String(user.id)])) || {};
+  if (state.userName || Object.keys(state.ownerships).length > 0) {
+    if (!confirm(`現在の入力内容を、メイン画面の「${user.name || '(無名)'}」のデータで置き換えます。よろしいですか？`)) return;
+  }
+  state.userName = user.name || '';
+  state.ownerships = JSON.parse(JSON.stringify(own));
+  document.getElementById('user-name').value = state.userName;
+  saveLocal();
+  renderRoster();
+  const ownedN = Object.values(state.ownerships).filter(o => o && o.owned).length;
+  notify(`✅ メイン画面の「${state.userName}」を取り込みました（所持 ${ownedN} 体）。\n内容を確認して「📤 送信」してください。`);
 });
 
 // 起動

@@ -335,12 +335,18 @@ function submitUser_(obj) {
       const names = sheet.getRange(2,1,lastRow-1,1).getValues();
       for (let i = 0; i < names.length; i++) if (String(names[i][0]) === name) { targetRow = i+2; break; }
     }
-    if (targetRow === -1) targetRow = lastRow + 1;
+    const isNew = (targetRow === -1);
+    if (isNew) targetRow = lastRow + 1;
+    // 画像が新規に添付されなかった & 既存行 → 既存の image_refs を維持（消さない）
+    let imageRefsToSave = imageRefs;
+    if (imageRefs.length === 0 && !isNew) {
+      imageRefsToSave = parseJson_(sheet.getRange(targetRow, 4).getValue(), []);
+    }
     sheet.getRange(targetRow,1).setValue(name);
     sheet.getRange(targetRow,2).setValue(JSON.stringify(ownerships));
     sheet.getRange(targetRow,3).setValue(now);
-    sheet.getRange(targetRow,4).setValue(JSON.stringify(imageRefs));
-    return jsonOut_({ ok: true, image_count: imageRefs.length });
+    sheet.getRange(targetRow,4).setValue(JSON.stringify(imageRefsToSave));
+    return jsonOut_({ ok: true, image_count: imageRefs.length, image_kept: imageRefsToSave.length });
   } catch (err) {
     return jsonOut_({ ok: false, error: String(err) });
   } finally { lock.releaseLock(); }
