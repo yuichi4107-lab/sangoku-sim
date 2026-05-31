@@ -1315,10 +1315,13 @@ function runAutoBuilderFor(legionIdx) {
   }
 
   // slot_stat・兵種による配置制限は廃止。配置/兵種条件は marginalContribution が考慮する。
+  // ただし戦車武将は1軍団 MAX_TANK_PER_LEGION 人まで（角陣3枠に対応）。
+  let tankCount = 0;
   function pickBest(slot, candidateFilter) {
     let best = null;
     for (const g of ownedGens) {
       if (used.has(g.id)) continue;
+      if (isTankGeneral(g) && tankCount >= MAX_TANK_PER_LEGION) continue;  // 戦車上限
       if (candidateFilter && !candidateFilter(g)) continue;
       const { score, newPool } = marginalContribution(g, pris, pool, userId, slot, troop);
       if (best === null || score > best.score) {
@@ -1335,6 +1338,7 @@ function runAutoBuilderFor(legionIdx) {
       if (best) {
         bat[slot] = best.g.id;
         used.add(best.g.id);
+        if (isTankGeneral(best.g)) tankCount++;
         pool = best.newPool;
       }
     }
@@ -1344,6 +1348,7 @@ function runAutoBuilderFor(legionIdx) {
     if (best) {
       fNew.array[slot] = best.g.id;
       used.add(best.g.id);
+      if (isTankGeneral(best.g)) tankCount++;
       pool = best.newPool;
     }
   }
@@ -1427,20 +1432,23 @@ function runAutoBuildAllGlobal(targetIdxs) {
 
   // ---- グローバル貪欲 ----
   let pool = { ...basePool };
+  const tankCountByIdx = {};  // 軍団ごとの戦車武将カウント（上限 MAX_TANK_PER_LEGION）
   const remaining = [...slots];
   while (remaining.length) {
-    // スコアは (userId, 兵種, スロット種) のみで決まる → 同一comboは代表1スロットだけ評価
+    // スコアは (userId, 兵種, スロット種) のみで決まるが、戦車上限は軍団(idx)単位なので idx も鍵に含める
     const reps = new Map();  // comboKey -> 代表 ri
     for (let ri = 0; ri < remaining.length; ri++) {
       const s = remaining[ri];
-      const ck = `${s.userId}#${s.troop}#${s.slot}`;
+      const ck = `${s.idx}#${s.userId}#${s.troop}#${s.slot}`;
       if (!reps.has(ck)) reps.set(ck, ri);
     }
     let best = null;
     for (const ri of reps.values()) {
       const s = remaining[ri];
+      const tankFull = (tankCountByIdx[s.idx] || 0) >= MAX_TANK_PER_LEGION;
       for (const g of candByUser[s.userId]) {
         if (isUsed(s.userId, g.id)) continue;
+        if (tankFull && isTankGeneral(g)) continue;  // この軍団は戦車上限に達している
         const { score, newPool } = marginalContribution(g, pris, pool, s.userId, s.slot, s.troop);
         if (best === null || score > best.score) best = { ri, g, score, newPool };
       }
@@ -1449,6 +1457,7 @@ function runAutoBuildAllGlobal(targetIdxs) {
     const s = remaining[best.ri];
     assign.set(slotKey(s), best.g.id);
     markUsed(s.userId, best.g.id);
+    if (isTankGeneral(best.g)) tankCountByIdx[s.idx] = (tankCountByIdx[s.idx] || 0) + 1;
     pool = best.newPool;
     remaining.splice(best.ri, 1);
   }
@@ -1469,6 +1478,18 @@ function runAutoBuildAllGlobal(targetIdxs) {
     }
     return total;
   }
+  // 全軍団の戦車数が上限以内かを検証（入れ替えで戦車が偏らないようにする）
+  function tankOk(amap) {
+    const cnt = {};
+    for (const s of slots) {
+      const gid = amap.get(slotKey(s));
+      if (gid && isTankGeneral(genMap.get(gid))) {
+        cnt[s.idx] = (cnt[s.idx] || 0) + 1;
+        if (cnt[s.idx] > MAX_TANK_PER_LEGION) return false;
+      }
+    }
+    return true;
+  }
   let curScore = configScore(assign);
   const filled = slots.filter(s => assign.has(slotKey(s)));
   const LS_BUDGET_MS = 2000;             // 入れ替え改善の時間予算
@@ -1486,7 +1507,7 @@ function runAutoBuildAllGlobal(targetIdxs) {
         if (ga === gb) continue;
         assign.set(ka, gb); assign.set(kb, ga);
         const sc = configScore(assign);
-        if (sc > curScore + 1e-9) { curScore = sc; improved = true; }
+        if (sc > curScore + 1e-9 && tankOk(assign)) { curScore = sc; improved = true; }
         else { assign.set(ka, ga); assign.set(kb, gb); }
       }
     }
@@ -1500,7 +1521,7 @@ function runAutoBuildAllGlobal(targetIdxs) {
         if (usedNow.has(g.id)) continue;
         assign.set(k, g.id);
         const sc = configScore(assign);
-        if (sc > curScore + 1e-9) { curScore = sc; improved = true; break; }
+        if (sc > curScore + 1e-9 && tankOk(assign)) { curScore = sc; improved = true; break; }
         else assign.set(k, cur);
       }
     }
@@ -1521,7 +1542,11 @@ function runAutoBuildAllGlobal(targetIdxs) {
   renderSummary();
 }
 
-// 軍団内の枠への並べ替え（担当条件スキル ＞ 角陣スキル ＞ 能力値順）。
+// 戦車武将の判定と、1軍団あたりの戦車上限（角陣3枠に対応）
+function isTankGeneral(g) { return !!(g && g.troop_type === '戦車'); }
+const MAX_TANK_PER_LEGION = 3;
+
+// 軍団内の枠への並べ替え（戦車=角陣のみ最優先 ＞ 角陣スキル ＞ 担当条件 ＞ 能力値順）。
 // 選定（どの武将を入れるか）は変えず、配置済み武将を枠に並べ替えるだけ（スコア中立）。
 function rearrangeLegion(f) {
   const ids = [];
@@ -1536,9 +1561,10 @@ function rearrangeLegion(f) {
     let req = null;
     for (const s of sks) { const r = skillRequiredSlot(s); if (r) { req = r; break; } }
     const isArray = sks.some(s => s.scope === 'array' || /角陣/.test(s.effect || ''));
-    meta[id] = { req, isArray, stats: (g && g.stats) || {} };
+    meta[id] = { req, isArray, isTank: isTankGeneral(g), stats: (g && g.stats) || {} };
   }
   const stat = (id, t) => Number(meta[id].stats[t]) || 0;
+  const bestStat = (id) => Math.max(...SLOT_KEYS.map(t => stat(id, t)));
 
   // 一旦クリア
   for (const b of f.battalions) for (const k of SLOT_KEYS) b[k] = null;
@@ -1547,7 +1573,32 @@ function rearrangeLegion(f) {
   const pool = new Set(ids);
   const setBat = (bi, t, id) => { f.battalions[bi][t] = id; pool.delete(id); };
   const setArr = (t, id) => { f.array[t] = id; pool.delete(id); };
+  const arrFreeType = (id) => {
+    // 角陣の空き枠タイプを決める: 担当条件 → 最高能力値type → 任意の空き
+    const want = meta[id].req;
+    if (want && !f.array[want]) return want;
+    const byStat = [...SLOT_KEYS].sort((a, b) => stat(id, b) - stat(id, a));
+    for (const t of byStat) if (!f.array[t]) return t;
+    return SLOT_KEYS.find(k => !f.array[k]) || null;
+  };
+  const arrayHasFree = () => SLOT_KEYS.some(k => !f.array[k]);
 
+  // === 角陣（最大3枠）を最優先で埋める ===
+  // 優先1: 角陣スキル持ち（戦車含む）。優先2: 戦車武将（角陣スキルなし）。能力値の高い順。
+  const arraySkill = [...pool].filter(id => meta[id].isArray).sort((a, b) => bestStat(b) - bestStat(a));
+  for (const id of arraySkill) {
+    if (!arrayHasFree()) break;
+    const t = arrFreeType(id); if (t) setArr(t, id);
+  }
+  const tanksForArray = [...pool].filter(id => meta[id].isTank).sort((a, b) => bestStat(b) - bestStat(a));
+  for (const id of tanksForArray) {
+    if (!arrayHasFree()) break;
+    const t = arrFreeType(id); if (t) setArr(t, id);
+  }
+  // 角陣に入れなかった戦車武将は「角陣のみ」制約のため部隊に置かない → プールから除外（非配置）
+  for (const id of [...pool]) if (meta[id].isTank) pool.delete(id);
+
+  // === 部隊枠（担当条件 → 能力値順）。ここに戦車武将は来ない（上で除外済み）===
   // 1) 担当条件スキル → 部隊(1→5)を type別に、その能力値の高い順で
   for (const t of SLOT_KEYS) {
     const conds = [...pool].filter(id => meta[id].req === t).sort((a, b) => stat(b, t) - stat(a, t));
@@ -1559,18 +1610,7 @@ function rearrangeLegion(f) {
     }
   }
 
-  // 2) 角陣スキル → 角陣スロットへ（希望type = 担当条件 or 最高能力値type）
-  const arrayGens = [...pool].filter(id => meta[id].isArray)
-    .sort((a, b) => Math.max(...SLOT_KEYS.map(t => stat(b, t))) - Math.max(...SLOT_KEYS.map(t => stat(a, t))));
-  for (const id of arrayGens) {
-    if (!pool.has(id)) continue;
-    const want = meta[id].req || [...SLOT_KEYS].sort((a, b) => stat(id, b) - stat(id, a))[0];
-    if (!f.array[want]) { setArr(want, id); continue; }
-    const free = SLOT_KEYS.find(k => !f.array[k]);
-    if (free) setArr(free, id);     // 角陣満杯なら後段で部隊へ
-  }
-
-  // 3) 残り → 能力値順で 統率部隊1-5 → 武力部隊1-5 → 知性部隊1-5 → 角陣統率/武力/知性
+  // 2) 残り → 能力値順で 統率部隊1-5 → 武力部隊1-5 → 知性部隊1-5 → 角陣（空きがあれば）
   const order = [];
   for (const t of SLOT_KEYS) for (let bi = 0; bi < 5; bi++) order.push({ arr: false, bi, t });
   for (const t of SLOT_KEYS) order.push({ arr: true, t });
