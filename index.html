@@ -136,7 +136,8 @@
 <main id="app">
 
   <section class="panel">
-    <h2>武将一覧 <span id="roster-count" style="font-weight:normal;font-size:12px;color:var(--muted);"></span></h2>
+    <h2 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">武将一覧 <span id="roster-count" style="font-weight:normal;font-size:12px;color:var(--muted);"></span>
+      <a href="register.html" target="_blank" style="font-size:14px;font-weight:600;color:#fff;background:#2e8b3a;padding:5px 14px;border-radius:6px;text-decoration:none;white-space:nowrap;">▶ 武将登録はこちら</a></h2>
     <div id="user-tabs" style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;align-items:center;font-size:12px;"></div>
     <div class="filters">
       <label>兵種<select id="filter-troop"><option value="">全</option></select></label>
@@ -148,7 +149,6 @@
       <button id="btn-add-user-json" title="register.html で作成された個人JSONをプレイヤーとして追加（複数可）" style="background:#5a7a5a;color:#fff;">ユーザーをインポート</button>
       <input id="file-add-user-json" type="file" accept="application/json,.json" multiple style="display:none;">
       <button id="btn-import-register" title="同じブラウザで register.html に入力した内容を取り込む" style="background:#5a7a8c;color:#fff;">🔄 登録ツールから取込</button>
-      <a href="register.html" target="_blank" style="font-size:12px;color:var(--accent);margin-left:8px;">▶ 武将登録はこちら</a>
       <button id="btn-show-qr" title="登録ツールURLのQRコードを表示" style="font-size:12px;padding:2px 8px;">📱 QR</button>
       <a href="https://github.com/yuichi4107-lab/sangoku-sim/blob/main/docs/usage.md" target="_blank" style="font-size:12px;color:var(--accent);margin-left:8px;">📖 使い方</a>
     </div>
