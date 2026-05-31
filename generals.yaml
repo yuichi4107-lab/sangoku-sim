@@ -1991,7 +1991,7 @@ generals:
   name: 全琮
   yomi: null
   base_rarity: 橙
-  troop_type: 戦車
+  troop_type: 歩兵
   slot_stat: 武力
   role_tags:
   - 装備武将
@@ -11266,7 +11266,7 @@ generals:
   name: 玄田豊
   yomi: null
   base_rarity: 玄
-  troop_type: 戦車
+  troop_type: 万能
   role_tags: []
   seal_bonus:
     by_seal:
