@@ -2353,6 +2353,8 @@ function initGroupLock() {
       <button id="btn-cloud-push" title="この端末の現在状態をクラウドへ保存（他端末に同期）" style="background:var(--accent);color:#fff;">⬆️ クラウドへ保存</button>
       <button id="btn-inbox" title="register.html から送信された友人データを取得" style="background:#5a7a5a;color:#fff;">📥 受信箱を取得</button>
       <button id="btn-compare-stats" title="プレイヤー兵士属性を横並びで比較" style="background:#4a6a8c;color:#fff;">📊 ステ比較</button>
+      <button id="btn-send-request" title="運営に要望・バグ報告を送る" style="background:#9c7a3a;color:#fff;">💡 要望を送る</button>
+      <button id="btn-view-requests" title="届いた要望の一覧・対応状況" style="background:#8c5a7a;color:#fff;">📋 要望一覧</button>
     </div>
     <div style="font-size:11px;color:#777;margin-top:6px;">
       ※ 後勝ち（last-write-wins）方式。試作モード中は保存ボタンが警告色になります。
@@ -2489,6 +2491,122 @@ async function cloudGetInbox() {
   return await res.json();
 }
 
+// 要望を送るモーダル（同期モード内）
+function showSendRequestModal() {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#fff;padding:16px 18px;border-radius:6px;max-width:460px;width:100%;box-shadow:0 4px 16px rgba(0,0,0,0.25);';
+  const activeUser = state.users.find(u => u.id === state.activeUserId);
+  const defName = activeUser ? (activeUser.name || '') : '';
+  box.innerHTML = `
+    <div style="font-weight:600;font-size:15px;margin-bottom:8px;">💡 要望・バグ報告を送る</div>
+    <label style="font-size:12px;display:block;margin-bottom:6px;">お名前
+      <input id="req-name" type="text" value="${String(defName).replace(/"/g,'&quot;')}" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;">
+    </label>
+    <label style="font-size:12px;display:block;margin-bottom:6px;">種別
+      <select id="req-cat" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;">
+        <option>バグ報告</option><option>武将データ修正</option><option>機能要望</option><option>その他</option>
+      </select>
+    </label>
+    <label style="font-size:12px;display:block;margin-bottom:6px;">内容
+      <textarea id="req-text" rows="5" placeholder="例: 〇〇のスキルの数値が違う／△△の機能がほしい 等" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;resize:vertical;"></textarea>
+    </label>
+    <div id="req-msg" style="font-size:12px;color:#c33;min-height:16px;margin:4px 0;"></div>
+    <div style="display:flex;gap:6px;justify-content:flex-end;">
+      <button id="req-cancel" style="background:#888;color:#fff;">キャンセル</button>
+      <button id="req-ok" style="background:#9c7a3a;color:#fff;font-weight:600;">📤 送信</button>
+    </div>`;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  const close = () => { if (overlay.parentNode) overlay.remove(); };
+  box.querySelector('#req-cancel').onclick = close;
+  box.querySelector('#req-ok').onclick = async () => {
+    const name = box.querySelector('#req-name').value.trim();
+    const cat = box.querySelector('#req-cat').value;
+    const text = box.querySelector('#req-text').value.trim();
+    const msg = box.querySelector('#req-msg');
+    if (!text) { msg.textContent = '内容を入力してください。'; return; }
+    const btn = box.querySelector('#req-ok'); btn.disabled = true; btn.textContent = '送信中…';
+    try {
+      // 送信前の件数をベースラインに（検証用）
+      let before = -1;
+      try { const r = await (await fetch(GROUP_API_URL + '?action=get_requests')).json(); if (r.ok) before = (r.requests || []).length; } catch (e) {}
+      const form = new URLSearchParams();
+      form.append('payload', JSON.stringify({ action: 'submit_request', user_name: name, category: cat, text }));
+      await fetch(GROUP_API_URL, { method: 'POST', body: form, mode: 'no-cors' });
+      // 反映確認（最大10秒）
+      let ok = false;
+      for (let i = 0; i < 20; i++) {
+        await new Promise(r => setTimeout(r, 500));
+        try { const r = await (await fetch(GROUP_API_URL + '?action=get_requests')).json(); if (r.ok && (r.requests || []).length > before) { ok = true; break; } } catch (e) {}
+      }
+      close();
+      notify(ok ? '✅ 要望を送信しました。ありがとうございます！' : '⚠️ 送信は試みましたが反映確認できませんでした。時間をおいて「📋 要望一覧」でご確認ください。');
+    } catch (e) {
+      msg.textContent = '送信失敗: ' + e.message; btn.disabled = false; btn.textContent = '📤 送信';
+    }
+  };
+}
+
+// 要望一覧モーダル（同期モード内・ステータス変更/削除）
+async function showRequestsModal() {
+  setGroupStatus('要望を取得中…', '#888');
+  let data;
+  try { data = await (await fetch(GROUP_API_URL + '?action=get_requests')).json(); if (!data.ok) throw new Error(data.error || 'unknown'); }
+  catch (e) { setGroupStatus('要望取得失敗', '#c33'); notify('要望の取得に失敗: ' + e.message); return; }
+  setGroupStatus('', '#666');
+  const reqs = (data.requests || []).sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#fff;padding:16px 18px;border-radius:6px;max-width:680px;width:100%;max-height:85vh;overflow:auto;box-shadow:0 4px 16px rgba(0,0,0,0.25);';
+  const esc = t => String(t == null ? '' : t).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  const statusColor = s => s === '対応済' ? '#1e8449' : (s === '却下' ? '#999' : '#b9560f');
+  let html = `<div style="font-weight:600;font-size:15px;margin-bottom:10px;">📋 要望一覧（${reqs.length}件）</div>`;
+  if (!reqs.length) html += '<div style="color:#888;padding:20px;text-align:center;">まだ要望はありません。</div>';
+  reqs.forEach(r => {
+    const ts = r.created_at ? new Date(r.created_at).toLocaleString() : '';
+    html += `<div class="req-item" data-id="${esc(r.id)}" style="border:1px solid #ddd;border-radius:6px;padding:8px 10px;margin-bottom:8px;">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;color:#666;">
+        <span style="background:#eee;border-radius:8px;padding:1px 8px;">${esc(r.category)}</span>
+        <strong style="color:${statusColor(r.status)};">${esc(r.status)}</strong>
+        <span>${esc(r.user_name) || '(無名)'}</span>
+        <span style="color:#aaa;">${ts}</span>
+      </div>
+      <div style="font-size:13px;margin:6px 0;white-space:pre-wrap;">${esc(r.text)}</div>
+      <div style="display:flex;gap:4px;justify-content:flex-end;">
+        <button class="req-st" data-st="未対応" style="font-size:11px;">未対応</button>
+        <button class="req-st" data-st="対応済" style="font-size:11px;">対応済</button>
+        <button class="req-st" data-st="却下" style="font-size:11px;">却下</button>
+        <button class="req-del" style="font-size:11px;background:#c33;color:#fff;">削除</button>
+      </div>
+    </div>`;
+  });
+  html += '<div style="display:flex;justify-content:flex-end;margin-top:8px;"><button id="req-close" style="background:#888;color:#fff;">閉じる</button></div>';
+  box.innerHTML = html;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  const close = () => { if (overlay.parentNode) overlay.remove(); };
+  box.querySelector('#req-close').onclick = close;
+  async function post(payload) {
+    const form = new URLSearchParams(); form.append('payload', JSON.stringify(payload));
+    await fetch(GROUP_API_URL, { method: 'POST', body: form, mode: 'no-cors' });
+  }
+  box.querySelectorAll('.req-item').forEach(item => {
+    const id = item.dataset.id;
+    item.querySelectorAll('.req-st').forEach(b => b.onclick = async () => {
+      await post({ action: 'update_request', id, status: b.dataset.st });
+      await new Promise(r => setTimeout(r, 1500)); close(); showRequestsModal();
+    });
+    item.querySelector('.req-del').onclick = async () => {
+      if (!await askConfirm('この要望を削除しますか？')) return;
+      await post({ action: 'delete_request', id });
+      await new Promise(r => setTimeout(r, 1500)); close(); showRequestsModal();
+    };
+  });
+}
+
 function initCloudSync() {
   const btnPull = document.getElementById('btn-cloud-pull');
   const btnPush = document.getElementById('btn-cloud-push');
@@ -2498,6 +2616,11 @@ function initCloudSync() {
 
   const btnCompare = document.getElementById('btn-compare-stats');
   if (btnCompare) btnCompare.addEventListener('click', () => showStatsCompareModal());
+
+  const btnSendReq = document.getElementById('btn-send-request');
+  if (btnSendReq) btnSendReq.addEventListener('click', () => showSendRequestModal());
+  const btnViewReq = document.getElementById('btn-view-requests');
+  if (btnViewReq) btnViewReq.addEventListener('click', () => showRequestsModal());
 
   // 受信箱を取得 → モーダルで選択 → ユーザー追加/上書き
   if (btnInbox) btnInbox.addEventListener('click', async () => {

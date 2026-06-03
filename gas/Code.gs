@@ -13,6 +13,7 @@ const SHEET_NAME = 'data';            // 旧: 共有stateの1セル格納（移�
 const USERS_SHEET = 'users_data';     // 新: 1ユーザー=1行
 const META_SHEET = 'shared_meta';     // 新: 編成/優先など軽量データ
 const INBOX_SHEET = 'inbox';
+const REQUESTS_SHEET = 'requests';
 const IMG_FOLDER_NAME = 'sangoku_inbox_images';
 const KEY_CELL = 'A1';
 const VALUE_CELL = 'B1';
@@ -72,6 +73,7 @@ function doGet(e) {
   const action = (e && e.parameter && e.parameter.action) || 'get_state';
   if (action === 'get_inbox') return getInbox_();
   if (action === 'get_user_by_pin') return getUserByPin_(e);  // 暗証番号で本人の前回送信を取得
+  if (action === 'get_requests') return getRequests_();       // 要望一覧
   return getState_();
 }
 function doPost(e) {
@@ -88,6 +90,9 @@ function doPost(e) {
     if (obj && obj.action === 'save_user') return saveUser_(obj);     // 新: 1ユーザー保存
     if (obj && obj.action === 'save_meta') return saveMeta_(obj.meta || {});  // 新: メタ保存
     if (obj && obj.action === 'delete_user') return deleteUser_(obj); // 新: 1ユーザー削除
+    if (obj && obj.action === 'submit_request') return submitRequest_(obj);   // 要望を保存
+    if (obj && obj.action === 'update_request') return updateRequest_(obj);   // 要望ステータス変更
+    if (obj && obj.action === 'delete_request') return deleteRequest_(obj);   // 要望削除
     if (obj && obj.action === 'clear_all') return clearAll_();        // 新: 共有データ全消去（メンテ用）
   } catch (err) {}
   return saveState_(body);  // 旧クライアント互換: schema付き一括保存
@@ -509,6 +514,100 @@ function deleteInbox_(obj) {
     }
     sheet.deleteRow(targetRow);
     return jsonOut_({ ok: true });
+  } catch (err) {
+    return jsonOut_({ ok: false, error: String(err) });
+  } finally { lock.releaseLock(); }
+}
+
+// ============================================================
+// 要望（requests）: 同期モードのフォームから送信 → 一覧・ステータス管理
+//   列: created_at | user_name | category | text | status | updated_at
+// ============================================================
+function getRequestsSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(REQUESTS_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(REQUESTS_SHEET);
+    sheet.getRange(1, 1, 1, 6).setValues([['created_at', 'user_name', 'category', 'text', 'status', 'updated_at']]);
+  }
+  return sheet;
+}
+
+function getRequests_() {
+  const sheet = getRequestsSheet_();
+  const last = sheet.getLastRow();
+  const rows = [];
+  if (last >= 2) {
+    const vals = sheet.getRange(2, 1, last - 1, 6).getValues();
+    for (let i = 0; i < vals.length; i++) {
+      const r = vals[i];
+      if (!r[0] && !r[3]) continue;
+      rows.push({
+        id: r[0] ? new Date(r[0]).toISOString() : String(i),  // created_at を一意キーに
+        created_at: r[0] ? new Date(r[0]).toISOString() : '',
+        user_name: String(r[1] || ''),
+        category: String(r[2] || ''),
+        text: String(r[3] || ''),
+        status: String(r[4] || '未対応'),
+        updated_at: r[5] ? new Date(r[5]).toISOString() : '',
+      });
+    }
+  }
+  return jsonOut_({ ok: true, requests: rows });
+}
+
+function submitRequest_(obj) {
+  const lock = LockService.getScriptLock(); lock.waitLock(15000);
+  try {
+    const sheet = getRequestsSheet_();
+    const text = String(obj.text || '').trim();
+    if (!text) throw new Error('text required');
+    const now = new Date();
+    sheet.appendRow([now, String(obj.user_name || ''), String(obj.category || 'その他'), text, '未対応', now]);
+    return jsonOut_({ ok: true, created_at: now.toISOString() });
+  } catch (err) {
+    return jsonOut_({ ok: false, error: String(err) });
+  } finally { lock.releaseLock(); }
+}
+
+// created_at（ISO文字列）で行を特定してステータス更新
+function updateRequest_(obj) {
+  const lock = LockService.getScriptLock(); lock.waitLock(15000);
+  try {
+    const sheet = getRequestsSheet_();
+    const id = String(obj.id || '');
+    const status = String(obj.status || '');
+    const last = sheet.getLastRow();
+    if (last < 2) throw new Error('empty');
+    const ts = sheet.getRange(2, 1, last - 1, 1).getValues();
+    for (let i = 0; i < ts.length; i++) {
+      if (ts[i][0] && new Date(ts[i][0]).toISOString() === id) {
+        sheet.getRange(i + 2, 5).setValue(status);
+        sheet.getRange(i + 2, 6).setValue(new Date());
+        return jsonOut_({ ok: true });
+      }
+    }
+    return jsonOut_({ ok: false, error: 'not_found' });
+  } catch (err) {
+    return jsonOut_({ ok: false, error: String(err) });
+  } finally { lock.releaseLock(); }
+}
+
+function deleteRequest_(obj) {
+  const lock = LockService.getScriptLock(); lock.waitLock(15000);
+  try {
+    const sheet = getRequestsSheet_();
+    const id = String(obj.id || '');
+    const last = sheet.getLastRow();
+    if (last < 2) throw new Error('empty');
+    const ts = sheet.getRange(2, 1, last - 1, 1).getValues();
+    for (let i = 0; i < ts.length; i++) {
+      if (ts[i][0] && new Date(ts[i][0]).toISOString() === id) {
+        sheet.deleteRow(i + 2);
+        return jsonOut_({ ok: true });
+      }
+    }
+    return jsonOut_({ ok: false, error: 'not_found' });
   } catch (err) {
     return jsonOut_({ ok: false, error: String(err) });
   } finally { lock.releaseLock(); }
