@@ -1317,14 +1317,18 @@ function runAutoBuilderFor(legionIdx) {
   }
 
   // slot_stat・兵種による配置制限は廃止。配置/兵種条件は marginalContribution が考慮する。
-  // 兵種優先: 主陣は「軍団兵種＋万能」、角陣は「戦車＋万能」。戦車は1軍団 MAX_TANK_PER_LEGION 人まで。
+  // 兵種優先: 主陣は「軍団兵種＋万能」、角陣は「戦車優先→軍団兵種＋万能」。戦車は1軍団 MAX_TANK_PER_LEGION 人まで。
+  // tankFilter: 'only'=戦車のみ / 'exclude'=戦車以外 / null=制限なし
   let tankCount = 0;
-  function pickBest(slot, isArrayPhase) {
+  function pickBest(slot, isArrayPhase, tankFilter) {
     let best = null;
     for (const g of ownedGens) {
       if (used.has(g.id)) continue;
       if (!troopAllowedForPhase(g.troop_type, troop, isArrayPhase)) continue;  // 兵種フィルタ
-      if (isTankGeneral(g) && tankCount >= MAX_TANK_PER_LEGION) continue;       // 戦車上限（角陣のみ戦車が来る）
+      const isT = isTankGeneral(g);
+      if (isT && tankCount >= MAX_TANK_PER_LEGION) continue;  // 戦車上限
+      if (tankFilter === 'only' && !isT) continue;
+      if (tankFilter === 'exclude' && isT) continue;
       const { score, newPool } = marginalContribution(g, pris, pool, userId, slot, troop);
       if (best === null || score > best.score) {
         best = { g, score, newPool };
@@ -1333,11 +1337,13 @@ function runAutoBuilderFor(legionIdx) {
     return best;
   }
   function placeBat(bi, slot) {
-    const best = pickBest(slot, false);
-    if (best) { fNew.battalions[bi][slot] = best.g.id; used.add(best.g.id); if (isTankGeneral(best.g)) tankCount++; pool = best.newPool; }
+    const best = pickBest(slot, false, null);  // 主陣（戦車は兵種フィルタで除外）
+    if (best) { fNew.battalions[bi][slot] = best.g.id; used.add(best.g.id); pool = best.newPool; }
   }
   function placeArr(slot) {
-    const best = pickBest(slot, true);
+    // 角陣は戦車優先 → 戦車がいなければ軍団兵種＋万能で埋める
+    let best = pickBest(slot, true, 'only');
+    if (!best) best = pickBest(slot, true, 'exclude');
     if (best) { fNew.array[slot] = best.g.id; used.add(best.g.id); if (isTankGeneral(best.g)) tankCount++; pool = best.newPool; }
   }
 
@@ -1446,18 +1452,23 @@ function runAutoBuildAllGlobal(targetIdxs) {
         const ck = `${s.idx}#${s.userId}#${s.troop}#${s.slot}`;
         if (!reps.has(ck)) reps.set(ck, ri);
       }
-      let best = null;
+      let best = null, bestTank = null;
       for (const ri of reps.values()) {
         const s = remaining[ri];
         const tankFull = (tankCountByIdx[s.idx] || 0) >= MAX_TANK_PER_LEGION;
         for (const g of candByUser[s.userId]) {
           if (isUsed(s.userId, g.id)) continue;
           if (!troopAllowedForPhase(g.troop_type, s.troop, phase.allowTank)) continue;  // 兵種フィルタ
-          if (isTankGeneral(g) && tankFull) continue;  // 戦車は角陣フェーズのみ（兵種フィルタで保証）＆上限
+          const isT = isTankGeneral(g);
+          if (isT && tankFull) continue;  // 戦車上限
           const { score, newPool } = marginalContribution(g, pris, pool, s.userId, s.slot, s.troop);
-          if (best === null || score > best.score) best = { ri, g, score, newPool };
+          if (isT) { if (bestTank === null || score > bestTank.score) bestTank = { ri, g, score, newPool }; }
+          else { if (best === null || score > best.score) best = { ri, g, score, newPool }; }
         }
       }
+      // 角陣フェーズは戦車優先（戦車候補があれば戦車を先に配置。いなければ軍団兵種＋万能）
+      if (phase.allowTank && bestTank) best = bestTank;
+      else if (best === null) best = bestTank;
       if (best === null) break;
       const s = remaining[best.ri];
       assign.set(slotKey(s), best.g.id);
@@ -1526,10 +1537,12 @@ function runAutoBuildAllGlobal(targetIdxs) {
       const isArrayPhase = s.bi < 0;
       const k = slotKey(s);
       const cur = assign.get(k);
+      const curIsTank = isArrayPhase && isTankGeneral(genMap.get(cur));  // 角陣の戦車は戦車優先のため保護
       const usedNow = new Set(assign.values());
       for (const g of candByUser[s.userId]) {
         if (usedNow.has(g.id)) continue;
         if (!troopAllowedForPhase(g.troop_type, s.troop, isArrayPhase)) continue;  // 兵種フィルタ（主陣に戦車/他兵種を入れない）
+        if (curIsTank && !isTankGeneral(g)) continue;  // 角陣の戦車を非戦車に置き換えない（戦車優先を維持）
         assign.set(k, g.id);
         const sc = configScore(assign);
         if (sc > curScore + 1e-9 && tankOk(assign)) { curScore = sc; improved = true; break; }
@@ -1559,9 +1572,13 @@ const MAX_TANK_PER_LEGION = 3;
 
 // その武将が、軍団兵種・フェーズ（主陣/角陣）に対して配置候補になれるか（兵種優先）。
 //   主陣: 軍団兵種 ＋ 万能（万能軍団なら戦車以外すべて）。
-//   角陣: 戦車 ＋ 万能（角陣＝戦車の支援陣）。
+//   角陣: 戦車 ＋ 軍団兵種 ＋ 万能（戦車優先。戦車がいなければ軍団兵種で埋める）。
 function troopAllowedForPhase(troopType, legionTroop, isArrayPhase) {
-  if (isArrayPhase) return troopType === '戦車' || troopType === '万能';
+  if (isArrayPhase) {
+    if (troopType === '戦車' || troopType === '万能') return true;
+    if (legionTroop === '万能') return true;
+    return troopType === legionTroop;   // 戦車不在時の埋め合わせ＝軍団兵種
+  }
   if (legionTroop === '万能') return troopType !== '戦車';   // 万能軍団: 主陣は戦車以外すべて
   return troopType === legionTroop || troopType === '万能';   // 通常: 軍団兵種＋万能
 }
