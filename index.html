@@ -32,8 +32,8 @@
   }
   header h1 { margin: 0; font-size: 18px; font-weight: 600; }
   header .meta { font-size: 12px; opacity: 0.8; }
-  main { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
-  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 16px; width: 100%; max-width: 1440px; margin: 0 auto; }
+  @media (max-width: 900px) { main { padding: 12px; } }
   .panel { background: #fff; border: 1px solid var(--border); padding: 12px; }
   .panel h2 { margin: 0 0 8px; font-size: 15px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
   .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; align-items: center; }
@@ -1201,6 +1201,13 @@ function getCapInfo(sk) {
 
 // 優先度ごとの重み（第一優先が最も重い。geometric 2倍ずつ）
 const PRIORITY_WEIGHTS = [16, 8, 4, 2, 1];
+const FORCED_AUTO_GENERAL_IDS = new Set(['関平', '蒋欽', '李典', 'chouryou']);
+const FORCED_AUTO_SCORE_BONUS = 1000000000;
+
+function isForcedAutoGeneral(g) {
+  return !!(g && FORCED_AUTO_GENERAL_IDS.has(g.id));
+}
+
 
 // 与えられた pool 状態のもとで、この武将を編成に加えたときの限界貢献スコアを計算
 // pris は [pri1..pri5] の配列（空文字含む）。pool は { bucketKey: 現在の合計 }。
@@ -1251,6 +1258,7 @@ function marginalContribution(g, pris, pool, userId, slot, legionTroop) {
   }
   let score = 0;
   for (let i = 0; i < scores.length; i++) score += scores[i] * (PRIORITY_WEIGHTS[i] || 0);
+  if (isForcedAutoGeneral(g)) score += FORCED_AUTO_SCORE_BONUS;
   return { score, newPool };
 }
 
@@ -1525,6 +1533,9 @@ function runAutoBuildAllGlobal(targetIdxs) {
         const ka = slotKey(filled[a]), kb = slotKey(filled[b]);
         const ga = assign.get(ka), gb = assign.get(kb);
         if (ga === gb) continue;
+        const gaObj = genMap.get(ga), gbObj = genMap.get(gb);
+        if (!troopAllowedForPhase((gbObj || {}).troop_type, filled[a].troop, filled[a].bi < 0)) continue;
+        if (!troopAllowedForPhase((gaObj || {}).troop_type, filled[b].troop, filled[b].bi < 0)) continue;
         assign.set(ka, gb); assign.set(kb, ga);
         const sc = configScore(assign);
         if (sc > curScore + 1e-9 && tankOk(assign)) { curScore = sc; improved = true; }
