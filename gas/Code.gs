@@ -74,6 +74,7 @@ function doGet(e) {
   if (action === 'get_inbox') return getInbox_();
   if (action === 'get_user_by_pin') return getUserByPin_(e);  // 暗証番号で本人の前回送信を取得
   if (action === 'get_requests') return getRequests_();       // 要望一覧
+  if (action === 'plan_request') return planRequest_(e);       // 要望AIプランニング
   return getState_();
 }
 function doPost(e) {
@@ -91,6 +92,7 @@ function doPost(e) {
     if (obj && obj.action === 'save_meta') return saveMeta_(obj.meta || {});  // 新: メタ保存
     if (obj && obj.action === 'delete_user') return deleteUser_(obj); // 新: 1ユーザー削除
     if (obj && obj.action === 'submit_request') return submitRequest_(obj);   // 要望を保存
+    if (obj && obj.action === 'plan_request') return planRequestFromPayload_(obj); // 要望AIプランニング
     if (obj && obj.action === 'update_request') return updateRequest_(obj);   // 要望ステータス変更
     if (obj && obj.action === 'delete_request') return deleteRequest_(obj);   // 要望削除
     if (obj && obj.action === 'clear_all') return clearAll_();        // 新: 共有データ全消去（メンテ用）
@@ -491,6 +493,107 @@ function parsePlayerStatsText_(text) {
     }
   }
   return ps;
+}
+
+function callGeminiText_(prompt) {
+  const apiKey = PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
+  if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
+  const model = 'gemini-flash-latest';
+  const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + apiKey;
+  const payload = {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: {
+      temperature: 0.25,
+      maxOutputTokens: 1600,
+    },
+  };
+  const res = UrlFetchApp.fetch(url, {
+    method: 'POST',
+    contentType: 'application/json',
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true,
+  });
+  Logger.log('Gemini plan status: ' + res.getResponseCode());
+  if (res.getResponseCode() !== 200) {
+    Logger.log(res.getContentText().substring(0, 500));
+    throw new Error('Gemini request failed: HTTP ' + res.getResponseCode());
+  }
+  const r = JSON.parse(res.getContentText());
+  return (r.candidates && r.candidates[0] && r.candidates[0].content &&
+    r.candidates[0].content.parts && r.candidates[0].content.parts[0] &&
+    r.candidates[0].content.parts[0].text) || '';
+}
+
+function stripCodeFence_(text) {
+  const s = String(text || '').trim();
+  const m = s.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+  return m ? m[1].trim() : s;
+}
+
+function buildRequestPlanPrompt_(obj) {
+  const category = String(obj.category || 'その他').slice(0, 40);
+  const userName = String(obj.user_name || '').slice(0, 80);
+  const requestText = String(obj.text || '').slice(0, 1800);
+  const extra = String(obj.message || '').slice(0, 1200);
+  const history = Array.isArray(obj.history) ? obj.history.slice(-8).map(function(h) {
+    return {
+      role: String(h && h.role || '').slice(0, 20),
+      text: String(h && h.text || '').slice(0, 900),
+    };
+  }) : [];
+  return [
+    'あなたは「三国覇王戦記 編成シミュレーター」の要望整理AIです。',
+    'このシステムは、武将データ、所持武将、兵士属性、軍団兵種、主陣/角陣、優先ステータス、クラウド同期、要望一覧を扱います。',
+    'あなたの役割は、実装前のプランニングまでです。コードを直接変更する、公開する、承認する、対応済みにする、とは言わないでください。',
+    '曖昧な点があれば確認質問を出しつつ、現時点の仮プランも作ってください。',
+    '返答は必ずJSONだけにしてください。Markdownのコードブロックは禁止です。',
+    'JSON schema: {"reply":"画面に表示する短い返答","draft_text":"要望一覧へ保存する本文"}',
+    'draft_text は次の見出しを必ず含めてください: 【ユーザー原文】, 【AI整理】, 【実装前プラン】, 【受け入れ条件】, 【確認事項】。',
+    '実装前プランは3から6項目、受け入れ条件は2から5項目にしてください。',
+    '',
+    '【名前】' + userName,
+    '【種別】' + category,
+    '【現在の要望本文】',
+    requestText,
+    '',
+    '【追加メッセージ】',
+    extra,
+    '',
+    '【これまでのAI相談履歴JSON】',
+    JSON.stringify(history),
+  ].join('\n');
+}
+
+function planRequestFromPayload_(obj) {
+  try {
+    const prompt = buildRequestPlanPrompt_(obj || {});
+    const raw = callGeminiText_(prompt);
+    let parsed;
+    try {
+      parsed = JSON.parse(stripCodeFence_(raw));
+    } catch (e) {
+      parsed = {
+        reply: 'AIの返答形式が少し崩れたため、本文として取り込みました。',
+        draft_text: String(raw || '').trim(),
+      };
+    }
+    const reply = String(parsed.reply || '').trim();
+    const draftText = String(parsed.draft_text || '').trim();
+    if (!draftText) throw new Error('empty AI draft');
+    return jsonOut_({ ok: true, kind: 'request_plan', reply: reply, draft_text: draftText });
+  } catch (err) {
+    return jsonOut_({ ok: false, error: String(err) });
+  }
+}
+
+function planRequest_(e) {
+  try {
+    const payload = e && e.parameter && e.parameter.payload;
+    const obj = payload ? JSON.parse(payload) : {};
+    return planRequestFromPayload_(obj);
+  } catch (err) {
+    return jsonOut_({ ok: false, error: String(err) });
+  }
 }
 
 function deleteInbox_(obj) {

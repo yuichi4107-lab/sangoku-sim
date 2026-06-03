@@ -38,6 +38,7 @@ Drive: `sangoku_inbox_images`（受信画像）
 | GET | get_inbox | 受信箱一覧 |
 | GET | get_user_by_pin | 暗証番号で本人の前回送信を取得（呼び戻し用）|
 | GET | get_requests | 要望一覧 |
+| GET | plan_request | 要望本文をAIで整理し、実装前プランを返す |
 | POST | （schema付き）| 一括保存（旧クライアント互換。各ユーザー行＋metaに分解）|
 | POST | save_user | 1ユーザー行だけ保存（軽量）|
 | POST | save_meta | メタ（編成等）だけ保存 |
@@ -47,6 +48,7 @@ Drive: `sangoku_inbox_images`（受信画像）
 | POST | delete_inbox | 受信箱エントリ削除（画像も）|
 | POST | re_ocr | 画像を再OCR |
 | POST | submit_request | 要望を保存（同期モードのフォームから）|
+| POST | plan_request | 要望本文をAIで整理し、実装前プランを返す（直接呼び出し用）|
 | POST | update_request | 要望のステータス変更（id=created_at で特定）|
 | POST | delete_request | 要望を削除 |
 | POST | clear_all | 共有データ全消去（メンテ用。受信箱・要望は触らない）|
@@ -55,3 +57,4 @@ Drive: `sangoku_inbox_images`（受信画像）
 - 共有データだけリセットしたい時: `clear_all` をPOST（受信箱は無傷）。
 - OCR動作確認: GASエディタで `testOcrLatest` を実行（受信箱最新ユーザーで試行、ログ確認）。
 - Drive権限の再承認: `authorizeDrive` を実行。
+- AI要望整理は `GEMINI_API_KEY` を使う。公開ページにAPIキーは置かず、GAS の `plan_request` で実装前プランを生成する。

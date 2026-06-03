@@ -2507,22 +2507,36 @@ function showSendRequestModal() {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;';
   const box = document.createElement('div');
-  box.style.cssText = 'background:#fff;padding:16px 18px;border-radius:6px;max-width:460px;width:100%;box-shadow:0 4px 16px rgba(0,0,0,0.25);';
+  box.style.cssText = 'background:#fff;padding:16px 18px;border-radius:6px;max-width:780px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 4px 16px rgba(0,0,0,0.25);';
   const activeUser = state.users.find(u => u.id === state.activeUserId);
   const defName = activeUser ? (activeUser.name || '') : '';
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   box.innerHTML = `
     <div style="font-weight:600;font-size:15px;margin-bottom:8px;">💡 要望・バグ報告を送る</div>
-    <label style="font-size:12px;display:block;margin-bottom:6px;">お名前
-      <input id="req-name" type="text" value="${String(defName).replace(/"/g,'&quot;')}" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;">
-    </label>
-    <label style="font-size:12px;display:block;margin-bottom:6px;">種別
-      <select id="req-cat" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;">
-        <option>バグ報告</option><option>武将データ修正</option><option>機能要望</option><option>その他</option>
-      </select>
-    </label>
-    <label style="font-size:12px;display:block;margin-bottom:6px;">内容
-      <textarea id="req-text" rows="5" placeholder="例: 〇〇のスキルの数値が違う／△△の機能がほしい 等" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;resize:vertical;"></textarea>
-    </label>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;align-items:start;">
+      <div>
+        <label style="font-size:12px;display:block;margin-bottom:6px;">お名前
+          <input id="req-name" type="text" value="${esc(defName)}" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;">
+        </label>
+        <label style="font-size:12px;display:block;margin-bottom:6px;">種別
+          <select id="req-cat" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;">
+            <option>バグ報告</option><option>武将データ修正</option><option>機能要望</option><option>その他</option>
+          </select>
+        </label>
+        <label style="font-size:12px;display:block;margin-bottom:6px;">内容
+          <textarea id="req-text" rows="12" placeholder="例: 〇〇のスキルの数値が違う／△△の機能がほしい 等" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;resize:vertical;"></textarea>
+        </label>
+      </div>
+      <div style="border:1px solid #ddd;border-radius:6px;padding:8px;background:#fafafa;">
+        <div style="font-weight:600;font-size:13px;margin-bottom:6px;">AIと実装前プランを整理</div>
+        <div id="req-ai-log" style="height:190px;overflow:auto;border:1px solid #e1e1e1;background:#fff;padding:6px;font-size:12px;white-space:pre-wrap;margin-bottom:6px;color:#333;"></div>
+        <textarea id="req-ai-input" rows="3" placeholder="AIへの追加説明・回答を書く" style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;resize:vertical;font-size:12px;"></textarea>
+        <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px;flex-wrap:wrap;">
+          <button id="req-ai-start" style="font-size:12px;background:#4a6a8c;color:#fff;">AIと整理</button>
+          <button id="req-ai-send" style="font-size:12px;background:#5a7a5a;color:#fff;">追加で相談</button>
+        </div>
+      </div>
+    </div>
     <div id="req-msg" style="font-size:12px;color:#c33;min-height:16px;margin:4px 0;"></div>
     <div style="display:flex;gap:6px;justify-content:flex-end;">
       <button id="req-cancel" style="background:#888;color:#fff;">キャンセル</button>
@@ -2531,12 +2545,71 @@ function showSendRequestModal() {
   overlay.appendChild(box);
   document.body.appendChild(overlay);
   const close = () => { if (overlay.parentNode) overlay.remove(); };
+  const aiHistory = [];
+  const msg = box.querySelector('#req-msg');
+  const textEl = box.querySelector('#req-text');
+  const aiInput = box.querySelector('#req-ai-input');
+  const aiLog = box.querySelector('#req-ai-log');
+  const renderAi = (role, text) => {
+    const label = role === 'ai' ? 'AI' : 'あなた';
+    const color = role === 'ai' ? '#2e6da4' : '#555';
+    const item = document.createElement('div');
+    item.style.cssText = `border-left:3px solid ${color};padding:4px 6px;margin-bottom:6px;background:${role === 'ai' ? '#f2f7ff' : '#f7f7f7'};`;
+    item.innerHTML = `<strong style="color:${color};">${label}</strong><br>${esc(text)}`;
+    aiLog.appendChild(item);
+    aiLog.scrollTop = aiLog.scrollHeight;
+  };
+  renderAi('ai', '要望を書いて「AIと整理」を押すと、確認質問と実装前プランを作ります。追加で相談すると本文を更新できます。');
+
+  async function requestAiPlan(message, isFirst) {
+    const name = box.querySelector('#req-name').value.trim();
+    const cat = box.querySelector('#req-cat').value;
+    const text = textEl.value.trim();
+    const userMsg = (message || '').trim();
+    if (!text && !userMsg) { msg.textContent = '内容を入力してください。'; return; }
+    if (isFirst && text) {
+      aiHistory.push({ role: 'user', text });
+      renderAi('user', text);
+    } else if (userMsg) {
+      aiHistory.push({ role: 'user', text: userMsg });
+      renderAi('user', userMsg);
+    }
+    const payload = { action: 'plan_request', user_name: name, category: cat, text, message: userMsg, history: aiHistory };
+    const url = GROUP_API_URL + '?action=plan_request&payload=' + encodeURIComponent(JSON.stringify(payload));
+    if (url.length > 7500) {
+      msg.textContent = '内容が長すぎるためAI相談できません。本文を少し短くしてください。';
+      return;
+    }
+    const startBtn = box.querySelector('#req-ai-start');
+    const sendBtn = box.querySelector('#req-ai-send');
+    startBtn.disabled = true; sendBtn.disabled = true; msg.style.color = '#666'; msg.textContent = 'AIが整理中…';
+    try {
+      const r = await (await fetch(url, { method: 'GET' })).json();
+      if (!r.ok) throw new Error(r.error || 'AI整理に失敗しました');
+      if (r.kind !== 'request_plan') throw new Error('GASのAI整理機能がまだ反映されていません');
+      const reply = String(r.reply || '実装前プランを作成しました。');
+      const draft = String(r.draft_text || '').trim();
+      if (!draft) throw new Error('AI整理結果が空でした');
+      aiHistory.push({ role: 'ai', text: reply });
+      renderAi('ai', reply);
+      if (draft) textEl.value = draft;
+      aiInput.value = '';
+      msg.style.color = '#1e8449'; msg.textContent = 'AI整理を本文に反映しました。必要なら追加で相談してください。';
+    } catch (e) {
+      msg.style.color = '#c33';
+      msg.textContent = 'AI整理に失敗しました: ' + e.message + '（GASを新バージョンでデプロイ後に利用できます）';
+    } finally {
+      startBtn.disabled = false; sendBtn.disabled = false;
+    }
+  }
+
   box.querySelector('#req-cancel').onclick = close;
+  box.querySelector('#req-ai-start').onclick = () => requestAiPlan('', true);
+  box.querySelector('#req-ai-send').onclick = () => requestAiPlan(aiInput.value, false);
   box.querySelector('#req-ok').onclick = async () => {
     const name = box.querySelector('#req-name').value.trim();
     const cat = box.querySelector('#req-cat').value;
-    const text = box.querySelector('#req-text').value.trim();
-    const msg = box.querySelector('#req-msg');
+    const text = textEl.value.trim();
     if (!text) { msg.textContent = '内容を入力してください。'; return; }
     const btn = box.querySelector('#req-ok'); btn.disabled = true; btn.textContent = '送信中…';
     try {
