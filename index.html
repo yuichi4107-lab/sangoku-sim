@@ -1583,20 +1583,56 @@ function troopAllowedForPhase(troopType, legionTroop, isArrayPhase) {
   return troopType === legionTroop || troopType === '万能';   // 通常: 軍団兵種＋万能
 }
 
-// 軍団内の並べ替え（段階開放で決めた枠タイプは保持し、同タイプ内の部隊1〜5を能力値順に詰めるだけ）。
-// 段階開放で「統率5 / 武力5 / 知性5 / 角陣3」の枠タイプが確定済み → 配置は変えず、
-// 各枠タイプ内で部隊1→5を能力値の高い順に並べ替える（強い武将を前の部隊へ）。
+// 軍団内の並べ替え。段階開放で「統率5 / 主陣(武力知性)10 / 角陣3」が確定済み。
+//  ・統率枠: 統率値の高い順に部隊1→5（枠タイプ確定）。
+//  ・武力/知力枠: 担当条件スキル（先鋒/前衛→武力、軍師/参謀→知力）を優先配置し、
+//    残りを「適材適所」（武力値≧知性値なら武力枠、そうでなければ知力枠）で振り分け、各枠内は能力値順。
+//  ・角陣: 段階開放の配置をそのまま確定（並べ替えない）。
 function rearrangeLegion(f) {
   const gmap = new Map(state.data.generals.map(g => [g.id, g]));
   const stat = (id, t) => Number((((gmap.get(id) || {}).stats) || {})[t]) || 0;
-  // 主陣: 各枠タイプ（統率/武力/知性）ごとに部隊1〜5を能力値順に並べ替え（空きは後ろへ詰める）
-  for (const t of SLOT_KEYS) {
+  const reqOf = (id) => {
+    const g = gmap.get(id); for (const s of ((g && g.skills) || [])) { const r = skillRequiredSlot(s); if (r) return r; } return null;
+  };
+
+  // 統率枠: 統率値の高い順に部隊1→5
+  {
     const ids = [];
-    for (let bi = 0; bi < 5; bi++) if (f.battalions[bi][t]) ids.push(f.battalions[bi][t]);
-    ids.sort((a, b) => stat(b, t) - stat(a, t));
-    for (let bi = 0; bi < 5; bi++) f.battalions[bi][t] = ids[bi] || null;
+    for (let bi = 0; bi < 5; bi++) if (f.battalions[bi]['統率']) ids.push(f.battalions[bi]['統率']);
+    ids.sort((a, b) => stat(b, '統率') - stat(a, '統率'));
+    for (let bi = 0; bi < 5; bi++) f.battalions[bi]['統率'] = ids[bi] || null;
   }
-  // 角陣（統率/武力/知性の3枠）は段階開放の配置をそのまま確定（並べ替えない）
+
+  // 主陣の武力・知力に入っている10人を集めて再振り分け
+  const pool = [];
+  for (let bi = 0; bi < 5; bi++) for (const t of ['武力', '知性']) if (f.battalions[bi][t]) pool.push(f.battalions[bi][t]);
+  for (let bi = 0; bi < 5; bi++) { f.battalions[bi]['武力'] = null; f.battalions[bi]['知性'] = null; }
+
+  const buSlots = [], chiSlots = [], free = [];
+  // ① 担当条件スキル優先（武力担当→武力枠 / 知力担当→知力枠）
+  const buT = pool.filter(id => reqOf(id) === '武力').sort((a, b) => stat(b, '武力') - stat(a, '武力'));
+  const chiT = pool.filter(id => reqOf(id) === '知性').sort((a, b) => stat(b, '知性') - stat(a, '知性'));
+  const placed = new Set();
+  for (const id of buT) { if (buSlots.length < 5) { buSlots.push(id); placed.add(id); } }
+  for (const id of chiT) { if (chiSlots.length < 5) { chiSlots.push(id); placed.add(id); } }
+  for (const id of pool) if (!placed.has(id)) free.push(id);
+
+  // ② 残りを適材適所（武力値−知性値の大きい順で、空きのある枠へ）
+  free.sort((a, b) => (stat(b, '武力') - stat(b, '知性')) - (stat(a, '武力') - stat(a, '知性')));
+  for (const id of free) {
+    const buSpace = 5 - buSlots.length, chiSpace = 5 - chiSlots.length;
+    if (buSpace <= 0 && chiSpace <= 0) break;
+    if (chiSpace <= 0) { buSlots.push(id); continue; }
+    if (buSpace <= 0) { chiSlots.push(id); continue; }
+    if (stat(id, '武力') - stat(id, '知性') >= 0) buSlots.push(id); else chiSlots.push(id);
+  }
+
+  // ③ 各枠内を能力値順に部隊1→5へ
+  buSlots.sort((a, b) => stat(b, '武力') - stat(a, '武力'));
+  chiSlots.sort((a, b) => stat(b, '知性') - stat(a, '知性'));
+  for (let bi = 0; bi < 5; bi++) { f.battalions[bi]['武力'] = buSlots[bi] || null; f.battalions[bi]['知性'] = chiSlots[bi] || null; }
+
+  // 角陣はそのまま確定（並べ替えない）
 }
 
 function renderFormation() {
