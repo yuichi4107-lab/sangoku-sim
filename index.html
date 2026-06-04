@@ -2583,8 +2583,13 @@ function showSendRequestModal() {
     const startBtn = box.querySelector('#req-ai-start');
     const sendBtn = box.querySelector('#req-ai-send');
     startBtn.disabled = true; sendBtn.disabled = true; msg.style.color = '#666'; msg.textContent = 'AIが整理中…';
+    renderAi('ai', '整理中です。10〜20秒ほどかかることがあります。');
     try {
-      const r = await (await fetch(url, { method: 'GET' })).json();
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 45000);
+      const res = await fetch(url, { method: 'GET', signal: controller.signal });
+      clearTimeout(timer);
+      const r = await res.json();
       if (!r.ok) throw new Error(r.error || 'AI整理に失敗しました');
       if (r.kind !== 'request_plan') throw new Error('GASのAI整理機能がまだ反映されていません');
       const reply = String(r.reply || '実装前プランを作成しました。');
@@ -2597,7 +2602,9 @@ function showSendRequestModal() {
       msg.style.color = '#1e8449'; msg.textContent = 'AI整理を本文に反映しました。必要なら追加で相談してください。';
     } catch (e) {
       msg.style.color = '#c33';
-      msg.textContent = 'AI整理に失敗しました: ' + e.message + '（GASを新バージョンでデプロイ後に利用できます）';
+      const detail = e.name === 'AbortError' ? 'AI整理がタイムアウトしました。少し短めの内容で再度お試しください。' : e.message;
+      renderAi('ai', 'AI整理に失敗しました: ' + detail);
+      msg.textContent = 'AI整理に失敗しました: ' + detail + '（GASを新バージョンでデプロイ後に利用できます）';
     } finally {
       startBtn.disabled = false; sendBtn.disabled = false;
     }

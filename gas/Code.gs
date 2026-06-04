@@ -504,7 +504,8 @@ function callGeminiText_(prompt) {
     contents: [{ parts: [{ text: prompt }] }],
     generationConfig: {
       temperature: 0.25,
-      maxOutputTokens: 1600,
+      maxOutputTokens: 2600,
+      responseMimeType: 'application/json',
     },
   };
   const res = UrlFetchApp.fetch(url, {
@@ -528,6 +529,46 @@ function stripCodeFence_(text) {
   const s = String(text || '').trim();
   const m = s.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
   return m ? m[1].trim() : s;
+}
+
+function parseRequestPlanJson_(raw) {
+  const cleaned = stripCodeFence_(raw);
+  const attempts = [cleaned];
+  const first = cleaned.indexOf('{');
+  const last = cleaned.lastIndexOf('}');
+  if (first >= 0 && last > first) attempts.push(cleaned.slice(first, last + 1));
+  for (let i = 0; i < attempts.length; i++) {
+    try {
+      let parsed = JSON.parse(attempts[i]);
+      if (typeof parsed === 'string') parsed = JSON.parse(stripCodeFence_(parsed));
+      if (parsed && typeof parsed === 'object') return parsed;
+    } catch (e) {}
+  }
+  return null;
+}
+
+function fallbackRequestDraft_(obj, raw) {
+  const original = String((obj && (obj.text || obj.message)) || '').trim();
+  const aiText = String(raw || '').trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').slice(0, 1200);
+  return [
+    '【ユーザー原文】',
+    original || '（未入力）',
+    '',
+    '【AI整理】',
+    aiText && aiText.charAt(0) !== '{' ? aiText : 'AIの返答形式が崩れたため、原文をもとに整理してください。',
+    '',
+    '【実装前プラン】',
+    '1. 要望の目的と困っている場面を確認する。',
+    '2. 既存画面・既存データへの影響範囲を確認する。',
+    '3. 小さく実装して、要望一覧から確認できる状態にする。',
+    '',
+    '【受け入れ条件】',
+    '- 要望内容が送信前に確認できる。',
+    '- 実装前の確認事項が本文に残る。',
+    '',
+    '【確認事項】',
+    '- 期待する画面や操作手順に補足があれば追記してください。',
+  ].join('\n');
 }
 
 function buildRequestPlanPrompt_(obj) {
@@ -568,17 +609,13 @@ function planRequestFromPayload_(obj) {
   try {
     const prompt = buildRequestPlanPrompt_(obj || {});
     const raw = callGeminiText_(prompt);
-    let parsed;
-    try {
-      parsed = JSON.parse(stripCodeFence_(raw));
-    } catch (e) {
-      parsed = {
-        reply: 'AIの返答形式が少し崩れたため、本文として取り込みました。',
-        draft_text: String(raw || '').trim(),
-      };
+    let parsed = parseRequestPlanJson_(raw) || {};
+    if (parsed.draft_text && String(parsed.draft_text).trim().charAt(0) === '{') {
+      const nested = parseRequestPlanJson_(parsed.draft_text);
+      if (nested && nested.draft_text) parsed = nested;
     }
-    const reply = String(parsed.reply || '').trim();
-    const draftText = String(parsed.draft_text || '').trim();
+    const reply = String(parsed.reply || '実装前プランを作成しました。').trim();
+    const draftText = String(parsed.draft_text || fallbackRequestDraft_(obj || {}, raw)).trim();
     if (!draftText) throw new Error('empty AI draft');
     return jsonOut_({ ok: true, kind: 'request_plan', reply: reply, draft_text: draftText });
   } catch (err) {
