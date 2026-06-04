@@ -1203,9 +1203,70 @@ function getCapInfo(sk) {
 const PRIORITY_WEIGHTS = [16, 8, 4, 2, 1];
 const FORCED_AUTO_GENERAL_IDS = new Set(['関平', '蒋欽', '李典', 'chouryou']);
 const FORCED_AUTO_SCORE_BONUS = 1000000000;
+const SLOT_STAT_SCORE_WEIGHT = { 統率: 120, 武力: 1, 知性: 1 };
+const SLOT_PREFERRED_SCORE_BONUS = 20;
 
 function isForcedAutoGeneral(g) {
   return !!(g && FORCED_AUTO_GENERAL_IDS.has(g.id));
+}
+
+function statValue(g, slot) {
+  return Number((((g || {}).stats) || {})[slot]) || 0;
+}
+
+function preferredSlotForGeneral(g) {
+  if (!g) return null;
+  for (const sk of (g.skills || [])) {
+    const req = skillRequiredSlot(sk);
+    if (req) return req;
+  }
+  const raw = g.slot_stat;
+  const slots = Array.isArray(raw) ? raw : (raw ? [raw] : []);
+  const valid = slots.filter(s => SLOT_KEYS.includes(s));
+  if (valid.length) {
+    valid.sort((a, b) => statValue(g, b) - statValue(g, a));
+    return valid[0];
+  }
+  const withStats = SLOT_KEYS.filter(s => statValue(g, s) > 0);
+  if (!withStats.length) return null;
+  withStats.sort((a, b) => statValue(g, b) - statValue(g, a));
+  return withStats[0];
+}
+
+function forcedPreferredSlot(g) {
+  return preferredSlotForGeneral(g) || '武力';
+}
+
+function slotFitScore(g, slot) {
+  let score = statValue(g, slot) * (SLOT_STAT_SCORE_WEIGHT[slot] || 0);
+  const pref = preferredSlotForGeneral(g);
+  if (pref && pref === slot) score += SLOT_PREFERRED_SCORE_BONUS;
+  if (isForcedAutoGeneral(g) && slot === forcedPreferredSlot(g)) score += FORCED_AUTO_SCORE_BONUS;
+  return score;
+}
+
+function slotReasonText(g, slot, formation) {
+  if (!g) return '';
+  const parts = [];
+  const sv = statValue(g, slot);
+  parts.push(`${slot}${sv ? sv : '?'}`);
+  const pref = preferredSlotForGeneral(g);
+  if (pref === slot) parts.push('適性一致');
+  else if (pref) parts.push(`${pref}適性`);
+  if (isForcedAutoGeneral(g)) parts.push('必須選択');
+  if (formation && formation.troop_type) parts.push(`${g.troop_type}→${formation.troop_type}`);
+  const skills = [];
+  for (const sk of (g.skills || [])) {
+    if (isDispatchFree(sk)) continue;
+    const req = skillRequiredSlot(sk);
+    if (req && req !== slot) continue;
+    const tt = formation && formation.troop_type ? skillTargetTroop(sk) : null;
+    if (tt && tt !== formation.troop_type) continue;
+    skills.push(sk.name);
+    if (skills.length >= 2) break;
+  }
+  if (skills.length) parts.push(skills.join('/'));
+  return parts.join(' / ');
 }
 
 
@@ -1258,7 +1319,7 @@ function marginalContribution(g, pris, pool, userId, slot, legionTroop) {
   }
   let score = 0;
   for (let i = 0; i < scores.length; i++) score += scores[i] * (PRIORITY_WEIGHTS[i] || 0);
-  if (isForcedAutoGeneral(g)) score += FORCED_AUTO_SCORE_BONUS;
+  if (slot) score += slotFitScore(g, slot);
   return { score, newPool };
 }
 
@@ -1810,6 +1871,17 @@ function makeSlotCell(bat, slot, opts) {
     renderSummary();
   });
   wrap.appendChild(sel);
+  if (bat[slot]) {
+    const g = state.data.generals.find(x => x.id === bat[slot]);
+    const reason = slotReasonText(g, slot, formation);
+    if (reason) {
+      sel.title = reason;
+      const why = document.createElement('div');
+      why.style.cssText = 'font-size:10px;color:var(--muted);line-height:1.25;margin-top:2px;white-space:normal;';
+      why.textContent = reason;
+      wrap.appendChild(why);
+    }
+  }
   return wrap;
 }
 
