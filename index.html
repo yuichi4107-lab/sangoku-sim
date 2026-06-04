@@ -1203,6 +1203,7 @@ function getCapInfo(sk) {
 const PRIORITY_WEIGHTS = [16, 8, 4, 2, 1];
 const FORCED_AUTO_GENERAL_IDS = new Set(['関平', '蒋欽', '李典', 'chouryou']);
 const FORCED_AUTO_SCORE_BONUS = 1000000000;
+const LEADERSHIP_PRIORITY_MIN_STAT = 96;
 const SLOT_STAT_SCORE_WEIGHT = { 統率: 120, 武力: 1, 知性: 1 };
 const SLOT_PREFERRED_SCORE_BONUS = 20;
 
@@ -1233,11 +1234,20 @@ function preferredSlotForGeneral(g) {
   return withStats[0];
 }
 
+function canTakeLeadershipPriority(g) {
+  return statValue(g, '統率') >= LEADERSHIP_PRIORITY_MIN_STAT;
+}
+
 function forcedPreferredSlot(g) {
-  return preferredSlotForGeneral(g) || '武力';
+  const pref = preferredSlotForGeneral(g) || '武力';
+  if (pref === '統率' && !canTakeLeadershipPriority(g)) {
+    return statValue(g, '武力') >= statValue(g, '知性') ? '武力' : '知性';
+  }
+  return pref;
 }
 
 function slotFitScore(g, slot) {
+  if (slot === '統率' && !canTakeLeadershipPriority(g)) return 0;
   let score = statValue(g, slot) * (SLOT_STAT_SCORE_WEIGHT[slot] || 0);
   const pref = preferredSlotForGeneral(g);
   if (pref && pref === slot) score += SLOT_PREFERRED_SCORE_BONUS;
@@ -1253,6 +1263,7 @@ function slotReasonText(g, slot, formation) {
   const pref = preferredSlotForGeneral(g);
   if (pref === slot) parts.push('適性一致');
   else if (pref) parts.push(`${pref}適性`);
+  if (slot === '統率' && !canTakeLeadershipPriority(g)) parts.push(`統率優先対象外(${LEADERSHIP_PRIORITY_MIN_STAT}未満)`);
   if (isForcedAutoGeneral(g)) parts.push('必須選択');
   if (formation && formation.troop_type) parts.push(`${g.troop_type}→${formation.troop_type}`);
   const skills = [];
