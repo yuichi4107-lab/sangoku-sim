@@ -152,6 +152,28 @@ const state = {
   filters: { troop: '', rarity: '', search: '', ownedOnly: false },
 };
 
+// 受信箱「はぶく」(2026-06-04受信) の所持武将は、登録用データベースから除外する。
+const HIDDEN_DATABASE_GENERAL_KEYS = new Set([
+  'ukin', 'kanu', '満龍', '玄貂蝉', '管路', '嵇康', '羊徽瑜', '張苞',
+  '玄袁紹', '玄鍾会', '鄭玄', '鍾繇', '呉懿', '孟獲', '廖化', '徐庶',
+  '曹植', '曹沖', '玄田豊', '祝融', '程昱', '羊祜', '蔡文姫', '鍾会',
+  '陳宮', '陳泰', '陸抗', '馬雲騄', '高順', '司馬朗', '張昭', '張紘',
+  '張郃', '王元姫', '王異', '蔡邕', '郭女王', '陳羣', '魯粛', '玄曹丕',
+  '玄甄姫', '玄魯粛', '劉焉', '華雄', '鄧艾', '郭嘉', '法正',
+]);
+function isHiddenDatabaseGeneral(g) {
+  return !!(g && (HIDDEN_DATABASE_GENERAL_KEYS.has(g.id) || HIDDEN_DATABASE_GENERAL_KEYS.has(g.name)));
+}
+function applyDatabaseHiddenGenerals(data) {
+  if (!data || !Array.isArray(data.generals)) return data;
+  const originalCount = data.generals.length;
+  data.generals = data.generals.filter(g => !isHiddenDatabaseGeneral(g));
+  data.meta = data.meta || {};
+  data.meta.original_general_count = originalCount;
+  data.meta.hidden_general_count = originalCount - data.generals.length;
+  return data;
+}
+
 function defaultOwn() {
   return { owned: false, breakthrough: 0, equipment: 0, seal: 0 };
 }
@@ -177,7 +199,7 @@ function loadData() {
     document.body.innerHTML = '<h1 style="color:red;">データロードエラー: ページを再読み込みしてください。</h1>';
     throw new Error('GENERALS_DATA missing');
   }
-  state.data = window.GENERALS_DATA;
+  state.data = applyDatabaseHiddenGenerals(window.GENERALS_DATA);
 }
 
 function saveLocal() {
