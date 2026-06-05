@@ -6,6 +6,8 @@
 direction:
   up / down / both / null
 """
+from __future__ import annotations
+
 import re
 import yaml
 from pathlib import Path
@@ -99,8 +101,6 @@ def main():
             sk['direction'] = direction
             key = f'{attr}/{direction}'
             counts[key] = counts.get(key, 0) + 1
-
-    doc['meta']['data_version'] = '0.5'
 
     with open(YAML_PATH, 'w', encoding='utf-8') as f:
         yaml.safe_dump(doc, f, allow_unicode=True, sort_keys=False, width=200)
