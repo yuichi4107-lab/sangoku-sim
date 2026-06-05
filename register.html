@@ -193,6 +193,24 @@ function devTypeLabel(g) { return DEV_TYPE_LABEL[devType(g)]; }
 function genById(id) {
   return state.data.generals.find(x => x.id === id);
 }
+function validGeneralIdSet() {
+  return new Set(((state.data && state.data.generals) || []).map(g => g.id));
+}
+function sanitizeOwnerships(ownerships) {
+  const validIds = validGeneralIdSet();
+  const clean = {};
+  let removed = 0;
+  for (const [id, own] of Object.entries(ownerships || {})) {
+    if (!validIds.has(id)) { removed++; continue; }
+    clean[id] = (own && typeof own === 'object') ? own : defaultOwn();
+  }
+  return { ownerships: clean, removed };
+}
+function pruneCurrentOwnerships() {
+  const result = sanitizeOwnerships(state.ownerships);
+  state.ownerships = result.ownerships;
+  return result.removed;
+}
 
 function loadData() {
   if (!window.GENERALS_DATA) {
@@ -204,6 +222,7 @@ function loadData() {
 
 function saveLocal() {
   try {
+    pruneCurrentOwnerships();
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       userName: state.userName,
       ownerships: state.ownerships,
@@ -219,7 +238,7 @@ function loadLocal() {
     if (!raw) return;
     const obj = JSON.parse(raw);
     state.userName = obj.userName || '';
-    state.ownerships = obj.ownerships || {};
+    state.ownerships = sanitizeOwnerships(obj.ownerships || {}).ownerships;
   } catch (e) {
     console.warn('localStorage load failed', e);
     try { notify(`⚠️ 入力データの読込に失敗しました: ${e.message}\n（初期状態で続行します）`); } catch (_) {}
@@ -576,6 +595,8 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
       }
     } catch (e) { /* ベースライン取得失敗時は空文字のままで続行 */ }
 
+    const removedBeforeSend = pruneCurrentOwnerships();
+    saveLocal();
     const payload = {
       action: 'submit_user',
       user_name: name,
@@ -606,7 +627,8 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
     }
 
     if (verified) {
-      notify(`✅ 送信完了（サーバー反映確認済）\n\n名前: ${name}\n登録した武将数: ${Object.values(state.ownerships).filter(o => o.owned).length}\n添付画像: ${images.length}枚\n\nデータは依頼者に届きました。\nご協力ありがとうございました！`);
+      const removedText = removedBeforeSend ? `\n送信対象外にした古い武将ID: ${removedBeforeSend}件` : '';
+      notify(`✅ 送信完了（サーバー反映確認済）\n\n名前: ${name}\n登録した武将数: ${Object.values(state.ownerships).filter(o => o.owned).length}${removedText}\n添付画像: ${images.length}枚\n\nデータは依頼者に届きました。\nご協力ありがとうございました！`);
     } else {
       notify(`⚠️ 送信は試みましたが、サーバー側での反映を10秒以内に確認できませんでした。\n\n考えられる原因:\n・ネットワーク不安定／タイムアウト\n・データサイズが大きすぎる（画像が大量等）\n・サーバー側で一時的なエラー\n\nしばらく待ってから、もう一度「📤 送信」を押してみてください。\n何度試しても失敗する場合は依頼者にご連絡ください。`);
     }
@@ -657,7 +679,8 @@ document.getElementById('btn-restore').addEventListener('click', async () => {
       }
       return;
     }
-    const own = d.ownerships || {};
+    const cleaned = sanitizeOwnerships(d.ownerships || {});
+    const own = cleaned.ownerships;
     const ownedN = Object.values(own).filter(o => o && o.owned).length;
     if (Object.keys(state.ownerships).length > 0) {
       if (!confirm(`現在の入力内容を、前回送信した「${name}」のデータ（所持 ${ownedN} 体）で置き換えます。よろしいですか？`)) return;
@@ -665,7 +688,8 @@ document.getElementById('btn-restore').addEventListener('click', async () => {
     state.ownerships = JSON.parse(JSON.stringify(own));
     saveLocal();
     renderRoster();
-    notify(`✅ 前回の登録を呼び戻しました（所持 ${ownedN} 体）。\n\n更新したい武将を追加・変更して、もう一度「📤 送信」してください。`);
+    const removedText = cleaned.removed ? `\n現在の一覧にない古い武将ID ${cleaned.removed}件は除外しました。` : '';
+    notify(`✅ 前回の登録を呼び戻しました（所持 ${ownedN} 体）。${removedText}\n\n更新したい武将を追加・変更して、もう一度「📤 送信」してください。`);
   } catch (err) {
     notify(`❌ 呼び戻し失敗: ${err.message}\n\n通信状態を確認のうえ、もう一度お試しください。`);
   } finally {
@@ -723,12 +747,14 @@ document.getElementById('btn-load-main').addEventListener('click', async () => {
     if (!confirm(`現在の入力内容を、メイン画面の「${user.name || '(無名)'}」のデータで置き換えます。よろしいですか？`)) return;
   }
   state.userName = user.name || '';
-  state.ownerships = JSON.parse(JSON.stringify(own));
+  const cleaned = sanitizeOwnerships(own);
+  state.ownerships = JSON.parse(JSON.stringify(cleaned.ownerships));
   document.getElementById('user-name').value = state.userName;
   saveLocal();
   renderRoster();
   const ownedN = Object.values(state.ownerships).filter(o => o && o.owned).length;
-  notify(`✅ メイン画面の「${state.userName}」を取り込みました（所持 ${ownedN} 体）。\n内容を確認して「📤 送信」してください。`);
+  const removedText = cleaned.removed ? `\n現在の一覧にない古い武将ID ${cleaned.removed}件は除外しました。` : '';
+  notify(`✅ メイン画面の「${state.userName}」を取り込みました（所持 ${ownedN} 体）。${removedText}\n内容を確認して「📤 送信」してください。`);
 });
 
 // 起動
