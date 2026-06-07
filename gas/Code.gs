@@ -21,6 +21,14 @@ const VALUE_CELL = 'B1';
 const UPDATED_CELL = 'C1';
 const CHUNK_SIZE = 40000;
 const USER_BACKUP_KEEP = 30;
+const DAILY_BACKUP_TRIGGER_FUNCTION = 'runDailyUserBackup';
+const DAILY_BACKUP_HOUR = 3;
+const DAILY_BACKUP_MINUTE = 0;
+const DAILY_BACKUP_TIMEZONE = 'Asia/Tokyo';
+const DAILY_BACKUP_LAST_DATE_KEY = 'daily_user_backup_last_date';
+const DAILY_BACKUP_LAST_RUN_KEY = 'daily_user_backup_last_run_at';
+const DAILY_BACKUP_LAST_ERROR_KEY = 'daily_user_backup_last_error';
+const DAILY_BACKUP_CONFIG_KEY = 'daily_user_backup_config';
 
 // ---------- シート取得 ----------
 function getSheet_() {
@@ -159,6 +167,99 @@ function backupAllExistingUsers_(sourceAction, note) {
     if (backupUserValues_(v, sourceAction, note)) count++;
   }
   return count;
+}
+
+// ---------- 毎日3時の自動バックアップ ----------
+function dailyBackupDateKey_(date) {
+  return Utilities.formatDate(date || new Date(), DAILY_BACKUP_TIMEZONE, 'yyyy-MM-dd');
+}
+
+function listDailyBackupTriggers_() {
+  const triggers = ScriptApp.getProjectTriggers();
+  const found = [];
+  for (const trigger of triggers) {
+    if (trigger.getHandlerFunction && trigger.getHandlerFunction() === DAILY_BACKUP_TRIGGER_FUNCTION) {
+      found.push(trigger);
+    }
+  }
+  return found;
+}
+
+function removeDailyBackupTriggers_() {
+  const triggers = listDailyBackupTriggers_();
+  for (const trigger of triggers) ScriptApp.deleteTrigger(trigger);
+  return triggers.length;
+}
+
+function getDailyUserBackupStatus() {
+  const props = PropertiesService.getScriptProperties();
+  return {
+    ok: true,
+    enabled: listDailyBackupTriggers_().length > 0,
+    trigger_count: listDailyBackupTriggers_().length,
+    function_name: DAILY_BACKUP_TRIGGER_FUNCTION,
+    hour: DAILY_BACKUP_HOUR,
+    minute: DAILY_BACKUP_MINUTE,
+    timezone: DAILY_BACKUP_TIMEZONE,
+    last_backup_date: props.getProperty(DAILY_BACKUP_LAST_DATE_KEY) || '',
+    last_run_at: props.getProperty(DAILY_BACKUP_LAST_RUN_KEY) || '',
+    last_error: props.getProperty(DAILY_BACKUP_LAST_ERROR_KEY) || '',
+    config: parseJson_(props.getProperty(DAILY_BACKUP_CONFIG_KEY), null),
+  };
+}
+
+function setupDailyUserBackupTrigger() {
+  const lock = LockService.getScriptLock(); lock.waitLock(15000);
+  try {
+    const removed = removeDailyBackupTriggers_();
+    ScriptApp.newTrigger(DAILY_BACKUP_TRIGGER_FUNCTION)
+      .timeBased()
+      .atHour(DAILY_BACKUP_HOUR)
+      .nearMinute(DAILY_BACKUP_MINUTE)
+      .everyDays(1)
+      .inTimezone(DAILY_BACKUP_TIMEZONE)
+      .create();
+    const config = {
+      function_name: DAILY_BACKUP_TRIGGER_FUNCTION,
+      hour: DAILY_BACKUP_HOUR,
+      minute: DAILY_BACKUP_MINUTE,
+      timezone: DAILY_BACKUP_TIMEZONE,
+      note: '毎日03:00前後（Apps Script仕様で±15分）',
+      updated_at: new Date().toISOString(),
+    };
+    PropertiesService.getScriptProperties().setProperty(DAILY_BACKUP_CONFIG_KEY, JSON.stringify(config));
+    return {
+      ok: true,
+      enabled: true,
+      removed: removed,
+      trigger_count: listDailyBackupTriggers_().length,
+      config: config,
+    };
+  } catch (err) {
+    PropertiesService.getScriptProperties().setProperty(DAILY_BACKUP_LAST_ERROR_KEY, String(err));
+    return { ok: false, error: String(err) };
+  } finally { lock.releaseLock(); }
+}
+
+function runDailyUserBackup() {
+  const lock = LockService.getScriptLock(); lock.waitLock(20000);
+  const props = PropertiesService.getScriptProperties();
+  const now = new Date();
+  const today = dailyBackupDateKey_(now);
+  try {
+    if (props.getProperty(DAILY_BACKUP_LAST_DATE_KEY) === today) {
+      return { ok: true, skipped: true, reason: 'already_backed_up_today', date: today };
+    }
+    const count = backupAllExistingUsers_('daily_backup', '毎日3時の自動バックアップ');
+    props.setProperty(DAILY_BACKUP_LAST_DATE_KEY, today);
+    props.setProperty(DAILY_BACKUP_LAST_RUN_KEY, now.toISOString());
+    props.deleteProperty(DAILY_BACKUP_LAST_ERROR_KEY);
+    SpreadsheetApp.flush();
+    return { ok: true, count: count, date: today, ran_at: now.toISOString() };
+  } catch (err) {
+    props.setProperty(DAILY_BACKUP_LAST_ERROR_KEY, String(err));
+    throw err;
+  } finally { lock.releaseLock(); }
 }
 
 // ---------- ルーティング ----------

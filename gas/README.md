@@ -10,6 +10,7 @@ GAS Web App のソースです。Google 側のプロジェクトが本体で、�
 4. 「デプロイ」→「デプロイを管理」→ 鉛筆（編集）→ バージョン「新バージョン」→「デプロイ」
    - ※ URL は変わらない。**新バージョンでデプロイしないと反映されない**
 5. 初回は権限承認（Drive / UrlFetch / Spreadsheet）
+6. 毎日3時バックアップを有効化する場合は、GASエディタまたは clasp で `setupDailyUserBackupTrigger` を1回実行する
 
 ## Script Properties（必須）
 - `GEMINI_API_KEY` : 兵士属性OCR（Gemini）用の API キー
@@ -63,3 +64,5 @@ Drive: `sangoku_inbox_images`（受信画像）
 - Drive権限の再承認: `authorizeDrive` を実行。
 - AI要望整理は `GEMINI_API_KEY` を使う。公開ページにAPIキーは置かず、GAS の `plan_request` で実装前プランを生成する。
 - ユーザー所持データは、上書き保存・一括保存・削除・全消去の直前に `user_backups` へ自動保存する。1ユーザーあたり直近30世代を保持する。
+- 毎日3時の自動バックアップは `setupDailyUserBackupTrigger` で設定する。実行関数は `runDailyUserBackup`。Apps Script の仕様上、03:00ちょうどではなく03:00前後（±15分）で動く。
+- 定期バックアップ状況を確認したい時は `getDailyUserBackupStatus` を実行する。
