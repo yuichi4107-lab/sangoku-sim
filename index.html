@@ -2536,7 +2536,6 @@ function initGroupLock() {
       <button id="btn-cloud-pull" title="クラウド上の最新データでこの端末を上書き">⬇️ クラウドから取得</button>
       <button id="btn-cloud-push" title="この端末の現在状態をクラウドへ保存（他端末に同期）" style="background:var(--accent);color:#fff;">⬆️ クラウドへ保存</button>
       <button id="btn-inbox" title="register.html から送信された友人データを取得" style="background:#5a7a5a;color:#fff;">📥 受信箱を取得</button>
-      <button id="btn-backups" title="所持データのバックアップ一覧・復元" style="background:#6a5a8c;color:#fff;">🛟 バックアップ</button>
       <button id="btn-compare-stats" title="プレイヤー兵士属性を横並びで比較" style="background:#4a6a8c;color:#fff;">📊 ステ比較</button>
       <button id="btn-send-request" title="運営に要望・バグ報告を送る" style="background:#9c7a3a;color:#fff;">💡 要望を送る</button>
       <button id="btn-view-requests" title="届いた要望の一覧・対応状況" style="background:#8c5a7a;color:#fff;">📋 要望一覧</button>
@@ -3054,9 +3053,6 @@ function initCloudSync() {
 
   const btnCompare = document.getElementById('btn-compare-stats');
   if (btnCompare) btnCompare.addEventListener('click', () => showStatsCompareModal());
-
-  const btnBackups = document.getElementById('btn-backups');
-  if (btnBackups) btnBackups.addEventListener('click', () => showBackupsModal());
 
   const btnSendReq = document.getElementById('btn-send-request');
   if (btnSendReq) btnSendReq.addEventListener('click', () => showSendRequestModal());
