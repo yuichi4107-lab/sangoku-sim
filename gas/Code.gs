@@ -12,6 +12,7 @@
 const SHEET_NAME = 'data';            // 旧: 共有stateの1セル格納（移行元として参照）
 const USERS_SHEET = 'users_data';     // 新: 1ユーザー=1行
 const META_SHEET = 'shared_meta';     // 新: 編成/優先など軽量データ
+const BACKUPS_SHEET = 'user_backups'; // 新: ユーザー所持データの自動バックアップ
 const INBOX_SHEET = 'inbox';
 const REQUESTS_SHEET = 'requests';
 const IMG_FOLDER_NAME = 'sangoku_inbox_images';
@@ -19,6 +20,7 @@ const KEY_CELL = 'A1';
 const VALUE_CELL = 'B1';
 const UPDATED_CELL = 'C1';
 const CHUNK_SIZE = 40000;
+const USER_BACKUP_KEEP = 30;
 
 // ---------- シート取得 ----------
 function getSheet_() {
@@ -40,6 +42,18 @@ function getMetaSheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(META_SHEET);
   if (!sheet) sheet = ss.insertSheet(META_SHEET);
+  return sheet;
+}
+function getBackupsSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(BACKUPS_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(BACKUPS_SHEET);
+    sheet.getRange(1, 1, 1, 9).setValues([[
+      'backup_id', 'saved_at', 'source_action', 'user_id', 'name',
+      'ownerships_json', 'player_stats_json', 'owned_count', 'note'
+    ]]);
+  }
   return sheet;
 }
 function getInboxSheet_() {
@@ -68,11 +82,91 @@ function jsonOut_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
 
+// ---------- ユーザー所持データのバックアップ ----------
+function countOwnedGenerals_(ownerships) {
+  let n = 0;
+  if (!ownerships || typeof ownerships !== 'object') return 0;
+  for (const k of Object.keys(ownerships)) {
+    const v = ownerships[k];
+    if (v && typeof v === 'object' && v.owned) n++;
+  }
+  return n;
+}
+
+function normalizeBackupSource_(source) {
+  const s = String(source || 'save_user').trim();
+  return s ? s.slice(0, 80) : 'save_user';
+}
+
+function pruneUserBackups_(userId, keep) {
+  const sh = getBackupsSheet_();
+  const last = sh.getLastRow();
+  if (last < 2) return;
+  const vals = sh.getRange(2, 1, last - 1, 4).getValues();
+  const rows = [];
+  for (let i = 0; i < vals.length; i++) {
+    if (String(vals[i][3]) !== String(userId)) continue;
+    const saved = vals[i][1];
+    const t = saved ? new Date(saved).getTime() : 0;
+    rows.push({ row: i + 2, time: isNaN(t) ? 0 : t });
+  }
+  if (rows.length <= keep) return;
+  rows.sort(function(a, b) {
+    if (b.time !== a.time) return b.time - a.time;
+    return b.row - a.row;
+  });
+  const removeRows = rows.slice(keep).map(function(r) { return r.row; }).sort(function(a, b) { return b - a; });
+  for (const row of removeRows) sh.deleteRow(row);
+}
+
+function backupUserValues_(values, sourceAction, note) {
+  if (!values || values[0] == null || values[0] === '') return false;
+  const uid = String(values[0]);
+  const name = String(values[1] == null ? '' : values[1]);
+  const ownJson = String(values[2] == null ? '' : values[2]);
+  const psJson = String(values[3] == null ? '' : values[3]);
+  if (!ownJson && !psJson) return false;
+  const own = parseJson_(ownJson, {});
+  const sh = getBackupsSheet_();
+  sh.appendRow([
+    Utilities.getUuid(),
+    new Date(),
+    normalizeBackupSource_(sourceAction),
+    uid,
+    name,
+    ownJson,
+    psJson,
+    countOwnedGenerals_(own),
+    String(note || '').slice(0, 200),
+  ]);
+  pruneUserBackups_(uid, USER_BACKUP_KEEP);
+  return true;
+}
+
+function backupUserRow_(usersSheet, row, sourceAction, note) {
+  if (row === -1) return false;
+  const values = usersSheet.getRange(row, 1, 1, 5).getValues()[0];
+  return backupUserValues_(values, sourceAction, note);
+}
+
+function backupAllExistingUsers_(sourceAction, note) {
+  const usersSheet = getUsersSheet_();
+  const last = usersSheet.getLastRow();
+  if (last < 2) return 0;
+  const vals = usersSheet.getRange(2, 1, last - 1, 5).getValues();
+  let count = 0;
+  for (const v of vals) {
+    if (backupUserValues_(v, sourceAction, note)) count++;
+  }
+  return count;
+}
+
 // ---------- ルーティング ----------
 function doGet(e) {
   const action = (e && e.parameter && e.parameter.action) || 'get_state';
   if (action === 'get_inbox') return getInbox_();
   if (action === 'get_user_by_pin') return getUserByPin_(e);  // 暗証番号で本人の前回送信を取得
+  if (action === 'get_user_backups') return getUserBackups_(e); // 所持データのバックアップ一覧
   if (action === 'get_requests') return getRequests_();       // 要望一覧
   if (action === 'plan_request') return planRequest_(e);       // 要望AIプランニング
   return getState_();
@@ -91,6 +185,8 @@ function doPost(e) {
     if (obj && obj.action === 'save_user') return saveUser_(obj);     // 新: 1ユーザー保存
     if (obj && obj.action === 'save_meta') return saveMeta_(obj.meta || {});  // 新: メタ保存
     if (obj && obj.action === 'delete_user') return deleteUser_(obj); // 新: 1ユーザー削除
+    if (obj && obj.action === 'create_backup') return createBackup_(obj); // 新: 手動バックアップ
+    if (obj && obj.action === 'restore_user_backup') return restoreUserBackup_(obj); // 新: バックアップ復元
     if (obj && obj.action === 'submit_request') return submitRequest_(obj);   // 要望を保存
     if (obj && obj.action === 'plan_request') return planRequestFromPayload_(obj); // 要望AIプランニング
     if (obj && obj.action === 'update_request') return updateRequest_(obj);   // 要望ステータス変更
@@ -127,6 +223,7 @@ function migrateLegacyIfNeeded_() {
 function clearAll_() {
   const lock = LockService.getScriptLock(); lock.waitLock(15000);
   try {
+    backupAllExistingUsers_('clear_all', '共有データ全消去前');
     getSheet_().getRange(VALUE_CELL).setValue('');
     const u = getUsersSheet_();
     u.clearContents();
@@ -139,8 +236,9 @@ function clearAll_() {
   } finally { lock.releaseLock(); }
 }
 
-function writeAllUsers_(data) {
+function writeAllUsers_(data, sourceAction) {
   const sh = getUsersSheet_();
+  backupAllExistingUsers_(sourceAction || 'save_state', '一括保存による上書き前');
   const users = data.users || [];
   const own = data.ownerships || {};
   const ps = data.playerStats || {};
@@ -180,7 +278,7 @@ function saveState_(body) {
       sheet.getRange(UPDATED_CELL).setValue(new Date().toISOString());
       return jsonOut_({ ok: true, updated_at: new Date().toISOString() });
     }
-    writeAllUsers_(data);
+    writeAllUsers_(data, 'save_state');
     saveMeta_({ formations: data.formations || [], priority: data.priority || {}, aggMode: data.aggMode || '', activeUserId: data.activeUserId });
     SpreadsheetApp.flush();
     return jsonOut_({ ok: true, updated_at: new Date().toISOString(), users: (data.users || []).length });
@@ -201,6 +299,7 @@ function saveUser_(obj) {
     if (ownJson.length > 49000 || psJson.length > 49000) throw new Error('field too large');
     const values = [String(obj.user_id), String(obj.name == null ? '' : obj.name), ownJson, psJson, now];
     const row = findUserRow_(sh, obj.user_id);
+    if (row !== -1) backupUserRow_(sh, row, obj.source_action || 'save_user', '1ユーザー保存による上書き前');
     if (row === -1) sh.appendRow(values);
     else sh.getRange(row, 1, 1, 5).setValues([values]);
     SpreadsheetApp.flush();
@@ -216,9 +315,97 @@ function deleteUser_(obj) {
     const sh = getUsersSheet_();
     const row = findUserRow_(sh, obj.user_id);
     if (row === -1) return jsonOut_({ ok: true, deleted: false });
+    backupUserRow_(sh, row, 'delete_user', 'ユーザー削除前');
     sh.deleteRow(row);
     SpreadsheetApp.flush();
     return jsonOut_({ ok: true, deleted: true });
+  } catch (err) {
+    return jsonOut_({ ok: false, error: String(err) });
+  } finally { lock.releaseLock(); }
+}
+
+function createBackup_(obj) {
+  const lock = LockService.getScriptLock(); lock.waitLock(15000);
+  try {
+    const sh = getUsersSheet_();
+    if (obj && obj.user_id != null && obj.user_id !== '') {
+      const row = findUserRow_(sh, obj.user_id);
+      if (row === -1) throw new Error('user not found');
+      const ok = backupUserRow_(sh, row, obj.source_action || 'manual_backup', '手動バックアップ');
+      return jsonOut_({ ok: true, count: ok ? 1 : 0 });
+    }
+    const count = backupAllExistingUsers_(obj && obj.source_action || 'manual_backup', '手動バックアップ');
+    return jsonOut_({ ok: true, count: count });
+  } catch (err) {
+    return jsonOut_({ ok: false, error: String(err) });
+  } finally { lock.releaseLock(); }
+}
+
+function getUserBackups_(e) {
+  const p = (e && e.parameter) || {};
+  const userId = String(p.user_id || '').trim();
+  const userName = String(p.user_name || '').trim();
+  const limit = Math.max(1, Math.min(200, Number(p.limit) || 50));
+  const includeData = String(p.include_data || '') === '1';
+  const sh = getBackupsSheet_();
+  const last = sh.getLastRow();
+  const backups = [];
+  if (last >= 2) {
+    const vals = sh.getRange(2, 1, last - 1, 9).getValues();
+    for (let i = 0; i < vals.length; i++) {
+      const r = vals[i];
+      if (!r[0]) continue;
+      if (userId && String(r[3]) !== userId) continue;
+      if (userName && String(r[4]) !== userName) continue;
+      const item = {
+        backup_id: String(r[0]),
+        saved_at: r[1] ? new Date(r[1]).toISOString() : '',
+        source_action: String(r[2] || ''),
+        user_id: String(r[3] || ''),
+        name: String(r[4] || ''),
+        owned_count: Number(r[7]) || 0,
+        note: String(r[8] || ''),
+      };
+      if (includeData) {
+        item.ownerships = parseJson_(r[5], {});
+        item.player_stats = parseJson_(r[6], {});
+      }
+      backups.push(item);
+    }
+  }
+  backups.sort(function(a, b) { return String(b.saved_at).localeCompare(String(a.saved_at)); });
+  return jsonOut_({ ok: true, backups: backups.slice(0, limit) });
+}
+
+function restoreUserBackup_(obj) {
+  const lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    const backupId = String(obj.backup_id || '').trim();
+    if (!backupId) throw new Error('backup_id required');
+    const backupsSheet = getBackupsSheet_();
+    const last = backupsSheet.getLastRow();
+    if (last < 2) throw new Error('backup empty');
+    const rows = backupsSheet.getRange(2, 1, last - 1, 9).getValues();
+    let backup = null;
+    for (let i = 0; i < rows.length; i++) {
+      if (String(rows[i][0]) === backupId) { backup = rows[i]; break; }
+    }
+    if (!backup) throw new Error('backup not found');
+    const uid = String(backup[3]);
+    const name = String(backup[4] || '');
+    const ownJson = String(backup[5] || '{}');
+    const psJson = String(backup[6] || '{}');
+    if (ownJson.length > 49000 || psJson.length > 49000) throw new Error('field too large');
+
+    const usersSheet = getUsersSheet_();
+    const now = new Date().toISOString();
+    const row = findUserRow_(usersSheet, uid);
+    if (row !== -1) backupUserRow_(usersSheet, row, 'restore_user_backup', 'バックアップ復元前');
+    const values = [uid, name, ownJson, psJson, now];
+    if (row === -1) usersSheet.appendRow(values);
+    else usersSheet.getRange(row, 1, 1, 5).setValues([values]);
+    SpreadsheetApp.flush();
+    return jsonOut_({ ok: true, user_id: uid, name: name, updated_at: now });
   } catch (err) {
     return jsonOut_({ ok: false, error: String(err) });
   } finally { lock.releaseLock(); }

@@ -2536,6 +2536,7 @@ function initGroupLock() {
       <button id="btn-cloud-pull" title="クラウド上の最新データでこの端末を上書き">⬇️ クラウドから取得</button>
       <button id="btn-cloud-push" title="この端末の現在状態をクラウドへ保存（他端末に同期）" style="background:var(--accent);color:#fff;">⬆️ クラウドへ保存</button>
       <button id="btn-inbox" title="register.html から送信された友人データを取得" style="background:#5a7a5a;color:#fff;">📥 受信箱を取得</button>
+      <button id="btn-backups" title="所持データのバックアップ一覧・復元" style="background:#6a5a8c;color:#fff;">🛟 バックアップ</button>
       <button id="btn-compare-stats" title="プレイヤー兵士属性を横並びで比較" style="background:#4a6a8c;color:#fff;">📊 ステ比較</button>
       <button id="btn-send-request" title="運営に要望・バグ報告を送る" style="background:#9c7a3a;color:#fff;">💡 要望を送る</button>
       <button id="btn-view-requests" title="届いた要望の一覧・対応状況" style="background:#8c5a7a;color:#fff;">📋 要望一覧</button>
@@ -2678,6 +2679,21 @@ async function cloudGetInbox() {
   const res = await fetch(GROUP_API_URL + '?action=get_inbox', { method: 'GET' });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return await res.json();
+}
+
+async function cloudGetBackups(userId, includeData = false) {
+  const qs = new URLSearchParams({ action: 'get_user_backups', limit: '80' });
+  if (userId != null && userId !== '') qs.set('user_id', String(userId));
+  if (includeData) qs.set('include_data', '1');
+  const res = await fetch(GROUP_API_URL + '?' + qs.toString(), { method: 'GET' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return await res.json();
+}
+
+async function cloudPostNoCors(payload) {
+  const form = new URLSearchParams();
+  form.append('payload', JSON.stringify(payload));
+  await fetch(GROUP_API_URL, { method: 'POST', body: form, mode: 'no-cors' });
 }
 
 // 要望を送るモーダル（同期モード内）
@@ -2886,6 +2902,149 @@ async function showRequestsModal() {
   });
 }
 
+// 所持データバックアップ一覧・復元
+async function showBackupsModal() {
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#fff;padding:16px 18px;border-radius:6px;max-width:720px;width:100%;max-height:86vh;overflow:auto;box-shadow:0 4px 16px rgba(0,0,0,0.25);font-family:inherit;';
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  const close = () => { if (overlay.parentNode) overlay.remove(); };
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+
+  let selectedUserId = String(state.activeUserId || (state.users[0] && state.users[0].id) || '');
+  let backups = [];
+
+  function sourceLabel(src) {
+    const map = {
+      save_user: '1ユーザー保存',
+      save_state: '一括保存',
+      manual_backup: '手動',
+      restore_user_backup: '復元前',
+      delete_user: '削除前',
+      clear_all: '全消去前',
+    };
+    return map[src] || src || '保存前';
+  }
+
+  async function load() {
+    const r = await cloudGetBackups(selectedUserId, false);
+    if (!r.ok) throw new Error(r.error || 'backup fetch failed');
+    backups = r.backups || [];
+  }
+
+  function render(message, color) {
+    const opts = state.users.map(u => `<option value="${esc(u.id)}" ${String(u.id) === String(selectedUserId) ? 'selected' : ''}>${esc(u.name)}</option>`).join('');
+    const rows = backups.length ? backups.map(b => {
+      const ts = b.saved_at ? new Date(b.saved_at).toLocaleString() : '';
+      return `<label style="display:block;border:1px solid #ddd;border-radius:5px;padding:8px 10px;margin-bottom:6px;background:#fff;cursor:pointer;">
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="radio" name="backup-id" value="${esc(b.backup_id)}">
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:13px;">${esc(ts)} <span style="font-size:11px;color:#666;font-weight:normal;">${esc(sourceLabel(b.source_action))}</span></div>
+            <div style="font-size:11px;color:#666;">所持 ${Number(b.owned_count || 0)}件 / ${esc(b.note || '')}</div>
+          </div>
+        </div>
+      </label>`;
+    }).join('') : '<div style="color:#888;text-align:center;padding:24px;border:1px dashed #ccc;border-radius:6px;">このユーザーのバックアップはまだありません。</div>';
+    box.innerHTML = `
+      <div style="font-weight:600;font-size:15px;margin-bottom:8px;">🛟 所持データバックアップ</div>
+      <div style="font-size:12px;color:#666;line-height:1.5;margin-bottom:10px;">
+        保存・上書き・削除の直前状態を自動で残します。復元時も、現在の状態は先にバックアップされます。
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
+        <label style="font-size:12px;">プレイヤー
+          <select id="backup-user" style="padding:5px;border:1px solid #ccc;border-radius:4px;">${opts}</select>
+        </label>
+        <button id="backup-refresh" style="font-size:12px;">更新</button>
+        <button id="backup-create" style="font-size:12px;background:#5a7a5a;color:#fff;">現在をバックアップ</button>
+      </div>
+      <div id="backup-msg" style="font-size:12px;min-height:16px;margin-bottom:8px;color:${color || '#666'};">${esc(message || '')}</div>
+      <div style="max-height:46vh;overflow:auto;margin-bottom:10px;">${rows}</div>
+      <div style="display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;">
+        <button id="backup-close" style="background:#888;color:#fff;">閉じる</button>
+        <button id="backup-restore" style="background:#6a5a8c;color:#fff;">選択した状態に戻す</button>
+      </div>
+    `;
+    bind();
+  }
+
+  function setMsg(text, color) {
+    const el = box.querySelector('#backup-msg');
+    if (!el) return;
+    el.textContent = text || '';
+    el.style.color = color || '#666';
+  }
+
+  function bind() {
+    box.querySelector('#backup-close').onclick = close;
+    box.querySelector('#backup-user').onchange = async e => {
+      selectedUserId = e.target.value;
+      setMsg('取得中…', '#888');
+      try { await load(); render('', '#666'); }
+      catch (err) { render('取得失敗: ' + err.message, '#c33'); }
+    };
+    box.querySelector('#backup-refresh').onclick = async () => {
+      setMsg('取得中…', '#888');
+      try { await load(); render('更新しました。', '#1e8449'); }
+      catch (err) { setMsg('取得失敗: ' + err.message, '#c33'); }
+    };
+    box.querySelector('#backup-create').onclick = async () => {
+      const beforeIds = new Set(backups.map(b => b.backup_id));
+      setMsg('バックアップ作成中…', '#888');
+      await cloudPostNoCors({ action: 'create_backup', user_id: selectedUserId, source_action: 'manual_backup' });
+      let ok = false;
+      for (let i = 0; i < 20; i++) {
+        await new Promise(r => setTimeout(r, 500));
+        try {
+          await load();
+          if (backups.some(b => !beforeIds.has(b.backup_id))) { ok = true; break; }
+        } catch (e) {}
+      }
+      render(ok ? '現在の状態をバックアップしました。' : '作成リクエストは送信しましたが、反映確認できませんでした。', ok ? '#1e8449' : '#c80');
+    };
+    box.querySelector('#backup-restore').onclick = async () => {
+      const checked = box.querySelector('input[name="backup-id"]:checked');
+      if (!checked) { setMsg('復元するバックアップを選択してください。', '#c33'); return; }
+      const backup = backups.find(b => b.backup_id === checked.value);
+      const label = backup && backup.saved_at ? new Date(backup.saved_at).toLocaleString() : checked.value;
+      if (!await askConfirm(`選択したバックアップへ戻します。\n\n対象: ${(state.users.find(u => String(u.id) === String(selectedUserId)) || {}).name || selectedUserId}\n日時: ${label}\n\n現在の状態も復元前にバックアップされます。よろしいですか？`)) return;
+      setMsg('復元中…', '#888');
+      let beforeTs = lastCloudUpdatedAt || '';
+      try {
+        const before = await cloudGet();
+        if (before && before.ok) beforeTs = before.updated_at || beforeTs;
+      } catch (e) {}
+      await cloudPostNoCors({ action: 'restore_user_backup', backup_id: checked.value });
+      let restored = false, latest = null;
+      for (let i = 0; i < 24; i++) {
+        await new Promise(r => setTimeout(r, 500));
+        try {
+          latest = await cloudGet();
+          if (latest && latest.ok && latest.updated_at && latest.updated_at !== beforeTs) {
+            restored = true;
+            break;
+          }
+        } catch (e) {}
+      }
+      if (restored && latest && latest.data) {
+        applySharedPayload(latest.data);
+        lastCloudUpdatedAt = latest.updated_at || '';
+        await load();
+        render('復元しました。画面にも反映しました。', '#1e8449');
+      } else {
+        setMsg('復元リクエストは送信しましたが、反映確認できませんでした。時間を置いてクラウドから取得してください。', '#c80');
+      }
+    };
+  }
+
+  render('取得中…', '#888');
+  try { await load(); render('', '#666'); }
+  catch (err) { render('取得失敗: ' + err.message + '（GASを新バージョンでデプロイ後に利用できます）', '#c33'); }
+}
+
 function initCloudSync() {
   const btnPull = document.getElementById('btn-cloud-pull');
   const btnPush = document.getElementById('btn-cloud-push');
@@ -2895,6 +3054,9 @@ function initCloudSync() {
 
   const btnCompare = document.getElementById('btn-compare-stats');
   if (btnCompare) btnCompare.addEventListener('click', () => showStatsCompareModal());
+
+  const btnBackups = document.getElementById('btn-backups');
+  if (btnBackups) btnBackups.addEventListener('click', () => showBackupsModal());
 
   const btnSendReq = document.getElementById('btn-send-request');
   if (btnSendReq) btnSendReq.addEventListener('click', () => showSendRequestModal());

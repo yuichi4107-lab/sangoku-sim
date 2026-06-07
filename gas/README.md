@@ -19,6 +19,7 @@ GAS Web App のソースです。Google 側のプロジェクトが本体で、�
 |---|---|---|
 | `users_data` | 共有データの本体（1ユーザー=1行）| user_id / name / ownerships_json / player_stats_json / updated_at |
 | `shared_meta` | 編成・優先など軽量データ | A1=更新時刻, A2=チャンク数, A3〜=metaJSON分割 |
+| `user_backups` | 所持データの自動バックアップ | backup_id / saved_at / source_action / user_id / name / ownerships_json / player_stats_json / owned_count / note |
 | `inbox` | 友人 register.html からの送信 | user_name / ownerships_json / updated_at / image_refs_json / player_stats_json / pin |
 | `requests` | 要望（同期モードのフォーム）| created_at / user_name / category / text / status / updated_at |
 | `data`（旧）| 旧形式の共有state（B1に全JSON）。移行後は空 | A1/B1/C1 |
@@ -37,12 +38,15 @@ Drive: `sangoku_inbox_images`（受信画像）
 | GET | （なし）| 共有データ取得（全ユーザー結合） |
 | GET | get_inbox | 受信箱一覧 |
 | GET | get_user_by_pin | 暗証番号で本人の前回送信を取得（呼び戻し用）|
+| GET | get_user_backups | ユーザー所持データのバックアップ一覧 |
 | GET | get_requests | 要望一覧 |
 | GET | plan_request | 要望本文をAIで整理し、実装前プランを返す |
 | POST | （schema付き）| 一括保存（旧クライアント互換。各ユーザー行＋metaに分解）|
 | POST | save_user | 1ユーザー行だけ保存（軽量）|
 | POST | save_meta | メタ（編成等）だけ保存 |
 | POST | delete_user | 1ユーザー行削除 |
+| POST | create_backup | ユーザー所持データの手動バックアップ |
+| POST | restore_user_backup | backup_id を指定して所持データを復元 |
 | POST | submit_user | 受信箱へ登録（画像Drive保存）|
 | POST | update_stats | 受信箱 player_stats 更新 |
 | POST | delete_inbox | 受信箱エントリ削除（画像も）|
@@ -58,3 +62,4 @@ Drive: `sangoku_inbox_images`（受信画像）
 - OCR動作確認: GASエディタで `testOcrLatest` を実行（受信箱最新ユーザーで試行、ログ確認）。
 - Drive権限の再承認: `authorizeDrive` を実行。
 - AI要望整理は `GEMINI_API_KEY` を使う。公開ページにAPIキーは置かず、GAS の `plan_request` で実装前プランを生成する。
+- ユーザー所持データは、上書き保存・一括保存・削除・全消去の直前に `user_backups` へ自動保存する。1ユーザーあたり直近30世代を保持する。
