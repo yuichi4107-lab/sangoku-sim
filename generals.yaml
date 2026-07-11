@@ -1,8 +1,8 @@
 meta:
   game: 三国覇王戦記～乱世の系譜～
   publisher: Six Waves Inc.
-  data_version: '0.6'
-  last_updated: '2026-06-05'
+  data_version: '0.7'
+  last_updated: '2026-07-11'
   rarity_order:
   - 緑
   - 青
@@ -1888,6 +1888,8 @@ generals:
 - id: 麹義
   name: 麹義
   yomi: null
+  legacy_ids:
+  - 魏義
   base_rarity: 橙
   troop_type: 歩兵
   slot_stat: 統率
@@ -7346,11 +7348,15 @@ generals:
     魅力: null
 - id: 玄周瑜
   name: 玄周瑜
-  yomi: null
+  yomi: げんしゅうゆ
   base_rarity: 玄
   troop_type: 万能
   slot_stat: 統率
   role_tags: []
+  data_status: incomplete
+  missing_fields:
+  - skills
+  notes: スキル情報は未登録。ゲーム内画像での確認が必要。
   skills: []
   stats:
     統率: 96
@@ -11772,12 +11778,18 @@ generals:
   - screenshot:馬雲騄.PNG
 - id: 文聘
   name: 文聘
-  yomi: null
+  yomi: ぶんぺい
   base_rarity: 橙
   troop_type: null
   slot_stat: null
   role_tags:
   - 装備武将
+  data_status: incomplete
+  missing_fields:
+  - troop_type
+  - slot_stat
+  - skills
+  notes: 兵種・配置枠・スキル情報は未登録。ゲーム内画像での確認が必要。
   stats:
     統率: 98
     武力: 95
@@ -13056,6 +13068,8 @@ generals:
 - id: 満寵
   name: 満寵
   yomi: null
+  legacy_ids:
+  - 満龍
   base_rarity: 橙
   troop_type: 歩兵
   slot_stat: null
@@ -13291,6 +13305,8 @@ generals:
 - id: 管輅
   name: 管輅
   yomi: null
+  legacy_ids:
+  - 管路
   base_rarity: 橙
   troop_type: 万能
   slot_stat: null
@@ -15931,6 +15947,8 @@ generals:
 - id: 禰衡
   name: 禰衡
   yomi: null
+  legacy_ids:
+  - 祢衡
   base_rarity: 橙
   troop_type: 弓兵
   slot_stat: null
@@ -17411,11 +17429,15 @@ generals:
   - 名将録:名将録_四段突破_追加_20260524.csv
 - id: 荀彧
   name: 荀彧
-  yomi: null
+  yomi: じゅんいく
   base_rarity: 橙
   troop_type: 万能
   slot_stat: null
   role_tags: []
+  data_status: incomplete
+  missing_fields:
+  - skills
+  notes: スキル情報は未登録。ゲーム内画像での確認が必要。
   skills: []
   stats:
     統率: 95

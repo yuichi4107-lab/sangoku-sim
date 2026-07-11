@@ -2,8 +2,10 @@ name: build
 
 # generals.yaml もしくは関連スクリプトが変わったら、
 # 1) classify_skill_attributes.py で属性分類を再付与
-# 2) inline_data_to_html.py で index.html に JSON を再埋め込み
-# 3) 差分があればコミット & push（GitHub Pages が自動再デプロイ）
+# 2) validate_generals.py でマスターデータを検査
+# 3) generate_data_overview.py で一覧表を更新
+# 4) inline_data_to_html.py で各 HTML に JSON を再埋め込み
+# 5) 差分があればコミット & push（GitHub Pages が自動再デプロイ）
 #
 # 補足: 既定 GITHUB_TOKEN による push は他ワークフローを再トリガーしないので、
 # 無限ループにはなりません（GitHub Actions の仕様）。
@@ -14,6 +16,8 @@ on:
     paths:
       - 'generals.yaml'
       - 'scripts/classify_skill_attributes.py'
+      - 'scripts/validate_generals.py'
+      - 'scripts/generate_data_overview.py'
       - 'scripts/inline_data_to_html.py'
       - '.github/workflows/build.yml'
   workflow_dispatch:
@@ -44,7 +48,13 @@ jobs:
       - name: Classify skill attributes
         run: python scripts/classify_skill_attributes.py
 
-      - name: Embed JSON into index.html
+      - name: Validate generals data
+        run: python scripts/validate_generals.py
+
+      - name: Generate current data overview
+        run: python scripts/generate_data_overview.py
+
+      - name: Embed JSON into HTML
         run: python scripts/inline_data_to_html.py
 
       - name: Commit & push if changed
@@ -52,8 +62,8 @@ jobs:
           if [[ -n "$(git status --porcelain)" ]]; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add generals.yaml index.html register.html
-            git commit -m "chore: auto-rebuild (classify + inline) [skip ci]"
+            git add generals.yaml index.html register.html status.html docs/data_overview.md
+            git commit -m "chore: auto-rebuild data outputs [skip ci]"
             git push
           else
             echo "No changes to commit"

@@ -22,7 +22,9 @@
 - **`scripts/`** — Python ビルドツール
   - `build_generals_from_xlsx.py` — xlsx 一次資料から武将を生成（手動実行）
   - `classify_skill_attributes.py` — 各スキルに `effect_attribute` / `direction` を付与
-  - `inline_data_to_html.py` — `generals.yaml` を JSON 化して `index.html` に埋め込む
+  - `validate_generals.py` — 重複・能力値・旧ID・スキル構造などを検査
+  - `generate_data_overview.py` — 現在の登録状況を `docs/data_overview.md` に一覧化
+  - `inline_data_to_html.py` — `generals.yaml` を JSON 化して各画面に埋め込む
 
 ## 開発フロー
 
@@ -32,7 +34,7 @@
    またはリポジトリページで `.` キー
 2. ファイルを編集
 3. 変更をコミット & push（ブラウザ UI 完結）
-4. **`generals.yaml` を編集した場合**は自動で属性再分類・index.html 再埋め込みが走る（[GitHub Actions](.github/workflows/build.yml)）
+4. **`generals.yaml` を編集した場合**は自動で属性再分類・データ検査・一覧更新・HTML 再埋め込みが走る（[GitHub Actions](.github/workflows/build.yml)）
 5. push 後 1〜2 分で <https://yuichi4107-lab.github.io/sangoku-sim/> に反映
 
 ### ターミナル必要時（Codespaces）
@@ -57,11 +59,13 @@ python -m http.server 8000     # → http://localhost:8000/
 
 ## 自動化（GitHub Actions）
 
-`generals.yaml`・`scripts/classify_skill_attributes.py`・`scripts/inline_data_to_html.py` のいずれかが push されると、`build` ワークフローが:
+`generals.yaml` または関連するデータ処理スクリプトが push されると、`build` ワークフローが:
 
 1. `classify_skill_attributes.py` を実行（属性再付与）
-2. `inline_data_to_html.py` を実行（HTML 再埋め込み）
-3. 差分があれば `chore: auto-rebuild [skip ci]` でコミット & push
+2. `validate_generals.py` を実行（マスターデータ検査）
+3. `generate_data_overview.py` を実行（現状一覧の更新）
+4. `inline_data_to_html.py` を実行（全画面の埋め込みデータ更新）
+5. 差分があれば自動コミット & push
 
 その後 GitHub Pages が自動再デプロイ。
 

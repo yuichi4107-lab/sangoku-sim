@@ -1,7 +1,7 @@
-# 武将データベース スキーマ定義（v0.4）
+# 武将データベース スキーマ定義（v0.7）
 
 > 対象: `generals.yaml`（および `generals_sample.yaml`）
-> 確定日: 2026-05-14
+> 更新日: 2026-07-11
 > 関連: `HANDOFF.md` セクション4の決定 + ユーザー提供 `3_20251224.xlsx` の解析結果
 
 ## 0. 決定事項サマリ
@@ -12,7 +12,7 @@
 |---|---|
 | 段階配列の運用 | **案A**: `by_breakthrough` 5要素配列を完全維持。判明分のみ実数、未判明は `null` |
 | 将印段数 | **0〜5 の6段** |
-| ステータス収録 | **しない**。スキル特化。`stats` ブロックは持たない |
+| ステータス収録 | `stats` に統率・武力・知性を必須登録。運用ルールにより各値の下限は95 |
 
 ### v0.4 追加・確定
 
@@ -20,7 +20,8 @@
 |---|---|
 | 一次情報源 | xlsx（提供資料）。wiki / haou-no-waza は補助 |
 | 兵種「共通」 | スキーマ上の `万能` と同一 |
-| 配置 | `slot_stat` フィールド必須（統率 / 武力 / 知性、複数可） |
+| 配置 | `slot_stat` は確認済みの場合のみ登録（統率 / 武力 / 知性、複数可）。自動編成の配置可否には使わない |
+| ID互換 | 一度公開した `id` は変更しない。表記訂正時は現行エントリの `legacy_ids` に旧IDを残す |
 | プレイヤー所持データ | 武将定義から分離（別ファイル `loadouts.yaml` で扱う、本スキーマ対象外） |
 | xlsx D列「上限」 | 意味不明のため当面取り込まない。必要なら後で扱う |
 
@@ -174,25 +175,35 @@ v0.4 では構造のみ定義、シミュレーターは段階的に対応。
 
 | フィールド | 型 | 説明 |
 |---|---|---|
-| `id` | string | 一意ID（ローマ字スネーク） |
+| `id` | string | 一意かつ永続的なID。既存IDは表記にかかわらず変更禁止 |
 | `name` | string | 表示名（漢字） |
-| `yomi` | string | 読み（ひらがな） |
 | `base_rarity` | string | `rarity_order` のいずれか |
-| `troop_type` | string | `troop_types` のいずれか（**共通=万能**） |
-| `slot_stat` | string \| array<string> | **v0.4新規**: 配置先スロット属性。`"統率"` または `["武力","知性"]` のように複数指定可（玄呂蒙等） |
+| `troop_type` | string \| null | `troop_types` のいずれか（**共通=万能**）。未確認時のみ `null` |
 | `skills` | array<Skill> | スキル配列（§7） |
 | `sources` | array<string> | 出典URL or `"xlsx:3_20251224.xlsx#武将!Bn"` のような内部参照 |
+| `stats` | object | `統率` / `武力` / `知性`。3値必須、各95以上 |
 
 ### 任意フィールド
 
 | フィールド | 型 | 説明 |
 |---|---|---|
+| `yomi` | string \| null | 読み（ひらがな）。未確認時は `null` |
+| `slot_stat` | string \| array<string> \| null | 確認済みの担当枠。未確認時は `null` |
 | `faction` | string | 所属勢力（魏/呉/蜀/群/漢/晋/他） |
 | `role_tags` | array<string> | 役割タグ |
+| `legacy_ids` | array<string> | 過去に所持データのキーとして使われた旧ID。現行IDへ安全に引き継ぐため保持 |
 | `base_general_id` | string | このエントリが玄武将版の場合の覚醒元ID |
 | `awakened_id` | string | このエントリが通常版で玄武将版が存在する場合の玄武将ID |
 | `seal_bonus` | object | 将印効果（§8） |
+| `data_status` | string | `incomplete` の場合、未確認項目が残る登録 |
+| `missing_fields` | array<string> | `data_status: incomplete` の不足項目一覧 |
 | `notes` | string | 編集者メモ |
+
+### IDの互換ルール
+
+- `id` は各ユーザーの所持データと直接結び付くため、誤字を見つけても既存IDを削除・置換しない。
+- 表記を訂正した新しいIDへ移行する場合は、現行エントリに `legacy_ids` を追加する。
+- クライアントは旧IDの所持情報を現行IDへ統合する。旧キー自体はバックアップ互換のため削除しない。
 
 ---
 
